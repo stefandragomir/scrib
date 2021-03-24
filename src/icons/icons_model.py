@@ -11,6 +11,7 @@ class SCR_Icon(object):
 
         self.name       = ""
         self.img        = ""
+        self.tags       = []
 
     def as_icon(self):
 
