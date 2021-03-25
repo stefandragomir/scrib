@@ -87,3 +87,46 @@ class SCR_WDG_PlainTextEdit(QPlainTextEdit):
 
         QPlainTextEdit.__init__(self)
 
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_WDG_PopUp(QMessageBox):
+
+    def __init__(self,title,txt,msgtype="information"):
+
+        QMessageBox.__init__(self)
+
+        self.txt     = txt
+        self.title   = title
+        self.msgtype = msgtype
+
+        self.draw_gui()
+
+        self.exec_()
+
+    def draw_gui(self):
+
+        self.setWindowTitle(self.title)
+        self.setWindowIcon(SWTW_GetIcon('d0f2525e4ec3b4d25285169ce8b0db1a4bb587cb'))
+        self.resize(400,40)
+        self.setFixedSize(400,40)
+        self.setStyleSheet("background-color: #ffffff")
+        self.setText(self.txt)
+        self.setWindowModality(Qt.ApplicationModal)
+
+        if self.msgtype == "question":
+            self.setIcon(QMessageBox.Question)
+            self.setStandardButtons(QMessageBox.Ok|QMessageBox.Cancel)
+        else:
+            if self.msgtype == "information":
+                self.setIcon(QMessageBox.Information)
+            else:
+                if self.msgtype == "warning":
+                    self.setIcon(QMessageBox.Warning)
+                else:
+                    if self.msgtype == "critical":
+                        self.setIcon(QMessageBox.Critical)
+                    else:
+                        self.setIcon(QMessageBox.NoIcon)
+
+        self.setStandardButtons(QMessageBox.Ok)

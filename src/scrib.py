@@ -1,7 +1,7 @@
 
 import os
 import sys
-
+import error.error
 from PyQt5.QtCore          import *
 from PyQt5.QtGui           import *
 from PyQt5.QtWidgets       import * 
@@ -75,6 +75,8 @@ class SCR_UI(QMainWindow):
 ****************************************************************************************************
 *************************************************************************************************"""
 def SCR():
+
+    sys.excepthook = error.error.SCR_Err_Net
 
     _app    = QApplication(sys.argv)  
 
