@@ -29,7 +29,7 @@ class SCR_UI(QMainWindow):
         self.setWindowTitle("Robot Framework Scrib")
         self.setMinimumSize(1300, 800)       
         self.setMinimumHeight(500)
-        self.setWindowIcon(SCR_GetIcon("8995d597af7135f3e133a116a7c6e8f603434af4"))
+        self.setWindowIcon(SCR_GetIcon("08e0c30ab7f9c6d43c70165c4ae42460d460c0aa"))
 
         self.wdg_central = QWidget()
 

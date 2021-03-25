@@ -88,7 +88,7 @@ class SCR_IconsMainApp(QMainWindow):
             self.internalPopUp = SCR_Info(self,"Error",errorText,QMessageBox.Critical)
 
         if len(imagesOk):
-            self.iconInserterWindow = iconInserter(self.centralWidget.databaseConnection,imagesOk)
+            self.iconInserterWindow = SCR_IconInserter(self.centralWidget.databaseConnection,imagesOk)
             if self.iconInserterWindow.accepted:
                 self.centralWidget._Tree_Icons._add_to_watch()
             QApplication.restoreOverrideCursor()
@@ -110,7 +110,7 @@ class SCR_IconInserter(QDialog):
         self.imagesPath = imagesPath
         self.myDict = {}
         self.buildUI()
-        self.setStyleSheet(_css)
+        self.setStyleSheet(CSS)
         self.setModal(True)
         self.accepted = False
         self.exec()
@@ -181,7 +181,7 @@ class SCR_IconInserter(QDialog):
                 newElementDb['img_medium'] = base64Dict["30_30"]
                 newElementDb['img_large']  = base64Dict["50_50"] 
 
-                self.dbConnection.insertElement(newElementDb)
+                self.dbConnection.insert(newElementDb)
 
                 shutil.rmtree(newPath)
                 shutil.rmtree(_temp_path)
@@ -538,8 +538,7 @@ class SCR_TreeContextMenu(QMenu):
 
         self.triggered.connect(self.menuActionTriggered)
 
-        global _css
-        self.setStyleSheet(_css)
+        self.setStyleSheet(CSS)
         self.runMenu()
 
     def runMenu(self):
