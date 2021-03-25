@@ -5,6 +5,7 @@ import sys
 from PyQt5.QtCore          import *
 from PyQt5.QtGui           import *
 from PyQt5.QtWidgets       import * 
+from config.config         import SCR_Config
 from widgets.widgets       import SCR_WDG_DockWidget
 from widgets.widgets       import SCR_WDG_ToolBar
 from icons.icons           import SCR_GetIcon
@@ -15,9 +16,11 @@ from widgets.test_tree     import SCR_WDG_TestTree
 *************************************************************************************************"""
 class SCR_UI(QMainWindow):
 
-    def __init__(self):
+    def __init__(self,config):
 
         QMainWindow.__init__(self)
+
+        self.config = config
 
         self.draw_gui() 
 
@@ -26,7 +29,7 @@ class SCR_UI(QMainWindow):
         self.setWindowTitle("Robot Framework Scrib")
         self.setMinimumSize(1300, 800)       
         self.setMinimumHeight(500)
-        self.setWindowIcon(SCR_GetIcon("356a192b7913b04c54574d18c28d46e6395428ab"))
+        self.setWindowIcon(SCR_GetIcon("8995d597af7135f3e133a116a7c6e8f603434af4"))
 
         self.wdg_central = QWidget()
 
@@ -43,18 +46,20 @@ class SCR_UI(QMainWindow):
 
     def draw_toolbar(self):
 
-        self.wdg_toolbar = SCR_WDG_ToolBar()
+        self.wdg_toolbar = SCR_WDG_ToolBar(self.config)
 
         self.wdg_toolbar.add_button(
                                         "load",
-                                        "da4b9237bacccdf19c0760cab7aec4a8359010b0",
-                                        "1b6453892473a467d07372d45eb05abc2031647a",
+                                        "8995d597af7135f3e133a116a7c6e8f603434af4",
+                                        "8995d597af7135f3e133a116a7c6e8f603434af4",
+                                        "Load Tests Folder",
                                         self.clbk_load)
 
         self.wdg_toolbar.add_button(
                                         "save",
-                                        "77de68daecd823babbb58edb1c8e14d7106e83bb",
-                                        "ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4",
+                                        "8995d597af7135f3e133a116a7c6e8f603434af4",
+                                        "8995d597af7135f3e133a116a7c6e8f603434af4",
+                                        "Save",
                                         self.clbk_save)
         self.wdg_toolbar.draw()
 
@@ -69,14 +74,23 @@ class SCR_UI(QMainWindow):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-if __name__ == "__main__":
+def SCR():
 
-    _app = QApplication(sys.argv)  
+    _app    = QApplication(sys.argv)  
 
-    _ui  = SCR_UI()    
+    _config = SCR_Config()
+
+    _ui     = SCR_UI(_config)    
 
     _ui.show()
 
     sys.exit(_app.exec_())
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+if __name__ == "__main__":
+
+    SCR()
 
 
