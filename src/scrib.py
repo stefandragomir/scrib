@@ -10,7 +10,7 @@ from widgets.widgets       import SCR_WDG_DockWidget
 from widgets.widgets       import SCR_WDG_ToolBar
 from icons.icons           import SCR_GetIcon
 from widgets.test_tree     import SCR_WDG_TestTree
-from widgets.widgets       import SCR_WDG_Tab
+from widgets.test_tab      import SCR_WDG_Test_Tab
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -40,10 +40,10 @@ class SCR_UI(QMainWindow):
 
         self.draw_toolbar()
         self.draw_test_tree() 
-        self.draw_tab()   
+        self.draw_test_tab()   
 
         self.ly_h.addWidget(self.wdg_tree_test)
-        self.ly_h.addWidget(self.wdg_tab)
+        self.ly_h.addWidget(self.wdg_test_tab)
 
         self.ly.addWidget(self.wdg_toolbar)
         self.ly.addLayout(self.ly_h)
@@ -60,15 +60,15 @@ class SCR_UI(QMainWindow):
 
         self.wdg_toolbar.add_button(
                                         "load",
-                                        "8995d597af7135f3e133a116a7c6e8f603434af4",
-                                        "8995d597af7135f3e133a116a7c6e8f603434af4",
+                                        "49850f9d3d0a11fd301d3514913462eda50bfc92",
+                                        "417538f47c04e8b72bd6534b36cf794640f56b0f",
                                         "Load Tests Folder",
                                         self.clbk_load)
 
         self.wdg_toolbar.add_button(
                                         "save",
-                                        "8995d597af7135f3e133a116a7c6e8f603434af4",
-                                        "8995d597af7135f3e133a116a7c6e8f603434af4",
+                                        "54f702f45430bdb78c15c1a94196e85c1ec432ab",
+                                        "2a2d5277ae393f65c3af483322f8055993228031",
                                         "Save",
                                         self.clbk_save)
         self.wdg_toolbar.draw()
@@ -83,21 +83,25 @@ class SCR_UI(QMainWindow):
 
         self.wdg_tree_test.setSizePolicy(_policy)
 
-    def draw_tab(self):
+    def draw_test_tab(self):
 
-        self.wdg_tab = SCR_WDG_Tab(self.config)
+        self.wdg_test_tab = SCR_WDG_Test_Tab(self.config)
 
         _policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
         _policy.setHorizontalStretch(3)
 
-        self.wdg_tab.setSizePolicy(_policy)
+        self.wdg_test_tab.setSizePolicy(_policy)
 
     def clbk_load(self,state):
 
         pass
 
     def clbk_save(self,state):
+
+        pass
+
+    def clbk_save_all(self,state):
 
         pass
 

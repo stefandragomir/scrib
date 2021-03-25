@@ -23,6 +23,8 @@ class SCR_WDG_Button(QPushButton):
 
         QPushButton.__init__(self)
 
+        self.icon_size = 25
+
         self.config = config
 
         _css  = """
@@ -33,7 +35,7 @@ class SCR_WDG_Button(QPushButton):
         self.setStyleSheet(_css)
 
         self.setIcon(SCR_GetIcon(icon_normal))
-        self.setIconSize(QSize(20,20))
+        self.setIconSize(QSize(self.icon_size,self.icon_size))
 
         self.icon_normal = icon_normal
         self.icon_hover  = icon_hover
@@ -45,12 +47,12 @@ class SCR_WDG_Button(QPushButton):
     def enterEvent(self,event):
 
         self.setIcon(SCR_GetIcon(self.icon_hover))
-        self.setIconSize(QSize(20,20))
+        self.setIconSize(QSize(self.icon_size,self.icon_size))
 
     def leaveEvent(self,event):
 
         self.setIcon(SCR_GetIcon(self.icon_normal)) 
-        self.setIconSize(QSize(20,20))
+        self.setIconSize(QSize(self.icon_size,self.icon_size))
 
 """*************************************************************************************************
 ****************************************************************************************************
