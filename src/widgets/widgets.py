@@ -3,7 +3,7 @@ from PyQt5.QtCore          import *
 from PyQt5.QtGui           import *
 from PyQt5.QtWidgets       import * 
 from icons.icons           import SCR_GetIcon
-
+from abc                   import abstractmethod
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -28,12 +28,12 @@ class SCR_WDG_Button(QPushButton):
         _css  = """
             border: 0px solid gray;
             background-color: %s;
-        """  % (config.get_theme_background(),)
+        """  % (self.config.get_theme_background(),)
 
         self.setStyleSheet(_css)
 
         self.setIcon(SCR_GetIcon(icon_normal))
-        self.setIconSize(QSize(30,30))
+        self.setIconSize(QSize(20,20))
 
         self.icon_normal = icon_normal
         self.icon_hover  = icon_hover
@@ -45,10 +45,12 @@ class SCR_WDG_Button(QPushButton):
     def enterEvent(self,event):
 
         self.setIcon(SCR_GetIcon(self.icon_hover))
+        self.setIconSize(QSize(20,20))
 
     def leaveEvent(self,event):
 
         self.setIcon(SCR_GetIcon(self.icon_normal)) 
+        self.setIconSize(QSize(20,20))
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -75,6 +77,8 @@ class SCR_WDG_ToolBar(QWidget):
         for _name in self.wdgs:
 
             self.ly.addWidget(self.wdgs[_name])
+
+        self.ly.addWidget(QSplitter())        
 
         self.setLayout(self.ly)
 
@@ -400,13 +404,13 @@ class SCR_WDG_Tree(QTreeView):
         _css += "selection-background-color: #c2d2ed;"
         _css += "font-family: Arial;"
         _css += "font-size: 9pt;"
+        _css += "border: 1px solid #707070;"
 
         self.setStyleSheet(_css)
 
         self.setSelectionMode(QAbstractItemView.SingleSelection)
 
         self.usefind       = usefind
-        self.parent        = parent
         self.root          =  SCR_WDG_Tree_Item(data=[""],parent=None)
         self.with_metadata = with_metadata
         self.custom_model  = model_class(parent=self)
@@ -792,7 +796,7 @@ class SCR_WDG_StatusBar(QWidget):
         self.cancel_bt = SCR_WDG_Button(
                                             SCR_GetIcon("08fbdd84bc6f62fe1b927b9115596ab50cbca623"),
                                             SCR_GetIcon("08fbdd84bc6f62fe1b927b9115596ab50cbca623"),
-                                            "Cancel"
+                                            "Cancel",
                                             self.cancel)
         self.cancel_bt.setFixedWidth(40)
 
