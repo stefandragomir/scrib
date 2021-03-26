@@ -11,6 +11,7 @@ from widgets.widgets       import SCR_WDG_ToolBar
 from icons.icons           import SCR_GetIcon
 from widgets.test_tree     import SCR_WDG_TestTree
 from widgets.test_tab      import SCR_WDG_Test_Tab
+from control.control       import SCR_Control
 
 """*************************************************************************************************
 ****************************************************************************************************
