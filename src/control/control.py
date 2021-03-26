@@ -1,5 +1,6 @@
 
 import os
+from robot.api import get_tokens
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -9,6 +10,19 @@ class SCR_Control(object):
 	def __init__(self):
 
 		pass
+
+	def read(self,path):
+
+		_tokens = get_tokens( 
+								path, 
+								data_only=False, 
+								tokenize_variables=False)
+
+		print(_tokens)
+
+		for _token in _tokens:
+
+			print(_token)
 
 
 """*************************************************************************************************
