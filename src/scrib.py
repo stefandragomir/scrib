@@ -19,7 +19,8 @@ from control.control       import SCR_Control_Folder
 *************************************************************************************************"""
 class SCR_UI(QMainWindow):
 
-    sgn_load_testsuite = pyqtSignal(object)
+    sgn_load_testsuite  = pyqtSignal(object)
+    sgn_load_testfolder = pyqtSignal(object)
 
     def __init__(self,config):
 
@@ -28,6 +29,7 @@ class SCR_UI(QMainWindow):
         self.config = config
 
         self.sgn_load_testsuite.connect(self.load_testsuite)
+        self.sgn_load_testfolder.connect(self.load_testfolder)
 
         self.draw_gui() 
 
@@ -72,6 +74,13 @@ class SCR_UI(QMainWindow):
                                         self.clbk_load_testsuite)
 
         self.wdg_toolbar.add_button(
+                                        "load testfolder",
+                                        "49850f9d3d0a11fd301d3514913462eda50bfc92",
+                                        "417538f47c04e8b72bd6534b36cf794640f56b0f",
+                                        "Load Tests Folder",
+                                        self.clbk_load_testfolder)
+
+        self.wdg_toolbar.add_button(
                                         "save",
                                         "54f702f45430bdb78c15c1a94196e85c1ec432ab",
                                         "2a2d5277ae393f65c3af483322f8055993228031",
@@ -113,6 +122,17 @@ class SCR_UI(QMainWindow):
 
             self.sgn_load_testsuite.emit(_path)
 
+    def clbk_load_testfolder(self,state):
+
+        _path = QFileDialog.getExistingDirectory(
+                                                self,
+                                                "Open Test Folder",
+                                                "")
+
+        if os.path.exists(_path):
+
+            self.sgn_load_testfolder.emit(_path)
+
     def clbk_save(self,state):
 
         pass
@@ -129,7 +149,17 @@ class SCR_UI(QMainWindow):
 
             _ctrl.read()
 
-            self.wdg_tree_test.populate(_ctrl,["debug"])
+            self.wdg_tree_test.populate(_ctrl,["Tests"])
+
+    def load_testfolder(self,path):
+
+        if os.path.exists(path):
+
+            _ctrl = SCR_Control_Folder(path)
+
+            _ctrl.read()
+
+            self.wdg_tree_test.populate(_ctrl,["Tests"])
 
 """*************************************************************************************************
 ****************************************************************************************************
