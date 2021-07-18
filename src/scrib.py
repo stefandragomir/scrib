@@ -11,18 +11,23 @@ from widgets.widgets       import SCR_WDG_ToolBar
 from icons.icons           import SCR_GetIcon
 from widgets.test_tree     import SCR_WDG_TestTree
 from widgets.test_tab      import SCR_WDG_Test_Tab
-from control.control       import SCR_Control
+from control.control       import SCR_Control_TestSuite
+from control.control       import SCR_Control_Folder
 
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
 class SCR_UI(QMainWindow):
 
+    sgn_load_testsuite = pyqtSignal(object)
+
     def __init__(self,config):
 
         QMainWindow.__init__(self)
 
         self.config = config
+
+        self.sgn_load_testsuite.connect(self.load_testsuite)
 
         self.draw_gui() 
 
@@ -60,11 +65,11 @@ class SCR_UI(QMainWindow):
         self.wdg_toolbar = SCR_WDG_ToolBar(self.config)
 
         self.wdg_toolbar.add_button(
-                                        "load",
+                                        "load testsuite",
                                         "49850f9d3d0a11fd301d3514913462eda50bfc92",
                                         "417538f47c04e8b72bd6534b36cf794640f56b0f",
-                                        "Load Tests Folder",
-                                        self.clbk_load)
+                                        "Load Tests Suite",
+                                        self.clbk_load_testsuite)
 
         self.wdg_toolbar.add_button(
                                         "save",
@@ -94,9 +99,19 @@ class SCR_UI(QMainWindow):
 
         self.wdg_test_tab.setSizePolicy(_policy)
 
-    def clbk_load(self,state):
+    def clbk_load_testsuite(self,state):
 
-        pass
+        _path = QFileDialog.getOpenFileName(
+                                                self,
+                                                "Open Test Suite",
+                                                "",
+                                                "*.robot")
+
+        _path = _path[0]
+
+        if os.path.exists(_path):
+
+            self.sgn_load_testsuite.emit(_path)
 
     def clbk_save(self,state):
 
@@ -105,6 +120,16 @@ class SCR_UI(QMainWindow):
     def clbk_save_all(self,state):
 
         pass
+
+    def load_testsuite(self,path):
+
+        if os.path.exists(path):
+
+            _ctrl = SCR_Control_TestSuite(path)
+
+            _ctrl.read()
+
+            self.wdg_tree_test.populate(_ctrl,["debug"])
 
 """*************************************************************************************************
 ****************************************************************************************************
