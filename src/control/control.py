@@ -13,6 +13,10 @@ class SCR_Control_Folders(SCR_Base_List):
 
         SCR_Base_List.__init__(self)
 
+    def has_files(self):
+
+        return any([_folder.has_files() for _folder in self.objects])
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -73,6 +77,10 @@ class SCR_Control_Folder(object):
         _testresource.read()
 
         self.resources.add(_testresource)
+
+    def has_files(self):
+
+        return self.testfolders.has_files() or len(self.testsuites) != 0 or len(self.resources) != 0
 
 """*************************************************************************************************
 ****************************************************************************************************

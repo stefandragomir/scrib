@@ -37,7 +37,7 @@ class SCR_UI(QMainWindow):
 
         self.setWindowTitle("Robot Framework Scrib")
         self.setMinimumSize(1300, 800)       
-        self.setMinimumHeight(500)
+        self.setMinimumHeight(800)
         self.setWindowIcon(SCR_GetIcon("08e0c30ab7f9c6d43c70165c4ae42460d460c0aa"))
         self.setStyleSheet("background-color: %s; border: 0px;" % (self.config.get_theme_background()))
 
@@ -66,24 +66,26 @@ class SCR_UI(QMainWindow):
 
         self.wdg_toolbar = SCR_WDG_ToolBar(self.config)
 
-        self.wdg_toolbar.add_button(
-                                        "load testsuite",
-                                        "49850f9d3d0a11fd301d3514913462eda50bfc92",
-                                        "417538f47c04e8b72bd6534b36cf794640f56b0f",
-                                        "Load Tests Suite",
-                                        self.clbk_load_testsuite)
+
 
         self.wdg_toolbar.add_button(
                                         "load testfolder",
-                                        "49850f9d3d0a11fd301d3514913462eda50bfc92",
-                                        "417538f47c04e8b72bd6534b36cf794640f56b0f",
+                                        "b28971455cf45af0e2e37a9c33ca8ca01d5a660f",
+                                        "c9c73609abb7d353a69882826114ab5d501cc2bf",
                                         "Load Tests Folder",
                                         self.clbk_load_testfolder)
 
         self.wdg_toolbar.add_button(
+                                        "load testsuite",
+                                        "848bfbbf98541b3f9ac8c51e6509c5c179802b81",
+                                        "97ab2839a78bc30f173e095f531cc322c9e536d3",
+                                        "Load Tests Suite",
+                                        self.clbk_load_testsuite)
+        
+        self.wdg_toolbar.add_button(
                                         "save",
-                                        "54f702f45430bdb78c15c1a94196e85c1ec432ab",
-                                        "2a2d5277ae393f65c3af483322f8055993228031",
+                                        "eb1729093812c3f38a5e4eb2714f2bde148f6eba",
+                                        "0b5ff6fecdc20faffd3884561995dfa5bab539fd",
                                         "Save",
                                         self.clbk_save)
         self.wdg_toolbar.draw()
