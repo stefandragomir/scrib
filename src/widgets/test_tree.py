@@ -41,6 +41,12 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         parent.add_child(_tree_testsuite)
 
+        self.load_variables(data,_tree_testsuite)
+
+        self.load_testcases(data,_tree_testsuite)
+
+        self.load_keywords(data,_tree_testsuite)
+
     def load_test_folder(self,data,parent):
 
         _labels = [
@@ -65,6 +71,89 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
         if data.has_files():
 
             parent.add_child(_tree_testfolder)
+
+    def load_testcases(self,data,parent):
+
+        for _section in data.model.sections:
+
+            if data.is_section_testcases(_section):
+
+                for _testcase in _section.body:
+
+                    self.load_testcase(_testcase,parent)
+
+    def load_testcase(self,data,parent):
+
+        _labels = [
+                    data.name,
+                  ]
+
+        _tree_testcase = SCR_WDG_Tree_Item(
+                                                data=_labels,
+                                                parent=parent)
+
+        _tree_testcase.icon     = "ca211c47afa3b991350a6c183d8aaf3f33db15a0"
+        _tree_testcase.userdata = {"model":None}
+
+        parent.add_child(_tree_testcase)
+
+    def load_variables(self,data,parent):
+
+        for _section in data.model.sections:
+
+            if data.is_section_variables(_section):
+
+                for _variable in _section.body:
+
+                    if data.is_statement_variable(_variable):
+
+                        self.load_variable(_variable,parent)
+
+    def load_variable(self,data,parent):
+
+        _labels = [
+                    data.name,
+                  ]
+
+        _tree_testcase = SCR_WDG_Tree_Item(
+                                                data=_labels,
+                                                parent=parent)
+
+        if data.name[0] == "$":
+            _tree_testcase.icon     = "de99afcb2a785eea0974463ae9e7e063a5482b4a"
+        elif data.name[0] == "@":
+            _tree_testcase.icon     = "000cc208d4e675301e21ed009db52ff361a35a9f"
+        elif data.name[0] == "&":
+            _tree_testcase.icon     = "490daab16fc73f3decf083a5cfb04b47708c8b22"
+
+        _tree_testcase.userdata = {"model":None}
+
+        parent.add_child(_tree_testcase)
+
+    def load_keywords(self,data,parent):
+
+        for _section in data.model.sections:
+
+            if data.is_section_keywords(_section):
+
+                for _keyword in _section.body:
+
+                    self.load_keyword(_keyword,parent)
+
+    def load_keyword(self,data,parent):
+
+        _labels = [
+                    data.name,
+                  ]
+
+        _tree_keyword = SCR_WDG_Tree_Item(
+                                                data=_labels,
+                                                parent=parent)
+
+        _tree_keyword.icon     = "14b802564477e8b8f64dc869c92a4b983edc1001"
+        _tree_keyword.userdata = {"model":None}
+
+        parent.add_child(_tree_keyword)
 
 """******************************************************************************************
 *********************************************************************************************

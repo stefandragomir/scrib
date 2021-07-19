@@ -1,8 +1,12 @@
 
 import os
-from model.model import SCR_Base_List
-from robot.api   import get_tokens
-from robot.api   import get_model
+from model.model                      import SCR_Base_List
+from robot.api                        import get_tokens
+from robot.api                        import get_model
+from robot.parsing.model.blocks       import TestCaseSection
+from robot.parsing.model.blocks       import VariableSection
+from robot.parsing.model.blocks       import KeywordSection
+from robot.parsing.model.statements   import Variable
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -106,15 +110,32 @@ class SCR_Control_TestSuite(object):
 
         self.model = get_model(source=self.path,data_only=False)
 
-        # for _section in self.model.sections:
+        for _section in self.model.sections:
 
-        #   print("SECTION: ",_section)
+          if self.is_section_keywords(_section):
 
-        #   for _body in _section.body:
+            print("-------------------------")
+            for _keyword in _section.body:
 
-        #       print("BODY--: ",_body)
+                    print(_keyword.name)
 
-        #   print("--------------------")
+            print("-------------------------")
+
+    def is_section_testcases(self,section):
+
+        return isinstance(section,TestCaseSection)
+
+    def is_section_variables(self,section):
+
+        return isinstance(section,VariableSection)
+
+    def is_section_keywords(self,section):
+
+        return isinstance(section,KeywordSection)        
+
+    def is_statement_variable(self,statement):
+
+        return isinstance(statement,Variable)
 
 """*************************************************************************************************
 ****************************************************************************************************
