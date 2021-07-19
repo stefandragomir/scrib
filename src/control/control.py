@@ -110,17 +110,6 @@ class SCR_Control_TestSuite(object):
 
         self.model = get_model(source=self.path,data_only=False)
 
-        for _section in self.model.sections:
-
-          if self.is_section_keywords(_section):
-
-            print("-------------------------")
-            for _keyword in _section.body:
-
-                    print(_keyword.name)
-
-            print("-------------------------")
-
     def is_section_testcases(self,section):
 
         return isinstance(section,TestCaseSection)
