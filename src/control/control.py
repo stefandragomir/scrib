@@ -11,6 +11,31 @@ from robot.parsing.model.statements   import Variable
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
+class _SCR_Control_With_Model():
+
+    def __init__(self):
+
+        self.model = None
+
+    def is_section_testcases(self,section):
+
+        return isinstance(section,TestCaseSection)
+
+    def is_section_variables(self,section):
+
+        return isinstance(section,VariableSection)
+
+    def is_section_keywords(self,section):
+
+        return isinstance(section,KeywordSection)        
+
+    def is_statement_variable(self,statement):
+
+        return isinstance(statement,Variable)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
 class SCR_Control_Folders(SCR_Base_List):
 
     def __init__(self):
@@ -24,7 +49,7 @@ class SCR_Control_Folders(SCR_Base_List):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Control_Folder(object):
+class SCR_Control_Folder():
 
     def __init__(self,path):
 
@@ -98,33 +123,20 @@ class SCR_Control_TestSuites(SCR_Base_List):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Control_TestSuite(object):
+class SCR_Control_TestSuite(_SCR_Control_With_Model):
 
     def __init__(self,path):
 
+        _SCR_Control_With_Model.__init__(self)
+
         self.path  = path
         self.name  = os.path.splitext(os.path.split(path)[1])[0]
-        self.model = None
 
     def read(self):
 
         self.model = get_model(source=self.path,data_only=False)
 
-    def is_section_testcases(self,section):
 
-        return isinstance(section,TestCaseSection)
-
-    def is_section_variables(self,section):
-
-        return isinstance(section,VariableSection)
-
-    def is_section_keywords(self,section):
-
-        return isinstance(section,KeywordSection)        
-
-    def is_statement_variable(self,statement):
-
-        return isinstance(statement,Variable)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -138,13 +150,19 @@ class SCR_Control_Resources(SCR_Base_List):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Control_Resource(object):
+class SCR_Control_Resource(_SCR_Control_With_Model):
 
     def __init__(self,path):
 
-        self.path  = path
-        self.model = None
+        _SCR_Control_With_Model.__init__(self)
 
+        self.path  = path
+        self.name  = os.path.splitext(os.path.split(path)[1])[0]
+
+    def read(self):
+
+        self.model = get_model(source=self.path,data_only=False)
+        
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""

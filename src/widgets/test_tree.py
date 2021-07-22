@@ -21,12 +21,12 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
     def load(self,data,parent):
 
         if isinstance(data,SCR_Control_TestSuite):
-            self.load_test_suite(data,parent)
+            self.load_testsuite(data,parent)
         else:
             if isinstance(data,SCR_Control_Folder):
-                self.load_test_folder(data,parent)
+                self.load_testfolder(data,parent)
 
-    def load_test_suite(self,data,parent):
+    def load_testsuite(self,data,parent):
 
         _labels = [
                     data.name,
@@ -47,7 +47,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         self.load_keywords(data,_tree_testsuite)
 
-    def load_test_folder(self,data,parent):
+    def load_testfolder(self,data,parent):
 
         _labels = [
                     data.name,
@@ -62,11 +62,15 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         for _testfolder in data.testfolders:
 
-            self.load_test_folder(_testfolder,_tree_testfolder)
+            self.load_testfolder(_testfolder,_tree_testfolder)
 
         for _testsuite in data.testsuites:
 
-            self.load_test_suite(_testsuite,_tree_testfolder)
+            self.load_testsuite(_testsuite,_tree_testfolder)
+
+        for _resource in data.resources:
+
+            self.load_resources(_resource,_tree_testfolder)
 
         if data.has_files():
 
@@ -154,6 +158,26 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
         _tree_keyword.userdata = {"model":None}
 
         parent.add_child(_tree_keyword)
+
+    def load_resources(self,data,parent):
+
+        _labels = [
+                    data.name,
+                  ]
+
+        _tree_resource = SCR_WDG_Tree_Item(
+                                                data=_labels,
+                                                parent=parent)
+
+        _tree_resource.icon     = "26b41084d7c558d94b50f5e1c40cdfd362f05478"
+        _tree_resource.userdata = {"model":None}
+
+        parent.add_child(_tree_resource)
+
+        self.load_variables(data,_tree_resource)
+
+        self.load_keywords(data,_tree_resource)
+
 
 """******************************************************************************************
 *********************************************************************************************

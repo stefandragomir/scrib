@@ -151,6 +151,8 @@ class SCR_UI(QMainWindow):
 
             _ctrl.read()
 
+            self.wdg_tree_test.clear()
+
             self.wdg_tree_test.populate(_ctrl,["Tests"])
 
     def load_testfolder(self,path):
@@ -160,6 +162,8 @@ class SCR_UI(QMainWindow):
             _ctrl = SCR_Control_Folder(path)
 
             _ctrl.read()
+
+            self.wdg_tree_test.clear()
 
             self.wdg_tree_test.populate(_ctrl,["Tests"])
 
