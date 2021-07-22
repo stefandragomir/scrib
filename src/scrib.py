@@ -8,6 +8,7 @@ from PyQt5.QtWidgets       import *
 from config.config         import SCR_Config
 from widgets.widgets       import SCR_WDG_DockWidget
 from widgets.widgets       import SCR_WDG_ToolBar
+from widgets.main_menu     import SCR_WDG_MainMenu
 from icons.icons           import SCR_GetIcon
 from widgets.test_tree     import SCR_WDG_TestTree
 from widgets.test_tab      import SCR_WDG_Test_Tab
@@ -49,6 +50,7 @@ class SCR_UI(QMainWindow):
         self.draw_toolbar()
         self.draw_test_tree() 
         self.draw_test_tab()   
+        self.draw_main_menu()
 
         self.ly_h.addWidget(self.wdg_tree_test)
         self.ly_h.addWidget(self.wdg_test_tab)
@@ -74,13 +76,6 @@ class SCR_UI(QMainWindow):
                                         "c9c73609abb7d353a69882826114ab5d501cc2bf",
                                         "Load Tests Folder",
                                         self.clbk_load_testfolder)
-
-        self.wdg_toolbar.add_button(
-                                        "load testsuite",
-                                        "848bfbbf98541b3f9ac8c51e6509c5c179802b81",
-                                        "97ab2839a78bc30f173e095f531cc322c9e536d3",
-                                        "Load Tests Suite",
-                                        self.clbk_load_testsuite)
         
         self.wdg_toolbar.add_button(
                                         "save",
@@ -110,6 +105,18 @@ class SCR_UI(QMainWindow):
 
         self.wdg_test_tab.setSizePolicy(_policy)
 
+    def draw_main_menu(self):
+
+        self.main_menu = SCR_WDG_MainMenu(self)
+
+        self.main_menu.populate()
+
+        self.setMenuBar(self.main_menu)
+
+    def clbk_new(self):
+
+        pass
+
     def clbk_load_testsuite(self,state):
 
         _path = QFileDialog.getOpenFileName(
@@ -136,10 +143,6 @@ class SCR_UI(QMainWindow):
             self.sgn_load_testfolder.emit(_path)
 
     def clbk_save(self,state):
-
-        pass
-
-    def clbk_save_all(self,state):
 
         pass
 
