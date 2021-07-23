@@ -20,6 +20,8 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         self.load_testfolder(data.testfolder,parent)
 
+        self.load_external_resources(data.resources,parent)
+        
     def load_testsuite(self,data,parent):
 
         _labels = [
@@ -173,6 +175,23 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
         self.load_variables(data,_tree_resource)
 
         self.load_keywords(data,_tree_resource)
+
+    def load_external_resources(self,data,parent):
+
+        _labels = ["External Resources"]
+
+        _tree_ext_resources = SCR_WDG_Tree_Item(
+                                                data=_labels,
+                                                parent=parent)
+
+        _tree_ext_resources.icon     = "616b77c9b4e3020bee662e34c6feb5e8ddcd2b7d"
+        _tree_ext_resources.userdata = {"model":None}
+
+        parent.add_child(_tree_ext_resources)
+
+        for _resource in data:
+
+            self.load_resources(_resource,_tree_ext_resources)
 
 """******************************************************************************************
 *********************************************************************************************

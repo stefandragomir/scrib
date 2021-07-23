@@ -8,7 +8,7 @@ from PyQt5.QtWidgets       import *
 from config.config         import SCR_Config
 from widgets.widgets       import SCR_WDG_DockWidget
 from widgets.widgets       import SCR_WDG_ToolBar
-# from widgets.main_menu     import SCR_WDG_MainMenu
+from widgets.main_menu     import SCR_WDG_MainMenu
 from icons.icons           import SCR_GetIcon
 from widgets.test_tree     import SCR_WDG_TestTree
 from widgets.test_tab      import SCR_WDG_Test_Tab
@@ -48,7 +48,7 @@ class SCR_UI(QMainWindow):
         self.draw_toolbar()
         self.draw_test_tree() 
         self.draw_test_tab()   
-        # self.draw_main_menu()
+        self.draw_main_menu()
 
         self.ly_h.addWidget(self.wdg_tree_test)
         self.ly_h.addWidget(self.wdg_test_tab)

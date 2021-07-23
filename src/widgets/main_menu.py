@@ -39,11 +39,6 @@ class SCR_WDG_MainMenu(QMenuBar):
         _action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_O))
         _action.triggered.connect(self.scrib.clbk_load_testfolder)
 
-        _action = _menu_file.addAction("&Open Test Suite")        
-        _action.setIcon(SCR_GetIcon("8e205a227046baee2a67b75fb12c95813784c484"))
-        _action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_T))
-        _action.triggered.connect(self.scrib.clbk_load_testsuite)
-
         _menu_file.addSeparator()
 
         _action = _menu_file.addAction("&Save")
