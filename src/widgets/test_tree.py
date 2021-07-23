@@ -6,8 +6,6 @@ from icons.icons           import SCR_GetIcon
 from widgets.widgets       import SCR_WDG_Tree
 from widgets.widgets       import SCR_WDG_Tree_Model
 from widgets.widgets       import SCR_WDG_Tree_Item
-from control.control       import SCR_Control_TestSuite
-from control.control       import SCR_Control_Folder
 
 """******************************************************************************************
 *********************************************************************************************
@@ -20,11 +18,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
     def load(self,data,parent):
 
-        if isinstance(data,SCR_Control_TestSuite):
-            self.load_testsuite(data,parent)
-        else:
-            if isinstance(data,SCR_Control_Folder):
-                self.load_testfolder(data,parent)
+        self.load_testfolder(data.testfolder,parent)
 
     def load_testsuite(self,data,parent):
 
@@ -142,7 +136,9 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
                 for _keyword in _section.body:
 
-                    self.load_keyword(_keyword,parent)
+                    if data.is_statement_keyword(_keyword):
+
+                        self.load_keyword(_keyword,parent)
 
     def load_keyword(self,data,parent):
 
@@ -177,7 +173,6 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
         self.load_variables(data,_tree_resource)
 
         self.load_keywords(data,_tree_resource)
-
 
 """******************************************************************************************
 *********************************************************************************************

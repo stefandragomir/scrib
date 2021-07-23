@@ -8,19 +8,17 @@ from PyQt5.QtWidgets       import *
 from config.config         import SCR_Config
 from widgets.widgets       import SCR_WDG_DockWidget
 from widgets.widgets       import SCR_WDG_ToolBar
-from widgets.main_menu     import SCR_WDG_MainMenu
+# from widgets.main_menu     import SCR_WDG_MainMenu
 from icons.icons           import SCR_GetIcon
 from widgets.test_tree     import SCR_WDG_TestTree
 from widgets.test_tab      import SCR_WDG_Test_Tab
-from control.control       import SCR_Control_TestSuite
-from control.control       import SCR_Control_Folder
+from control.control       import SCR_Control
 
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
 class SCR_UI(QMainWindow):
 
-    sgn_load_testsuite  = pyqtSignal(object)
     sgn_load_testfolder = pyqtSignal(object)
 
     def __init__(self,config):
@@ -28,8 +26,8 @@ class SCR_UI(QMainWindow):
         QMainWindow.__init__(self)
 
         self.config = config
+        self.ctrl   = SCR_Control()
 
-        self.sgn_load_testsuite.connect(self.load_testsuite)
         self.sgn_load_testfolder.connect(self.load_testfolder)
 
         self.draw_gui() 
@@ -50,7 +48,7 @@ class SCR_UI(QMainWindow):
         self.draw_toolbar()
         self.draw_test_tree() 
         self.draw_test_tab()   
-        self.draw_main_menu()
+        # self.draw_main_menu()
 
         self.ly_h.addWidget(self.wdg_tree_test)
         self.ly_h.addWidget(self.wdg_test_tab)
@@ -117,20 +115,6 @@ class SCR_UI(QMainWindow):
 
         pass
 
-    def clbk_load_testsuite(self,state):
-
-        _path = QFileDialog.getOpenFileName(
-                                                self,
-                                                "Open Test Suite",
-                                                "",
-                                                "*.robot")
-
-        _path = _path[0]
-
-        if os.path.exists(_path):
-
-            self.sgn_load_testsuite.emit(_path)
-
     def clbk_load_testfolder(self,state):
 
         _path = QFileDialog.getExistingDirectory(
@@ -146,29 +130,15 @@ class SCR_UI(QMainWindow):
 
         pass
 
-    def load_testsuite(self,path):
-
-        if os.path.exists(path):
-
-            _ctrl = SCR_Control_TestSuite(path)
-
-            _ctrl.read()
-
-            self.wdg_tree_test.clear()
-
-            self.wdg_tree_test.populate(_ctrl,["Tests"])
-
     def load_testfolder(self,path):
 
         if os.path.exists(path):
 
-            _ctrl = SCR_Control_Folder(path)
-
-            _ctrl.read()
+            self.ctrl.read(path)
 
             self.wdg_tree_test.clear()
 
-            self.wdg_tree_test.populate(_ctrl,["Tests"])
+            self.wdg_tree_test.populate(self.ctrl,["Tests"])
 
 """*************************************************************************************************
 ****************************************************************************************************
