@@ -20,7 +20,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         self.load_testfolder(data.testfolder,parent)
 
-        self.load_external_resources(data.resources,parent)
+        self.load_external_resources(data.resources.external(),parent)
         
     def load_testsuite(self,data,parent):
 
@@ -74,13 +74,15 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
     def load_testcases(self,data,parent):
 
-        for _section in data.model.sections:
+        if data.model != None:
 
-            if data.is_section_testcases(_section):
+            for _section in data.model.sections:
 
-                for _testcase in _section.body:
+                if data.is_section_testcases(_section):
 
-                    self.load_testcase(_testcase,parent)
+                    for _testcase in _section.body:
+
+                        self.load_testcase(_testcase,parent)
 
     def load_testcase(self,data,parent):
 
@@ -99,15 +101,17 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
     def load_variables(self,data,parent):
 
-        for _section in data.model.sections:
+        if data.model != None:
 
-            if data.is_section_variables(_section):
+            for _section in data.model.sections:
 
-                for _variable in _section.body:
+                if data.is_section_variables(_section):
 
-                    if data.is_statement_variable(_variable):
+                    for _variable in _section.body:
 
-                        self.load_variable(_variable,parent)
+                        if data.is_statement_variable(_variable):
+
+                            self.load_variable(_variable,parent)
 
     def load_variable(self,data,parent):
 
@@ -132,15 +136,17 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
     def load_keywords(self,data,parent):
 
-        for _section in data.model.sections:
+        if data.model != None:
 
-            if data.is_section_keywords(_section):
+            for _section in data.model.sections:
 
-                for _keyword in _section.body:
+                if data.is_section_keywords(_section):
 
-                    if data.is_statement_keyword(_keyword):
+                    for _keyword in _section.body:
 
-                        self.load_keyword(_keyword,parent)
+                        if data.is_statement_keyword(_keyword):
+
+                            self.load_keyword(_keyword,parent)
 
     def load_keyword(self,data,parent):
 

@@ -23,8 +23,8 @@ class SCR_Control():
 
     def clear(self):
 
-        self.testfolder = None
-        self.resources  = SCR_Control_Resources()
+        self.testfolder  = None
+        self.resources   = SCR_Control_Resources()
 
     def read(self,path):
 
@@ -69,7 +69,7 @@ class SCR_Control_Folder():
 
                         if os.path.splitext(_path)[1] == ".resource":
 
-                           self.read_resource(_path)
+                           self.read_resources(_path)
 
     def read_testfolder(self,path):
 
@@ -87,17 +87,13 @@ class SCR_Control_Folder():
 
         self.testsuites.add(_testsuite)
 
-    def read_resource(self,path):
+    def read_resources(self,path):
 
-        _resource = self.ctrl.resources.find_by_attribute("path",path)
+        _resource = SCR_Control_Resource(self.ctrl,path)
 
-        if _resource == None:
+        _resource.read()
 
-            _resource = SCR_Control_Resource(self.ctrl,path)
-
-            _resource.read()
-
-            self.ctrl.resources.add(_resource)
+        self.ctrl.resources.add(_resource)
 
         self.resources.add(_resource)
 
@@ -177,11 +173,14 @@ class SCR_Control_TestSuite(_SCR_Control_With_Model):
         self.name      = os.path.splitext(os.path.split(path)[1])[0]
         self.dir       = os.path.split(path)[0]
         self.ctrl      = ctrl
-        self.resources = SCR_Control_Resources()
 
     def read(self):
 
         self.model = get_model(source=self.path,data_only=False)
+
+        self.read_resources()
+
+    def read_resources(self):
 
         for _section in self.model.sections:
 
@@ -199,7 +198,9 @@ class SCR_Control_TestSuite(_SCR_Control_With_Model):
 
                             _resource = SCR_Control_Resource(self.ctrl,_path)
 
-                        self.ctrl.resources.add(_resource)
+                            _resource.read()
+
+                            self.ctrl.resources.add(_resource)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -210,6 +211,22 @@ class SCR_Control_Resources(SCR_Base_List):
 
         SCR_Base_List.__init__(self)
 
+    def external(self):
+
+        _resources = SCR_Control_Resources()
+
+        _resources.objects = [_resource for _resource in self.objects if _resource.external]
+
+        return _resources
+
+    def internal(self):
+
+        _resources = SCR_Control_Resources()
+
+        _resources.objects = [_resource for _resource in self.objects if not _resource.external]
+
+        return _resources
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -219,15 +236,42 @@ class SCR_Control_Resource(_SCR_Control_With_Model):
 
         _SCR_Control_With_Model.__init__(self)
 
-        self.path  = path
-        self.name  = os.path.splitext(os.path.split(path)[1])[0]
-        self.dir   = os.path.split(path)[0]
-        self.ctrl  = ctrl
+        self.path     = path
+        self.name     = os.path.splitext(os.path.split(path)[1])[0]
+        self.dir      = os.path.split(path)[0]
+        self.ctrl     = ctrl
+        self.external = not os.path.abspath(path).startswith(os.path.abspath(ctrl.testfolder.path))
 
     def read(self):
 
         self.model = get_model(source=self.path,data_only=False)
-        
+
+        self.read_resources()
+
+    def read_resources(self):
+
+        for _section in self.model.sections:
+
+            if self.is_section_settings(_section):
+
+                for _item in _section.body:
+
+                    if self.is_statement_resource_import(_item):
+
+                        _path = os.path.abspath(os.path.join(self.dir,_item.name))
+
+                        if os.path.exists(_path):
+
+                            _resource = self.ctrl.resources.find_by_attribute("path",_path)
+
+                            if _resource == None:
+
+                                _resource = SCR_Control_Resource(self.ctrl,_path)
+
+                                _resource.read()
+
+                                self.ctrl.resources.add(_resource)
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
