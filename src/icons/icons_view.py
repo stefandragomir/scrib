@@ -611,7 +611,7 @@ class SCR_Info(QMessageBox):
         self.boxType   = boxType
         QInputDialog.__init__(self,self.boxType,title,text,QMessageBox.Ok)
         self.parent = parent
-        self.setStyleSheet(_css)
+        self.setStyleSheet(CSS)
         self.setModal(True)
         self.exec()
 

@@ -8,6 +8,7 @@ from PyQt5.QtWidgets       import *
 from config.config         import SCR_Config
 from widgets.widgets       import SCR_WDG_DockWidget
 from widgets.widgets       import SCR_WDG_ToolBar
+from widgets.widgets       import SCR_WDG_StatusBar
 from widgets.main_menu     import SCR_WDG_MainMenu
 from icons.icons           import SCR_GetIcon
 from widgets.test_tree     import SCR_WDG_TestTree
@@ -21,12 +22,13 @@ class SCR_UI(QMainWindow):
 
     sgn_load_testfolder = pyqtSignal(object)
 
-    def __init__(self,config):
+    def __init__(self,app,config):
 
         QMainWindow.__init__(self)
 
         self.config = config
         self.ctrl   = SCR_Control()
+        self.app    = app
 
         self.sgn_load_testfolder.connect(self.load_testfolder)
 
@@ -49,12 +51,14 @@ class SCR_UI(QMainWindow):
         self.draw_test_tree() 
         self.draw_test_tab()   
         self.draw_main_menu()
+        self.draw_status_bar()
 
         self.ly_h.addWidget(self.wdg_tree_test)
         self.ly_h.addWidget(self.wdg_test_tab)
 
         self.ly.addWidget(self.wdg_toolbar)
         self.ly.addLayout(self.ly_h)
+        self.ly.addWidget(self.statusbar)
         self.ly.setAlignment(Qt.AlignTop)
 
         self.wdg_central.setLayout(self.ly)
@@ -111,6 +115,10 @@ class SCR_UI(QMainWindow):
 
         self.setMenuBar(self.main_menu)
 
+    def draw_status_bar(self):
+
+        self.statusbar = SCR_WDG_StatusBar(self.app,self,self.config)
+
     def clbk_new(self):
 
         pass
@@ -134,11 +142,19 @@ class SCR_UI(QMainWindow):
 
         if os.path.exists(path):
 
-            self.ctrl.read(path)
+            self.statusbar.start(withload=False,withcancel=False)
+
+            self.statusbar.msg("loading...")
+
+            self.ctrl.read(path,self.statusbar)
 
             self.wdg_tree_test.clear()
 
+            self.statusbar.msg("drawing test tree...")
+
             self.wdg_tree_test.populate(self.ctrl,["Tests"])
+
+            self.statusbar.stop()
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -151,7 +167,7 @@ def SCR():
 
     _config = SCR_Config()
 
-    _ui     = SCR_UI(_config)    
+    _ui     = SCR_UI(_app,_config)    
 
     _ui.show()
 

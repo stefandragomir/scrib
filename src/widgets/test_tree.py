@@ -21,6 +21,8 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
         self.load_testfolder(data.testfolder,parent)
 
         self.load_external_resources(data.resources.external(),parent)
+
+        self.load_external_libraries(data.libraries.external(),parent)
         
     def load_testsuite(self,data,parent):
 
@@ -67,6 +69,10 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
         for _resource in data.resources:
 
             self.load_resources(_resource,_tree_testfolder)
+
+        for _library in data.libraries:
+
+            self.load_libraries(_library,_tree_testfolder)
 
         if data.has_files():
 
@@ -198,6 +204,38 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
         for _resource in data:
 
             self.load_resources(_resource,_tree_ext_resources)
+
+    def load_external_libraries(self,data,parent):
+
+        _labels = ["External Libraries"]
+
+        _tree_ext_libraries = SCR_WDG_Tree_Item(
+                                                data=_labels,
+                                                parent=parent)
+
+        _tree_ext_libraries.icon     = "66a73259d66004e2b9c7180030bc347836ddcb82"
+        _tree_ext_libraries.userdata = {"model":None}
+
+        parent.add_child(_tree_ext_libraries)
+
+        for _resource in data:
+
+            self.load_libraries(_resource,_tree_ext_libraries)
+
+    def load_libraries(self,data,parent):
+
+        _labels = [
+                    data.name,
+                  ]
+
+        _tree_library = SCR_WDG_Tree_Item(
+                                                data=_labels,
+                                                parent=parent)
+
+        _tree_library.icon     = "66a73259d66004e2b9c7180030bc347836ddcb82"
+        _tree_library.userdata = {"model":None}
+
+        parent.add_child(_tree_library)
 
 """******************************************************************************************
 *********************************************************************************************

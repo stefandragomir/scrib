@@ -9,6 +9,7 @@ from robot.parsing.model.blocks       import KeywordSection
 from robot.parsing.model.blocks       import SettingSection
 from robot.parsing.model.statements   import Variable
 from robot.parsing.model.statements   import ResourceImport
+from robot.parsing.model.statements   import LibraryImport
 from robot.parsing.model.blocks       import Keyword
 
 
@@ -25,81 +26,13 @@ class SCR_Control():
 
         self.testfolder  = None
         self.resources   = SCR_Control_Resources()
+        self.libraries   = SCR_Control_Libraries()
 
-    def read(self,path):
+    def read(self,path,observer):
 
         self.testfolder = SCR_Control_Folder(self,path)
 
-        self.testfolder.read(path)
-
-"""*************************************************************************************************
-****************************************************************************************************
-*************************************************************************************************"""
-class SCR_Control_Folder():
-
-    def __init__(self,ctrl,path):
-
-        self.path        = path
-        self.name        = os.path.split(path)[1]
-        self.dir         = os.path.split(path)[0]
-        self.ctrl        = ctrl
-        self.testfolders = SCR_Control_Folders()
-        self.testsuites  = SCR_Control_TestSuites()
-        self.resources   = SCR_Control_Resources()
-
-    def read(self,path):
-
-        for _item in os.listdir(self.path):
-
-            _path = os.path.join(self.path,_item)
-
-            if os.path.isdir(_path):
-
-                self.read_testfolder(_path)
-
-            else:
-
-                if os.path.isfile(_path):
-
-                    if os.path.splitext(_path)[1] == ".robot":
-
-                      self.read_testsuite(_path)
-
-                    else:
-
-                        if os.path.splitext(_path)[1] == ".resource":
-
-                           self.read_resources(_path)
-
-    def read_testfolder(self,path):
-
-        _testfolder = SCR_Control_Folder(self.ctrl,path)
-
-        _testfolder.read(path)
-
-        self.testfolders.add(_testfolder)
-
-    def read_testsuite(self,path):
-
-        _testsuite = SCR_Control_TestSuite(self.ctrl,path)
-
-        _testsuite.read()
-
-        self.testsuites.add(_testsuite)
-
-    def read_resources(self,path):
-
-        _resource = SCR_Control_Resource(self.ctrl,path)
-
-        _resource.read()
-
-        self.ctrl.resources.add(_resource)
-
-        self.resources.add(_resource)
-
-    def has_files(self):
-
-        return self.testfolders.has_files() or len(self.testsuites) != 0 or len(self.resources) != 0
+        self.testfolder.read(path,observer)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -138,6 +71,10 @@ class _SCR_Control_With_Model():
 
         return isinstance(statement,ResourceImport)
 
+    def is_statement_library_import(self,statement):
+
+        return isinstance(statement,LibraryImport)
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -150,6 +87,95 @@ class SCR_Control_Folders(SCR_Base_List):
     def has_files(self):
 
         return any([_folder.has_files() for _folder in self.objects])
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Control_Folder():
+
+    def __init__(self,ctrl,path):
+
+        self.path        = path
+        self.name        = os.path.split(path)[1]
+        self.dir         = os.path.split(path)[0]
+        self.ctrl        = ctrl
+        self.testfolders = SCR_Control_Folders()
+        self.testsuites  = SCR_Control_TestSuites()
+        self.resources   = SCR_Control_Resources()
+        self.libraries   = SCR_Control_Libraries()
+
+    def read(self,path,observer):
+
+        if None != observer:
+
+            observer.msg("reading test folder %s" % (self.name,))
+
+        for _item in os.listdir(self.path):
+
+            _path = os.path.join(self.path,_item)
+
+            if os.path.isdir(_path):
+
+                self.read_testfolder(_path,observer)
+
+            else:
+
+                if os.path.isfile(_path):
+
+                    if os.path.splitext(_path)[1] == ".robot":
+
+                      self.read_testsuite(_path,observer)
+
+                    else:
+
+                        if os.path.splitext(_path)[1] == ".resource":
+
+                           self.read_resource(_path,observer)
+
+                        else:
+                            if os.path.splitext(_path)[1] == ".py":
+
+                                self.read_library(_path,observer)
+
+    def read_testfolder(self,path,observer):
+
+        _testfolder = SCR_Control_Folder(self.ctrl,path)
+
+        _testfolder.read(path,observer)
+
+        self.testfolders.add(_testfolder)
+
+    def read_testsuite(self,path,observer):
+
+        _testsuite = SCR_Control_TestSuite(self.ctrl,path)
+
+        _testsuite.read(observer)
+
+        self.testsuites.add(_testsuite)
+
+    def read_resource(self,path,observer):
+
+        _resource = SCR_Control_Resource(self.ctrl,path)
+
+        _resource.read(observer)
+
+        self.ctrl.resources.add(_resource)
+
+        self.resources.add(_resource)
+
+    def read_library(self,path,observer):
+
+        _library = SCR_Control_Library(self.ctrl,path)
+
+        _library.read(observer)
+
+        self.ctrl.libraries.add(_library)
+
+        self.libraries.add(_library)
+
+    def has_files(self):
+
+        return self.testfolders.has_files() or len(self.testsuites) != 0 or len(self.resources) != 0
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -174,13 +200,17 @@ class SCR_Control_TestSuite(_SCR_Control_With_Model):
         self.dir       = os.path.split(path)[0]
         self.ctrl      = ctrl
 
-    def read(self):
+    def read(self,observer):
+
+        if None != observer:
+
+            observer.msg("reading test suite %s" % (self.name,))
 
         self.model = get_model(source=self.path,data_only=False)
 
-        self.read_resources()
+        self.read_resources(observer)
 
-    def read_resources(self):
+    def read_resources(self,observer):
 
         for _section in self.model.sections:
 
@@ -198,7 +228,7 @@ class SCR_Control_TestSuite(_SCR_Control_With_Model):
 
                             _resource = SCR_Control_Resource(self.ctrl,_path)
 
-                            _resource.read()
+                            _resource.read(observer)
 
                             self.ctrl.resources.add(_resource)
 
@@ -242,13 +272,19 @@ class SCR_Control_Resource(_SCR_Control_With_Model):
         self.ctrl     = ctrl
         self.external = not os.path.abspath(path).startswith(os.path.abspath(ctrl.testfolder.path))
 
-    def read(self):
+    def read(self,observer):
+
+        if None != observer:
+
+            observer.msg("reading resource %s" % (self.name,))
 
         self.model = get_model(source=self.path,data_only=False)
 
-        self.read_resources()
+        self.read_resources(observer)
 
-    def read_resources(self):
+        self.read_libraries(observer)
+
+    def read_resources(self,observer):
 
         for _section in self.model.sections:
 
@@ -268,10 +304,80 @@ class SCR_Control_Resource(_SCR_Control_With_Model):
 
                                 _resource = SCR_Control_Resource(self.ctrl,_path)
 
-                                _resource.read()
+                                _resource.read(observer)
 
                                 self.ctrl.resources.add(_resource)
 
+    def read_libraries(self,observer):
+
+        for _section in self.model.sections:
+
+            if self.is_section_settings(_section):
+
+                for _item in _section.body:
+
+                    if self.is_statement_library_import(_item):
+
+                        _path = os.path.abspath(os.path.join(self.dir,_item.name))
+
+                        if os.path.exists(_path):
+
+                            _library = self.ctrl.libraries.find_by_attribute("path",_path)
+
+                            if _library == None:
+
+                                _library = SCR_Control_Library(self.ctrl,_path)
+
+                                _library.read(observer)
+
+                                self.ctrl.libraries.add(_library)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Control_Libraries(SCR_Base_List):
+
+    def __init__(self):
+
+        SCR_Base_List.__init__(self)
+
+    def external(self):
+
+        _libraries = SCR_Control_Libraries()
+
+        _libraries.objects = [_library for _library in self.objects if _library.external]
+
+        return _libraries
+
+    def internal(self):
+
+        _libraries = SCR_Control_Libraries()
+
+        _libraries.objects = [_library for _library in self.objects if not _library.external]
+
+        return _libraries
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Control_Library(_SCR_Control_With_Model):
+
+    def __init__(self,ctrl,path):
+
+        _SCR_Control_With_Model.__init__(self)
+
+        self.path     = path
+        self.name     = os.path.splitext(os.path.split(path)[1])[0]
+        self.dir      = os.path.split(path)[0]
+        self.ctrl     = ctrl
+        self.external = not os.path.abspath(path).startswith(os.path.abspath(ctrl.testfolder.path))
+
+    def read(self,observer):
+
+        if None != observer:
+
+            observer.msg("reading library %s" % (self.name,))
+                       
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""

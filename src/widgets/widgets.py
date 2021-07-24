@@ -113,7 +113,7 @@ class SCR_WDG_PopUp(QMessageBox):
     def draw_gui(self):
 
         self.setWindowTitle(self.title)
-        self.setWindowIcon(SCR_GetIcon('d0f2525e4ec3b4d25285169ce8b0db1a4bb587cb'))
+        self.setWindowIcon(SCR_GetIcon('08e0c30ab7f9c6d43c70165c4ae42460d460c0aa'))
         self.resize(400,40)
         self.setFixedSize(400,40)
         self.setStyleSheet("background-color: #ffffff")
@@ -796,8 +796,9 @@ class SCR_WDG_StatusBar(QWidget):
         self.setFixedHeight(40)
 
         self.cancel_bt = SCR_WDG_Button(
-                                            SCR_GetIcon("08fbdd84bc6f62fe1b927b9115596ab50cbca623"),
-                                            SCR_GetIcon("08fbdd84bc6f62fe1b927b9115596ab50cbca623"),
+                                            self.config,
+                                            "08fbdd84bc6f62fe1b927b9115596ab50cbca623",
+                                            "08fbdd84bc6f62fe1b927b9115596ab50cbca623",
                                             "Cancel",
                                             self.cancel)
         self.cancel_bt.setFixedWidth(40)
