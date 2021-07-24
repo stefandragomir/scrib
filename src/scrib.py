@@ -13,6 +13,7 @@ from widgets.main_menu     import SCR_WDG_MainMenu
 from icons.icons           import SCR_GetIcon
 from widgets.test_tree     import SCR_WDG_TestTree
 from widgets.test_tab      import SCR_WDG_Test_Tab
+from widgets.status_bar    import SCR_WDG_Status_Bar
 from control.control       import SCR_Control
 
 """*************************************************************************************************
@@ -51,6 +52,7 @@ class SCR_UI(QMainWindow):
         self.draw_test_tree() 
         self.draw_test_tab()   
         self.draw_main_menu()
+        self.draw_action_bar()
         self.draw_status_bar()
 
         self.ly_h.addWidget(self.wdg_tree_test)
@@ -58,7 +60,7 @@ class SCR_UI(QMainWindow):
 
         self.ly.addWidget(self.wdg_toolbar)
         self.ly.addLayout(self.ly_h)
-        self.ly.addWidget(self.statusbar)
+        self.ly.addWidget(self.action_bar)
         self.ly.setAlignment(Qt.AlignTop)
 
         self.wdg_central.setLayout(self.ly)
@@ -115,9 +117,15 @@ class SCR_UI(QMainWindow):
 
         self.setMenuBar(self.main_menu)
 
+    def draw_action_bar(self):
+
+        self.action_bar = SCR_WDG_StatusBar(self.app,self,self.config)
+
     def draw_status_bar(self):
 
-        self.statusbar = SCR_WDG_StatusBar(self.app,self,self.config)
+        self.status_bar = SCR_WDG_Status_Bar(self.config)
+
+        self.setStatusBar(self.status_bar)
 
     def clbk_new(self):
 
@@ -142,19 +150,21 @@ class SCR_UI(QMainWindow):
 
         if os.path.exists(path):
 
-            self.statusbar.start(withload=False,withcancel=False)
+            self.action_bar.start(withload=False,withcancel=False)
 
-            self.statusbar.msg("loading...")
+            self.action_bar.msg("loading...")
 
-            self.ctrl.read(path,self.statusbar)
+            self.ctrl.read(path,self.action_bar)
 
             self.wdg_tree_test.clear()
 
-            self.statusbar.msg("drawing test tree...")
+            self.action_bar.msg("drawing test tree...")
 
             self.wdg_tree_test.populate(self.ctrl,["Tests"])
 
-            self.statusbar.stop()
+            self.action_bar.stop()
+
+            self.status_bar.message("Test Folder: %s" % (path,))
 
 """*************************************************************************************************
 ****************************************************************************************************
