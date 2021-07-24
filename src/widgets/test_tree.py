@@ -284,12 +284,12 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 ******************************************************************************************"""
 class SCR_WDG_TestTree(SCR_WDG_Tree):
 
-    def __init__(self, config):
+    def __init__(self, config, search_clbk):
 
         SCR_WDG_Tree.__init__(
                                 self,
                                 config=config, 
-                                find=SCR_WDG_TestTree_Find,
+                                search_clbk=search_clbk,
                                 with_metadata=True,
                                 model_class=SCR_WDG_TestTree_Model)
 
@@ -312,38 +312,42 @@ class SCR_WDG_TestTree_Find(QWidget):
         self._item_idx       = 0
         self._text_changed   = False
         self.tree            = tree
-        self.selection_type  = "All"
-           
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Popup )         
+        self.selection_type  = "all"  
+
+        self.setStyleSheet('border: 1px solid #ffffff;')      
             
         #write line
         self.line = QLineEdit()
         self.line.setContextMenuPolicy(Qt.NoContextMenu)    
-        self.line.setStyleSheet('border: 2px solid gray;')
+        self.line.setStyleSheet('border: 1px solid gray;')
         self.line.returnPressed.connect(self._find_next) 
         self.line.textEdited.connect(self._textedited)
 
         #find previous button
         self._find_prev_button = QToolButton()
         self._find_prev_button.setStyleSheet("background: transparent; border-radius: 0px")
-        self._find_prev_button.setIcon(SCR_GetIcon('47d97a19678ecbc93257bfc890b71cc62f4ae908'))
+        self._find_prev_button.setIcon(SCR_GetIcon('85905e29412dc4ee1bca3b78beeca05a0ea1d14b'))
+        self._find_prev_button.setToolTip("Find Previous Item")
         self._find_prev_button.clicked.connect(self._find_prev)                 
 
         #find next button
         self._find_next_button = QToolButton()
         self._find_next_button.setStyleSheet("background: transparent; border-radius: 0px")
-        self._find_next_button.setIcon(SCR_GetIcon('85905e29412dc4ee1bca3b78beeca05a0ea1d14b'))
+        self._find_next_button.setIcon(SCR_GetIcon('47d97a19678ecbc93257bfc890b71cc62f4ae908'))
+        self._find_prev_button.setToolTip("Find Next Item")
         self._find_next_button.clicked.connect(self._find_next)           
 
         #close button
         self._close_button = QToolButton()
         self._close_button.setStyleSheet("background: transparent; border-radius: 0px")
         self._close_button.setIcon(SCR_GetIcon('779d79bcda4833c45d97b063d0041af2e47265e4'))
-        self._close_button.clicked.connect(self._close)
+        self._find_prev_button.setToolTip("Close Test Tree Search Bar")
+        self._close_button.clicked.connect(self.hide)
 
-        #column selection
+        #type selection
         self._selection = SCR_WDG_Selection(self.config)
         self._selection.setFixedWidth(80)
+        self._selection.setStyleSheet('border: 1px solid gray;')
         self._selection.currentIndexChanged.connect(self.selection_change)
 
         _data = [
@@ -368,9 +372,6 @@ class SCR_WDG_TestTree_Find(QWidget):
         box.setSizeConstraint(3)
         box.setContentsMargins(8, 8, 5, 5)
         self.setLayout(box)
-        
-        QShortcut(QKeySequence(Qt.Key_Escape), self).activated.connect(self._close)           
-        QShortcut(QKeySequence(Qt.CTRL + Qt.Key_F), self).activated.connect(self._close)    
 
         #Animation
         self._animation = QPropertyAnimation(self,b"geometry")
@@ -381,29 +382,6 @@ class SCR_WDG_TestTree_Find(QWidget):
     def selection_change(self):
 
         self.selection_type = self._selection.get_item_data(self._selection.currentText())
-
-    def showEvent(self, event): 
-
-        _point = self.tree.mapToGlobal(QPoint(self.tree.geometry().x(),self.tree.geometry().y()))
-
-        _x,_y = _point.x(),_point.y()
-        
-        self._animation.setStartValue( QRect(_x, _y + 200, self.width(), self.height()) )
-        self._animation.setEndValue( QRect(_x, _y + 30, self.width(), self.height()) )
-        self._animation.start() 
-        
-        self.line.setFocus()
-
-    def _close(self):
-
-        _point = self.tree.mapToGlobal(QPoint(self.tree.geometry().x(),self.tree.geometry().y()))
-
-        _x,_y = _point.x(),_point.y()
-
-        self._animation.setStartValue(QRect(_x, _y + 30, self.width(), self.height()))
-        self._animation.setEndValue(QRect(_x, _y + 200, self.width(), self.height()))
-        self._animation.start()
-        self._animation.finished.connect(self.close)
 
     def _textedited(self):
 
@@ -433,6 +411,8 @@ class SCR_WDG_TestTree_Find(QWidget):
 
                 self._items = self.tree.find_items_by_type(self.word, self.selection_type)
 
+                self._text_changed = False
+
             if self._item_idx < len(self._items) and self._item_idx >= 0:
 
                 _item           = self._items[self._item_idx]   
@@ -440,7 +420,7 @@ class SCR_WDG_TestTree_Find(QWidget):
             else:
                 _item = None
 
-            self.go_to_item(_item)                
+            self.go_to_item(_item)               
 
     def _find_prev(self):
 
@@ -452,10 +432,13 @@ class SCR_WDG_TestTree_Find(QWidget):
 
                 self._items = self.tree.find_items_by_type(self.word, self.selection_type)
 
-            if self._item_idx < len(self._items) and self._item_idx >= 0:
+                self._text_changed = False
 
-                _item           = self._items[self._item_idx]   
+            if self._item_idx <= len(self._items) and self._item_idx >= 1:
+
                 self._item_idx -= 1
+                _item           = self._items[self._item_idx]   
+                
             else:
                 _item = None
 
