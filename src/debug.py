@@ -1,8 +1,7 @@
 
-from control.control import SCR_Control
 
+a = [1,2,3,4,5,6,7]
 
+a = a[-5:]
 
-_ctrl = SCR_Control()
-
-_ctrl.read(r"c:\projects\scrib\examples\ex1\ts1.robot")
+print(a)

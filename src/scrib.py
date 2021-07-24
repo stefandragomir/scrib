@@ -15,6 +15,7 @@ from widgets.test_tree     import SCR_WDG_TestTree
 from widgets.test_tab      import SCR_WDG_Test_Tab
 from widgets.status_bar    import SCR_WDG_Status_Bar
 from control.control       import SCR_Control
+from cache.preferences     import SCR_Preferences
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -27,9 +28,12 @@ class SCR_UI(QMainWindow):
 
         QMainWindow.__init__(self)
 
-        self.config = config
-        self.ctrl   = SCR_Control()
-        self.app    = app
+        self.config      = config
+        self.ctrl        = SCR_Control()
+        self.app         = app
+        self.preferences = SCR_Preferences()
+
+        self.preferences.load()
 
         self.sgn_load_testfolder.connect(self.load_testfolder)
 
@@ -133,10 +137,15 @@ class SCR_UI(QMainWindow):
 
     def clbk_load_testfolder(self,state):
 
+        _cwd = self.preferences.get("cwd")
+
+        if _cwd == None:
+            _cwd = ""
+
         _path = QFileDialog.getExistingDirectory(
                                                 self,
                                                 "Open Test Folder",
-                                                "")
+                                                _cwd)
 
         if os.path.exists(_path):
 
@@ -164,7 +173,26 @@ class SCR_UI(QMainWindow):
 
             self.action_bar.stop()
 
-            self.status_bar.message("Test Folder: %s" % (path,))
+            self.status_bar.message("%s" % (path,))
+
+            self.update_recent(path)
+
+    def update_recent(self,path):
+
+        _recents = self.preferences.get("recents")
+
+        if _recents == None:
+            _recents = []
+
+        _recents.append(path)
+
+        _recents = list(set(_recents))[-5:]
+
+        self.preferences.set("recents",_recents)
+
+        self.preferences.set("cwd",path)
+
+        self.preferences.save()
 
 """*************************************************************************************************
 ****************************************************************************************************

@@ -3,7 +3,7 @@ from PyQt5.QtCore          import *
 from PyQt5.QtGui           import *
 from PyQt5.QtWidgets       import * 
 from icons.icons           import SCR_GetIcon
-
+from functools             import partial
 """******************************************************************************************
 *********************************************************************************************
 ******************************************************************************************"""
@@ -15,7 +15,7 @@ class SCR_WDG_MainMenu(QMenuBar):
 
         self.scrib = scrib
 
-    def populate(self):
+    def populate(self,):
 
         self.populate_file()
 
@@ -48,7 +48,17 @@ class SCR_WDG_MainMenu(QMenuBar):
 
         _menu_file.addSeparator()
 
-        _menu_file.addMenu("&Open Recent")
+        _menu_recents = _menu_file.addMenu("&Open Recent")
+        _recents      = self.scrib.preferences.get("recents")
+
+        if _recents != None:
+            for _recent in _recents:
+                _name = _recent
+                if len(_recent) > 100:
+                    _name = "...%s" % (_recent[100:])
+                _action = _menu_recents.addAction("&%s" % (_name,))
+                _action.setIcon(SCR_GetIcon("b28971455cf45af0e2e37a9c33ca8ca01d5a660f"))
+                _action.triggered.connect(partial(self.scrib.sgn_load_testfolder.emit,_recent))
 
         _menu_file.addSeparator()
 

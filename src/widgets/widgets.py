@@ -816,8 +816,6 @@ class SCR_WDG_StatusBar(QWidget):
         self.wdg_txt.setStyleSheet("border: 1px solid gray; border-radius: 4px; color: %s" % (self.config.get_theme_foreground(),))
         self.wdg_progress.setStyleSheet("border: 1px solid gray; border-radius: 4px;")
 
-        
-
         self.stop()
 
     def start(self,withload=False,withcancel=False):
