@@ -4,6 +4,7 @@ from PyQt5.QtGui           import *
 from PyQt5.QtWidgets       import * 
 from icons.icons           import SCR_GetIcon
 from functools             import partial
+
 """******************************************************************************************
 *********************************************************************************************
 ******************************************************************************************"""
@@ -27,23 +28,28 @@ class SCR_WDG_MainMenu(QMenuBar):
 
     def populate_file(self):
 
-        _menu_file    = self.addMenu("&File")
+        _menu_file    = self.addMenu("File")
 
-        _action = _menu_file.addAction("&New")
-        _action.setIcon(SCR_GetIcon("f35b5975f6d636d7a6418bb4941edbdf89b80b55"))
-        _action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_N))
-        _action.triggered.connect(self.scrib.clbk_new)
+        self.add_action(
+                        _menu_file, 
+                        "New",              
+                        "f35b5975f6d636d7a6418bb4941edbdf89b80b55", 
+                        QKeySequence(Qt.CTRL + Qt.Key_N), 
+                        self.scrib.clbk_new)
 
-        _action = _menu_file.addAction("&Open Test Folder")    
-        _action.setIcon(SCR_GetIcon("b28971455cf45af0e2e37a9c33ca8ca01d5a660f"))
-        _action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_O))
-        _action.triggered.connect(self.scrib.clbk_load_testfolder)
-        _menu_file.addSeparator()
+        self.add_action(
+                        _menu_file, 
+                        "Open Test Folder", 
+                        "b28971455cf45af0e2e37a9c33ca8ca01d5a660f", 
+                        QKeySequence(Qt.CTRL + Qt.Key_O), 
+                        self.scrib.clbk_load_testfolder)
 
-        _action = _menu_file.addAction("&Save")
-        _action.setIcon(SCR_GetIcon("eb1729093812c3f38a5e4eb2714f2bde148f6eba"))
-        _action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_S))
-        _action.triggered.connect(self.scrib.clbk_save)
+        self.add_action(
+                        _menu_file, 
+                        "Save",             
+                        "eb1729093812c3f38a5e4eb2714f2bde148f6eba", 
+                        QKeySequence(Qt.CTRL + Qt.Key_S), 
+                        self.scrib.clbk_save)
 
         _menu_file.addSeparator()
 
@@ -55,16 +61,22 @@ class SCR_WDG_MainMenu(QMenuBar):
                 _name = _recent
                 if len(_recent) > 100:
                     _name = "...%s" % (_recent[100:])
-                _action = _menu_recents.addAction("&%s" % (_name,))
-                _action.setIcon(SCR_GetIcon("b28971455cf45af0e2e37a9c33ca8ca01d5a660f"))
-                _action.triggered.connect(partial(self.scrib.sgn_load_testfolder.emit,_recent))
+
+                self.add_action(
+                                _menu_recents, 
+                                _name,             
+                                "b28971455cf45af0e2e37a9c33ca8ca01d5a660f", 
+                                None, 
+                                partial(self.scrib.sgn_load_testfolder.emit,_recent))
 
         _menu_file.addSeparator()
 
-        _action = _menu_file.addAction("&Exit")
-        _action.setIcon(SCR_GetIcon("325eab1e2242ef8223f4b2506db6da27384f3789"))
-        _action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_Q))
-        _action.triggered.connect(self.scrib.close)
+        self.add_action(
+                        _menu_file, 
+                        "Exit",             
+                        "325eab1e2242ef8223f4b2506db6da27384f3789", 
+                        QKeySequence(Qt.CTRL + Qt.Key_Q), 
+                        self.scrib.close)
 
     def populate_search(self):
 
@@ -78,12 +90,38 @@ class SCR_WDG_MainMenu(QMenuBar):
 
         _menu_help = self.addMenu("&Help")
 
-        _action = _menu_help.addAction("&Documentation")
-        _action.setIcon(SCR_GetIcon("edaf568e98a4c6023a1d9eb657bc737cff2ef279"))
-        _action.setShortcut(QKeySequence(Qt.Key_F1))
+        self.add_action(
+                        _menu_help, 
+                        "Documentation",             
+                        "edaf568e98a4c6023a1d9eb657bc737cff2ef279", 
+                        QKeySequence(Qt.CTRL + Qt.Key_F1), 
+                        self.scrib.clbk_help_documentation)
 
-        _action = _menu_help.addAction("&Issue or Idea")
-        _action.setIcon(SCR_GetIcon("68887170a19a6b6eb82e9a9346dd81efa8a67f4d"))
+        self.add_action(
+                        _menu_help, 
+                        "Issue or Idea",             
+                        "68887170a19a6b6eb82e9a9346dd81efa8a67f4d", 
+                        None, 
+                        self.scrib.clbk_help_issue)
 
-        _action = _menu_help.addAction("&About")
-        _action.setIcon(SCR_GetIcon("fd2cf51bcbd304d61dbae1fdd954d4d1ec41e535"))
+        self.add_action(
+                        _menu_help, 
+                        "About",             
+                        "fd2cf51bcbd304d61dbae1fdd954d4d1ec41e535", 
+                        None, 
+                        self.scrib.clbk_help_about)
+
+    def add_action(self,parent,text,icon,shortcut,callback):
+
+        _action = QAction(parent)
+        _action.setText(text)
+        _action.setIcon(SCR_GetIcon(icon))
+
+        if shortcut != None:
+            _action.setShortcut(shortcut)
+
+        _action.triggered.connect(callback)
+        parent.addAction(_action)
+
+
+

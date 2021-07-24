@@ -352,7 +352,7 @@ class SCR_WDG_Tree_Model(QAbstractItemModel):
             self.root.clear()
             self.endResetModel()
 
-    def findItems(self,text,column):
+    def find_items(self,text,column):
 
         _items = []
 
@@ -387,112 +387,6 @@ class SCR_WDG_Tree_Model(QAbstractItemModel):
                                 _index_root)
 
         return _finds
-
-"""*************************************************************************************************
-****************************************************************************************************
-*************************************************************************************************"""
-class SCR_WDG_Tree(QTreeView):
-    
-    def __init__(self, config, usefind=False, with_metadata=True, model_class=SCR_WDG_Tree_Model):
-
-        QTreeView.__init__(self)
-
-        self.config = config
-
-        _css  = ""
-        _css += "background-color: %s;" % (self.config.get_theme_background(),)
-        _css += "color: %s;" % (self.config.get_theme_foreground(),)  
-        _css += "selection-color: #000000;"
-        _css += "selection-background-color: #c2d2ed;"
-        _css += "font-family: Arial;"
-        _css += "font-size: 9pt;"
-        _css += "border: 1px solid #707070;"
-
-        self.setStyleSheet(_css)
-
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
-
-        self.usefind       = usefind
-        self.root          =  SCR_WDG_Tree_Item(data=[""],parent=None)
-        self.with_metadata = with_metadata
-        self.custom_model  = model_class(parent=self)
-
-    def expandChildren(self,item):
-
-        if item.isValid():
-
-            _count = item.model().rowCount(item)
-            
-            for _index in range(_count):
-
-                _child = item.child(_index, 0)
-
-                self.expandChildren(_child);            
-
-                self.expand(item)            
-
-    def collapseChildren(self,item):
-
-        if item.isValid():
-
-            _count = item.model().rowCount(item)
-            
-            for _index in range(_count):
-
-                _child = item.child(_index, 0)
-
-                self.collapseChildren(_child);            
-
-                self.collapse(item)  
-
-    def populate(self, data, header):
-
-        self.root = SCR_WDG_Tree_Item(
-                                            data=header,
-                                            parent=None)
-
-        self.custom_model.root = self.root
-        self.custom_model.load(data, self.root) 
-
-        self.setModel(self.custom_model)  
-
-    def clear(self):
-
-        self.custom_model.clear()
-        
-    def get_user_data(self,item):
-
-        if self.with_metadata:
-            _serial_data = item.data(Qt.UserRole)
-        else:
-            _serial_data = None
-
-        return _serial_data
-
-    def keyPressEvent(self, event):
-
-        _find_shortcut = (event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_F)  
-
-        if _find_shortcut:
-
-            if self.usefind:
-
-                self.search_tree()
-
-        QWidget.keyPressEvent(self,event) 
-
-    def search_tree(self):
-
-        self.search = SCR_WDG_Tree_Find_Dialog( self)
-        self.search.show()   
-
-    def findItems(self,text,column):
-
-        return self.custom_model.findItems(text,column)
-
-    def scrollToItem(self,item):
-
-        self.scrollTo(item)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -622,7 +516,7 @@ class SCR_WDG_Tree_Find_Dialog(QWidget):
 
             if self._text_changed:
 
-                self._items = self.tree.findItems(self.word, self.selected_column)
+                self._items = self.tree.find_items(self.word, self.selected_column)
 
             if self._item_idx < len(self._items) and self._item_idx >= 0:
 
@@ -641,7 +535,7 @@ class SCR_WDG_Tree_Find_Dialog(QWidget):
 
             if self._text_changed:
 
-                self._items = self.tree.findItems(self.word, self.selected_column)
+                self._items = self.tree.find_items(self.word, self.selected_column)
 
             if self._item_idx < len(self._items) and self._item_idx >= 0:
 
@@ -656,6 +550,112 @@ class SCR_WDG_Tree_Find_Dialog(QWidget):
     def word(self):
 
         return str(self.line.text())
+        
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_WDG_Tree(QTreeView):
+    
+    def __init__(self, config, find=SCR_WDG_Tree_Find_Dialog, with_metadata=True, model_class=SCR_WDG_Tree_Model):
+
+        QTreeView.__init__(self)
+
+        self.config = config
+
+        _css  = ""
+        _css += "background-color: %s;" % (self.config.get_theme_background(),)
+        _css += "color: %s;" % (self.config.get_theme_foreground(),)  
+        _css += "selection-color: #000000;"
+        _css += "selection-background-color: #c2d2ed;"
+        _css += "font-family: Arial;"
+        _css += "font-size: 9pt;"
+        _css += "border: 1px solid #707070;"
+
+        self.setStyleSheet(_css)
+
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+
+        self.find          = find
+        self.root          =  SCR_WDG_Tree_Item(data=[""],parent=None)
+        self.with_metadata = with_metadata
+        self.custom_model  = model_class(parent=self)
+
+    def expandChildren(self,item):
+
+        if item.isValid():
+
+            _count = item.model().rowCount(item)
+            
+            for _index in range(_count):
+
+                _child = item.child(_index, 0)
+
+                self.expandChildren(_child);            
+
+                self.expand(item)            
+
+    def collapseChildren(self,item):
+
+        if item.isValid():
+
+            _count = item.model().rowCount(item)
+            
+            for _index in range(_count):
+
+                _child = item.child(_index, 0)
+
+                self.collapseChildren(_child);            
+
+                self.collapse(item)  
+
+    def populate(self, data, header):
+
+        self.root = SCR_WDG_Tree_Item(
+                                            data=header,
+                                            parent=None)
+
+        self.custom_model.root = self.root
+        self.custom_model.load(data, self.root) 
+
+        self.setModel(self.custom_model)  
+
+    def clear(self):
+
+        self.custom_model.clear()
+        
+    def get_user_data(self,item):
+
+        if self.with_metadata:
+            _serial_data = item.data(Qt.UserRole)
+        else:
+            _serial_data = None
+
+        return _serial_data
+
+    def keyPressEvent(self, event):
+
+        _find_shortcut = (event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_F)  
+
+        if _find_shortcut:
+
+            if self.find != None:
+
+                self.search_tree()
+
+        QWidget.keyPressEvent(self,event) 
+
+    def search_tree(self):
+
+        self.search = self.find(self.config,self)
+        self.search.show()   
+
+    def find_items(self,text,column):
+
+        return self.custom_model.find_items(text,column)
+
+    def scrollToItem(self,item):
+
+        self.scrollTo(item)
 
 """*************************************************************************************************
 ****************************************************************************************************
