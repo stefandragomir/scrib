@@ -242,13 +242,15 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         _items = []
 
-        for _row in range(self.root.child_count()):
+        if self.root != None:
 
-            _items += self.find(
-                                _row,
-                                text,
-                                QModelIndex(),
-                                datatype)
+            for _row in range(self.root.child_count()):
+
+                _items += self.find(
+                                    _row,
+                                    text,
+                                    QModelIndex(),
+                                    datatype)
 
         return _items
 
@@ -313,8 +315,6 @@ class SCR_WDG_TestTree_Find(QWidget):
         self._text_changed   = False
         self.tree            = tree
         self.selection_type  = "all"  
-
-        self.setStyleSheet('border: 1px solid #ffffff;')      
             
         #write line
         self.line = QLineEdit()
@@ -373,15 +373,11 @@ class SCR_WDG_TestTree_Find(QWidget):
         box.setContentsMargins(8, 8, 5, 5)
         self.setLayout(box)
 
-        #Animation
-        self._animation = QPropertyAnimation(self,b"geometry")
-        self._animation.setTargetObject(self)
-        self._animation.setDuration(150)
-        self._animation.setEasingCurve(QEasingCurve.Linear)           
-
     def selection_change(self):
 
         self.selection_type = self._selection.get_item_data(self._selection.currentText())
+
+        self._text_changed = True
 
     def _textedited(self):
 
