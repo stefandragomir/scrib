@@ -9,7 +9,7 @@ from widgets.widgets       import SCR_WDG_Tab
 """******************************************************************************************
 *********************************************************************************************
 ******************************************************************************************"""
-class SCR_WDG_Status_Bar(QStatusBar ):
+class SCR_WDG_Status_Bar(QStatusBar):
 
     def __init__(self,config):
 
@@ -17,6 +17,10 @@ class SCR_WDG_Status_Bar(QStatusBar ):
 
         QStatusBar .__init__(self)
 
+        self.lbl = QLabel()
+
+        self.addPermanentWidget(self.lbl)
+
     def message(self,msg):
 
-        self.showMessage(msg)
+        self.lbl.setText(msg)

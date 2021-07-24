@@ -34,11 +34,10 @@ class SCR_WDG_MainMenu(QMenuBar):
         _action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_N))
         _action.triggered.connect(self.scrib.clbk_new)
 
-        _action = _menu_file.addAction("&Open Test Folder")        
+        _action = _menu_file.addAction("&Open Test Folder")    
         _action.setIcon(SCR_GetIcon("b28971455cf45af0e2e37a9c33ca8ca01d5a660f"))
         _action.setShortcut(QKeySequence(Qt.CTRL + Qt.Key_O))
         _action.triggered.connect(self.scrib.clbk_load_testfolder)
-
         _menu_file.addSeparator()
 
         _action = _menu_file.addAction("&Save")
