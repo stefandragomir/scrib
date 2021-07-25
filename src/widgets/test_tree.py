@@ -8,6 +8,22 @@ from widgets.widgets       import SCR_WDG_Tree_Model
 from widgets.widgets       import SCR_WDG_Tree_Item
 from widgets.widgets       import SCR_WDG_Selection
 
+
+"""******************************************************************************************
+*********************************************************************************************
+******************************************************************************************"""
+class SCR_Tree_Types():
+
+    TESTFOLDER   = "testfolder"
+    TESTSUITE    = "testsuite"
+    TESTCASE     = "testcase"
+    KEYWORD      = "keyword"
+    VARIABLE     = "variable"
+    RESOURCE     = "resource"
+    LIBRARY      = "library"
+    EXTRESOURCES = "extresources"
+    EXTLIBRARIES = "extlibraries"
+
 """******************************************************************************************
 *********************************************************************************************
 ******************************************************************************************"""
@@ -36,7 +52,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_testsuite.icon     = "8e205a227046baee2a67b75fb12c95813784c484"
-        _tree_testsuite.userdata = {"model":data,"type": "testsuite"}
+        _tree_testsuite.userdata = {"model":data,"type": SCR_Tree_Types.TESTSUITE}
 
         parent.add_child(_tree_testsuite)
 
@@ -57,7 +73,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_testfolder.icon     = "585ba3e6f845cb67ef8a6098bed724e247278a5b"
-        _tree_testfolder.userdata = {"model":data,"type": "testfolder"}
+        _tree_testfolder.userdata = {"model":data,"type": SCR_Tree_Types.TESTFOLDER}
 
         for _testfolder in data.testfolders:
 
@@ -102,7 +118,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_testcase.icon     = "ca211c47afa3b991350a6c183d8aaf3f33db15a0"
-        _tree_testcase.userdata = {"model":data,"type": "testcase"}
+        _tree_testcase.userdata = {"model":data,"type": SCR_Tree_Types.TESTCASE}
 
         parent.add_child(_tree_testcase)
 
@@ -137,7 +153,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
         elif data.name[0] == "&":
             _tree_testcase.icon     = "490daab16fc73f3decf083a5cfb04b47708c8b22"
 
-        _tree_testcase.userdata = {"model":data,"type": "variable"}
+        _tree_testcase.userdata = {"model":data,"type": SCR_Tree_Types.VARIABLE}
 
         parent.add_child(_tree_testcase)
 
@@ -166,7 +182,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_keyword.icon     = "14b802564477e8b8f64dc869c92a4b983edc1001"
-        _tree_keyword.userdata = {"model":data,"type": "keyword"}
+        _tree_keyword.userdata = {"model":data,"type": SCR_Tree_Types.KEYWORD}
 
         parent.add_child(_tree_keyword)
 
@@ -181,7 +197,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_resource.icon     = "26b41084d7c558d94b50f5e1c40cdfd362f05478"
-        _tree_resource.userdata = {"model":data,"type": "resource"}
+        _tree_resource.userdata = {"model":data,"type": SCR_Tree_Types.RESOURCE}
 
         parent.add_child(_tree_resource)
 
@@ -200,7 +216,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_library.icon     = "66a73259d66004e2b9c7180030bc347836ddcb82"
-        _tree_library.userdata = {"model":data,"type": "library"}
+        _tree_library.userdata = {"model":data,"type": SCR_Tree_Types.LIBRARY}
 
         parent.add_child(_tree_library)
 
@@ -213,7 +229,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_ext_resources.icon     = "616b77c9b4e3020bee662e34c6feb5e8ddcd2b7d"
-        _tree_ext_resources.userdata = {"model":None,"type":None}
+        _tree_ext_resources.userdata = {"model":None,"type": SCR_Tree_Types.EXTRESOURCES}
 
         parent.add_child(_tree_ext_resources)
 
@@ -230,7 +246,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_ext_libraries.icon     = "66a73259d66004e2b9c7180030bc347836ddcb82"
-        _tree_ext_libraries.userdata = {"model":None,"type":None}
+        _tree_ext_libraries.userdata = {"model":None,"type":SCR_Tree_Types.EXTLIBRARIES}
 
         parent.add_child(_tree_ext_libraries)
 
@@ -286,7 +302,9 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 ******************************************************************************************"""
 class SCR_WDG_TestTree(SCR_WDG_Tree):
 
-    def __init__(self, config, search_clbk):
+    def __init__(self, scrib, config, search_clbk):
+
+        self.scrib = scrib
 
         SCR_WDG_Tree.__init__(
                                 self,
@@ -295,9 +313,318 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                 with_metadata=True,
                                 model_class=SCR_WDG_TestTree_Model)
 
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.draw_menu)
+
     def find_items_by_type(self,text,datatype):
 
         return self.custom_model.find_items_by_type(text,datatype)
+
+    def draw_menu(self,point):
+
+        self.menu_item =  self.indexAt(point)
+
+        if self.menu_item:
+
+            _user_data = self.get_user_data(self.menu_item)
+
+            if _user_data != None:
+
+                self.context_menu = QMenu()
+
+                if _user_data["type"] == SCR_Tree_Types.TESTFOLDER:
+
+                    self.draw_menu_testfolder()
+
+                elif _user_data["type"] == SCR_Tree_Types.TESTSUITE:
+
+                    self.draw_menu_testsuite()
+
+                elif _user_data["type"] == SCR_Tree_Types.TESTCASE:
+
+                    self.draw_menu_testcase()
+
+                elif _user_data["type"] == SCR_Tree_Types.KEYWORD:
+
+                    self.draw_menu_keyword()
+
+                elif _user_data["type"] == SCR_Tree_Types.VARIABLE:
+
+                    self.draw_menu_variable()
+
+                elif _user_data["type"] == SCR_Tree_Types.RESOURCE:
+
+                    self.draw_menu_resource()
+
+                elif _user_data["type"] == SCR_Tree_Types.LIBRARY:
+
+                    self.draw_menu_library()
+
+                elif _user_data["type"] == SCR_Tree_Types.EXTRESOURCES:
+
+                    self.draw_menu_ext_resources()
+
+                elif _user_data["type"] == SCR_Tree_Types.EXTLIBRARIES:
+
+                    self.draw_menu_ext_libraries()
+
+                self.context_menu.exec_(self.mapToGlobal(point)) 
+
+            else:
+                self.context_menu = QMenu()
+
+                self.context_menu.addAction(
+                                            SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
+                                            "Search in Test Tree", 
+                                            self.scrib.wdg_test_tree_find.show)
+
+                self.context_menu.exec_(self.mapToGlobal(point)) 
+
+    def draw_menu_testfolder(self):
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("8e205a227046baee2a67b75fb12c95813784c484"), 
+                                    "New Test Suite", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("26b41084d7c558d94b50f5e1c40cdfd362f05478"), 
+                                    "New Resource", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("66a73259d66004e2b9c7180030bc347836ddcb82"), 
+                                    "New Library", 
+                                    lambda:None)
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
+                                    "Delete", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
+                                    "Rename", 
+                                    lambda:None)
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("8c4ee08746e9d4d8b64596c87ac3fab1"), 
+                                    "Expand", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("1022c7267f54abc54bd42a8b279d9180"), 
+                                    "Collapse", 
+                                    lambda:None)
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("b28971455cf45af0e2e37a9c33ca8ca01d5a660f"), 
+                                    "Open Folder", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
+                                    "Search in Folder", 
+                                    lambda:None)
+
+    def draw_menu_testsuite(self):
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("ca211c47afa3b991350a6c183d8aaf3f33db15a0"), 
+                                    "New Test Case", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("14b802564477e8b8f64dc869c92a4b983edc1001"), 
+                                    "New Keyword", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("de99afcb2a785eea0974463ae9e7e063a5482b4a"), 
+                                    "New Scalar Variable", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("000cc208d4e675301e21ed009db52ff361a35a9f"), 
+                                    "New List Variable", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("490daab16fc73f3decf083a5cfb04b47708c8b22"), 
+                                    "New Dictionary Variable", 
+                                    lambda:None)
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("836b4d076077202c00f2fbd10c605023bb2bbfe5"), 
+                                    "Select All Test Cases", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("a2588e1c2a378b9710d5a1b74299060ca2271413"), 
+                                    "Select All Failed Test Cases", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("8bd133d5a6e9b47ba80a6d774149085b20483fb0"), 
+                                    "Select All Passed Test Cases", 
+                                    lambda:None)
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
+                                    "Delete", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
+                                    "Rename", 
+                                    lambda:None)
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
+                                    "Search in Test Suite", 
+                                    lambda:None)
+
+    def draw_menu_testcase(self):
+
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
+                                    "Delete", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
+                                    "Rename", 
+                                    lambda:None)
+
+    def draw_menu_keyword(self):
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("fd2cf51bcbd304d61dbae1fdd954d4d1ec41e535"), 
+                                    "Delete", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("fd2cf51bcbd304d61dbae1fdd954d4d1ec41e535"), 
+                                    "Rename", 
+                                    lambda:None)
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("ffc3fb09c5db2b34f971c0ec4979b73de4f14be5"), 
+                                    "Find Usage", 
+                                    lambda:None)
+
+    def draw_menu_variable(self):
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
+                                    "Delete", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
+                                    "Rename", 
+                                    lambda:None)
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("ffc3fb09c5db2b34f971c0ec4979b73de4f14be5"), 
+                                    "Find Usage", 
+                                    lambda:None)
+
+    def draw_menu_resource(self):
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("14b802564477e8b8f64dc869c92a4b983edc1001"), 
+                                    "New Keyword", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("de99afcb2a785eea0974463ae9e7e063a5482b4a"), 
+                                    "New Scalar Variable", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("000cc208d4e675301e21ed009db52ff361a35a9f"), 
+                                    "New List Variable", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("490daab16fc73f3decf083a5cfb04b47708c8b22"), 
+                                    "New Dictionary Variable", 
+                                    lambda:None)
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
+                                    "Delete", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
+                                    "Rename", 
+                                    lambda:None)
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
+                                    "Search in Resource", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("ffc3fb09c5db2b34f971c0ec4979b73de4f14be5"), 
+                                    "Find Usage", 
+                                    lambda:None)
+
+    def draw_menu_library(self):
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
+                                    "Delete", 
+                                    lambda:None)
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
+                                    "Rename", 
+                                    lambda:None)
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("ffc3fb09c5db2b34f971c0ec4979b73de4f14be5"), 
+                                    "Find Usage", 
+                                    lambda:None)
+
+    def draw_menu_ext_resources(self):
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
+                                    "Search in External Resource", 
+                                    lambda:None)
+
+    def draw_menu_ext_libraries(self):
+
+        self.context_menu.addAction(
+                                    SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
+                                    "Search in External Libraries", 
+                                    lambda:None)
 
 """******************************************************************************************
 *********************************************************************************************
@@ -351,14 +678,14 @@ class SCR_WDG_TestTree_Find(QWidget):
         self._selection.currentIndexChanged.connect(self.selection_change)
 
         _data = [
-                    {"All"       : "all"       },
-                    {"Test Suite": "testsuite" },
-                    {"Test Case" : "testcase"  },
-                    {"Keyword"   : "keyword"   },
-                    {"Variable"  : "variable"  },
-                    {"Folder"    : "testfolder"},
-                    {"Resource"  : "resource"  },
-                    {"Library"   : "library"   },
+                    {"All"       : "all"                     },
+                    {"Test Suite": SCR_Tree_Types.TESTSUITE  },
+                    {"Test Case" : SCR_Tree_Types.TESTCASE   },
+                    {"Keyword"   : SCR_Tree_Types.KEYWORD    },
+                    {"Variable"  : SCR_Tree_Types.VARIABLE   },
+                    {"Folder"    : SCR_Tree_Types.TESTFOLDER },
+                    {"Resource"  : SCR_Tree_Types.RESOURCE   },
+                    {"Library"   : SCR_Tree_Types.LIBRARY    },
                 ] 
 
         self._selection.populate(_data)

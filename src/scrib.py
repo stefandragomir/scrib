@@ -100,7 +100,7 @@ class SCR_UI(QMainWindow):
 
     def draw_test_tree(self):
 
-        self.wdg_tree_test = SCR_WDG_TestTree(self.config,lambda:self.wdg_test_tree_find.show())
+        self.wdg_tree_test = SCR_WDG_TestTree(self,self.config,lambda:self.wdg_test_tree_find.show())
 
         _policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
