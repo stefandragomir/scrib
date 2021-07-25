@@ -93,3 +93,40 @@ class SCR_Actions_Help():
     def clbk_help_about(self):
 
         pass
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Actions_TestFolder():
+
+    def __init__(self,scrib):
+
+        self.scrib = scrib
+
+    def clbk_new_test_suite(self,data):
+
+        pass
+
+    def clbk_new_resource(self,data):
+
+        pass
+
+    def clbk_new_library(self,data):
+
+        pass
+
+    def clbk_delete(self,data):
+
+        pass
+
+    def clbk_rename(self,data):
+
+        pass
+
+    def clbk_open(self,data):
+
+        pass
+
+    def clbk_search(self,data):
+
+        pass

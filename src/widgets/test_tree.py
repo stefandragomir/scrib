@@ -7,7 +7,8 @@ from widgets.widgets       import SCR_WDG_Tree
 from widgets.widgets       import SCR_WDG_Tree_Model
 from widgets.widgets       import SCR_WDG_Tree_Item
 from widgets.widgets       import SCR_WDG_Selection
-
+from actions.actions       import SCR_Actions_TestFolder
+from functools             import partial
 
 """******************************************************************************************
 *********************************************************************************************
@@ -52,7 +53,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_testsuite.icon     = "8e205a227046baee2a67b75fb12c95813784c484"
-        _tree_testsuite.userdata = {"model":data,"type": SCR_Tree_Types.TESTSUITE}
+        _tree_testsuite.userdata = {"data":data,"type": SCR_Tree_Types.TESTSUITE}
 
         parent.add_child(_tree_testsuite)
 
@@ -73,7 +74,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_testfolder.icon     = "585ba3e6f845cb67ef8a6098bed724e247278a5b"
-        _tree_testfolder.userdata = {"model":data,"type": SCR_Tree_Types.TESTFOLDER}
+        _tree_testfolder.userdata = {"data":data,"type": SCR_Tree_Types.TESTFOLDER}
 
         for _testfolder in data.testfolders:
 
@@ -118,7 +119,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_testcase.icon     = "ca211c47afa3b991350a6c183d8aaf3f33db15a0"
-        _tree_testcase.userdata = {"model":data,"type": SCR_Tree_Types.TESTCASE}
+        _tree_testcase.userdata = {"data":data,"type": SCR_Tree_Types.TESTCASE}
 
         parent.add_child(_tree_testcase)
 
@@ -153,7 +154,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
         elif data.name[0] == "&":
             _tree_testcase.icon     = "490daab16fc73f3decf083a5cfb04b47708c8b22"
 
-        _tree_testcase.userdata = {"model":data,"type": SCR_Tree_Types.VARIABLE}
+        _tree_testcase.userdata = {"data":data,"type": SCR_Tree_Types.VARIABLE}
 
         parent.add_child(_tree_testcase)
 
@@ -182,7 +183,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_keyword.icon     = "14b802564477e8b8f64dc869c92a4b983edc1001"
-        _tree_keyword.userdata = {"model":data,"type": SCR_Tree_Types.KEYWORD}
+        _tree_keyword.userdata = {"data":data,"type": SCR_Tree_Types.KEYWORD}
 
         parent.add_child(_tree_keyword)
 
@@ -197,7 +198,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_resource.icon     = "26b41084d7c558d94b50f5e1c40cdfd362f05478"
-        _tree_resource.userdata = {"model":data,"type": SCR_Tree_Types.RESOURCE}
+        _tree_resource.userdata = {"data":data,"type": SCR_Tree_Types.RESOURCE}
 
         parent.add_child(_tree_resource)
 
@@ -216,7 +217,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_library.icon     = "66a73259d66004e2b9c7180030bc347836ddcb82"
-        _tree_library.userdata = {"model":data,"type": SCR_Tree_Types.LIBRARY}
+        _tree_library.userdata = {"data":data,"type": SCR_Tree_Types.LIBRARY}
 
         parent.add_child(_tree_library)
 
@@ -229,7 +230,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_ext_resources.icon     = "616b77c9b4e3020bee662e34c6feb5e8ddcd2b7d"
-        _tree_ext_resources.userdata = {"model":None,"type": SCR_Tree_Types.EXTRESOURCES}
+        _tree_ext_resources.userdata = {"data":None,"type": SCR_Tree_Types.EXTRESOURCES}
 
         parent.add_child(_tree_ext_resources)
 
@@ -246,7 +247,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 parent=parent)
 
         _tree_ext_libraries.icon     = "66a73259d66004e2b9c7180030bc347836ddcb82"
-        _tree_ext_libraries.userdata = {"model":None,"type":SCR_Tree_Types.EXTLIBRARIES}
+        _tree_ext_libraries.userdata = {"data":None,"type":SCR_Tree_Types.EXTLIBRARIES}
 
         parent.add_child(_tree_ext_libraries)
 
@@ -304,7 +305,8 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
 
     def __init__(self, scrib, config, search_clbk):
 
-        self.scrib = scrib
+        self.scrib          = scrib
+        self.act_testfolder = SCR_Actions_TestFolder(self.scrib)
 
         SCR_WDG_Tree.__init__(
                                 self,
@@ -334,39 +336,39 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
 
                 if _user_data["type"] == SCR_Tree_Types.TESTFOLDER:
 
-                    self.draw_menu_testfolder()
+                    self.draw_menu_testfolder(_user_data["data"])
 
                 elif _user_data["type"] == SCR_Tree_Types.TESTSUITE:
 
-                    self.draw_menu_testsuite()
+                    self.draw_menu_testsuite(_user_data["data"])
 
                 elif _user_data["type"] == SCR_Tree_Types.TESTCASE:
 
-                    self.draw_menu_testcase()
+                    self.draw_menu_testcase(_user_data["data"])
 
                 elif _user_data["type"] == SCR_Tree_Types.KEYWORD:
 
-                    self.draw_menu_keyword()
+                    self.draw_menu_keyword(_user_data["data"])
 
                 elif _user_data["type"] == SCR_Tree_Types.VARIABLE:
 
-                    self.draw_menu_variable()
+                    self.draw_menu_variable(_user_data["data"])
 
                 elif _user_data["type"] == SCR_Tree_Types.RESOURCE:
 
-                    self.draw_menu_resource()
+                    self.draw_menu_resource(_user_data["data"])
 
                 elif _user_data["type"] == SCR_Tree_Types.LIBRARY:
 
-                    self.draw_menu_library()
+                    self.draw_menu_library(_user_data["data"])
 
                 elif _user_data["type"] == SCR_Tree_Types.EXTRESOURCES:
 
-                    self.draw_menu_ext_resources()
+                    self.draw_menu_ext_resources(_user_data["data"])
 
                 elif _user_data["type"] == SCR_Tree_Types.EXTLIBRARIES:
 
-                    self.draw_menu_ext_libraries()
+                    self.draw_menu_ext_libraries(_user_data["data"])
 
                 self.context_menu.exec_(self.mapToGlobal(point)) 
 
@@ -380,60 +382,60 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
 
                 self.context_menu.exec_(self.mapToGlobal(point)) 
 
-    def draw_menu_testfolder(self):
+    def draw_menu_testfolder(self,data):
 
         self.context_menu.addAction(
                                     SCR_GetIcon("8e205a227046baee2a67b75fb12c95813784c484"), 
                                     "New Test Suite", 
-                                    lambda:None)
+                                    partial(self.act_testfolder.clbk_new_test_suite,data))
 
         self.context_menu.addAction(
                                     SCR_GetIcon("26b41084d7c558d94b50f5e1c40cdfd362f05478"), 
                                     "New Resource", 
-                                    lambda:None)
+                                    partial(self.act_testfolder.clbk_new_resource,data))
 
         self.context_menu.addAction(
                                     SCR_GetIcon("66a73259d66004e2b9c7180030bc347836ddcb82"), 
                                     "New Library", 
-                                    lambda:None)
+                                    partial(self.act_testfolder.clbk_new_library,data))
 
         self.context_menu.addSeparator()
 
         self.context_menu.addAction(
                                     SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
                                     "Delete", 
-                                    lambda:None)
+                                    partial(self.act_testfolder.clbk_delete,data))
 
         self.context_menu.addAction(
                                     SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
                                     "Rename", 
-                                    lambda:None)
+                                    partial(self.act_testfolder.clbk_rename,data))
 
         self.context_menu.addSeparator()
 
         self.context_menu.addAction(
                                     SCR_GetIcon("8c4ee08746e9d4d8b64596c87ac3fab1"), 
                                     "Expand", 
-                                    lambda:None)
+                                    partial(self.expandChildren,self.menu_item))
 
         self.context_menu.addAction(
                                     SCR_GetIcon("1022c7267f54abc54bd42a8b279d9180"), 
                                     "Collapse", 
-                                    lambda:None)
+                                    partial(self.collapseChildren,self.menu_item))
 
         self.context_menu.addSeparator()
 
         self.context_menu.addAction(
                                     SCR_GetIcon("b28971455cf45af0e2e37a9c33ca8ca01d5a660f"), 
                                     "Open Folder", 
-                                    lambda:None)
+                                    partial(self.act_testfolder.clbk_open,data))
 
         self.context_menu.addAction(
                                     SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
                                     "Search in Folder", 
-                                    lambda:None)
+                                    partial(self.act_testfolder.clbk_search,data))
 
-    def draw_menu_testsuite(self):
+    def draw_menu_testsuite(self,data):
 
         self.context_menu.addAction(
                                     SCR_GetIcon("ca211c47afa3b991350a6c183d8aaf3f33db15a0"), 
@@ -496,7 +498,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                     "Search in Test Suite", 
                                     lambda:None)
 
-    def draw_menu_testcase(self):
+    def draw_menu_testcase(self,data):
 
 
         self.context_menu.addAction(
@@ -509,7 +511,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                     "Rename", 
                                     lambda:None)
 
-    def draw_menu_keyword(self):
+    def draw_menu_keyword(self,data):
 
         self.context_menu.addAction(
                                     SCR_GetIcon("fd2cf51bcbd304d61dbae1fdd954d4d1ec41e535"), 
@@ -528,7 +530,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                     "Find Usage", 
                                     lambda:None)
 
-    def draw_menu_variable(self):
+    def draw_menu_variable(self,data):
 
         self.context_menu.addAction(
                                     SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
@@ -547,7 +549,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                     "Find Usage", 
                                     lambda:None)
 
-    def draw_menu_resource(self):
+    def draw_menu_resource(self,data):
 
         self.context_menu.addAction(
                                     SCR_GetIcon("14b802564477e8b8f64dc869c92a4b983edc1001"), 
@@ -593,7 +595,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                     "Find Usage", 
                                     lambda:None)
 
-    def draw_menu_library(self):
+    def draw_menu_library(self,data):
 
         self.context_menu.addAction(
                                     SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
@@ -612,14 +614,14 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                     "Find Usage", 
                                     lambda:None)
 
-    def draw_menu_ext_resources(self):
+    def draw_menu_ext_resources(self,data):
 
         self.context_menu.addAction(
                                     SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
                                     "Search in External Resource", 
                                     lambda:None)
 
-    def draw_menu_ext_libraries(self):
+    def draw_menu_ext_libraries(self,data):
 
         self.context_menu.addAction(
                                     SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
