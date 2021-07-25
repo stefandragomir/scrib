@@ -97,36 +97,36 @@ class SCR_Actions_Help():
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Actions_TestFolder():
+class SCR_Actions_Tree_TestFolder():
 
     def __init__(self,scrib):
 
-        self.scrib = scrib
+        self.scrib     = scrib
 
-    def clbk_new_test_suite(self,data):
+    def clbk_new_test_suite(self,tree_item,data):
 
-        pass
+        self.scrib.wdg_tree_test.create_item(tree_item,"NewTestSuite")
 
-    def clbk_new_resource(self,data):
-
-        pass
-
-    def clbk_new_library(self,data):
+    def clbk_new_resource(self,tree_item,data):
 
         pass
 
-    def clbk_delete(self,data):
+    def clbk_new_library(self,tree_item,data):
 
         pass
 
-    def clbk_rename(self,data):
+    def clbk_delete(self,tree_item,data):
 
         pass
 
-    def clbk_open(self,data):
+    def clbk_rename(self,tree_item,data):
 
         pass
 
-    def clbk_search(self,data):
+    def clbk_open(self,tree_item,data):
+
+        pass
+
+    def clbk_search(self,tree_item,data):
 
         pass

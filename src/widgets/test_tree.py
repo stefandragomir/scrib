@@ -7,7 +7,7 @@ from widgets.widgets       import SCR_WDG_Tree
 from widgets.widgets       import SCR_WDG_Tree_Model
 from widgets.widgets       import SCR_WDG_Tree_Item
 from widgets.widgets       import SCR_WDG_Selection
-from actions.actions       import SCR_Actions_TestFolder
+from actions.actions       import SCR_Actions_Tree_TestFolder
 from functools             import partial
 
 """******************************************************************************************
@@ -306,7 +306,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
     def __init__(self, scrib, config, search_clbk):
 
         self.scrib          = scrib
-        self.act_testfolder = SCR_Actions_TestFolder(self.scrib)
+        self.act_testfolder = SCR_Actions_Tree_TestFolder(self.scrib)
 
         SCR_WDG_Tree.__init__(
                                 self,
@@ -324,11 +324,11 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
 
     def draw_menu(self,point):
 
-        self.menu_item =  self.indexAt(point)
+        self.tree_item =  self.indexAt(point)
 
-        if self.menu_item:
+        if self.tree_item:
 
-            _user_data = self.get_user_data(self.menu_item)
+            _user_data = self.get_user_data(self.tree_item)
 
             if _user_data != None:
 
@@ -387,53 +387,53 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
         self.context_menu.addAction(
                                     SCR_GetIcon("8e205a227046baee2a67b75fb12c95813784c484"), 
                                     "New Test Suite", 
-                                    partial(self.act_testfolder.clbk_new_test_suite,data))
+                                    partial(self.act_testfolder.clbk_new_test_suite,self.tree_item,data))
 
         self.context_menu.addAction(
                                     SCR_GetIcon("26b41084d7c558d94b50f5e1c40cdfd362f05478"), 
                                     "New Resource", 
-                                    partial(self.act_testfolder.clbk_new_resource,data))
+                                    partial(self.act_testfolder.clbk_new_resource,self.tree_item,data))
 
         self.context_menu.addAction(
                                     SCR_GetIcon("66a73259d66004e2b9c7180030bc347836ddcb82"), 
                                     "New Library", 
-                                    partial(self.act_testfolder.clbk_new_library,data))
+                                    partial(self.act_testfolder.clbk_new_library,self.tree_item,data))
 
         self.context_menu.addSeparator()
 
         self.context_menu.addAction(
                                     SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
                                     "Delete", 
-                                    partial(self.act_testfolder.clbk_delete,data))
+                                    partial(self.act_testfolder.clbk_delete,self.tree_item,data))
 
         self.context_menu.addAction(
                                     SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
                                     "Rename", 
-                                    partial(self.act_testfolder.clbk_rename,data))
+                                    partial(self.act_testfolder.clbk_rename,self.tree_item,data))
 
         self.context_menu.addSeparator()
 
         self.context_menu.addAction(
                                     SCR_GetIcon("8c4ee08746e9d4d8b64596c87ac3fab1"), 
                                     "Expand", 
-                                    partial(self.expandChildren,self.menu_item))
+                                    partial(self.expandChildren,self.tree_item))
 
         self.context_menu.addAction(
                                     SCR_GetIcon("1022c7267f54abc54bd42a8b279d9180"), 
                                     "Collapse", 
-                                    partial(self.collapseChildren,self.menu_item))
+                                    partial(self.collapseChildren,self.tree_item))
 
         self.context_menu.addSeparator()
 
         self.context_menu.addAction(
                                     SCR_GetIcon("b28971455cf45af0e2e37a9c33ca8ca01d5a660f"), 
                                     "Open Folder", 
-                                    partial(self.act_testfolder.clbk_open,data))
+                                    partial(self.act_testfolder.clbk_open,self.tree_item,data))
 
         self.context_menu.addAction(
                                     SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
                                     "Search in Folder", 
-                                    partial(self.act_testfolder.clbk_search,data))
+                                    partial(self.act_testfolder.clbk_search,self.tree_item,data))
 
     def draw_menu_testsuite(self,data):
 
@@ -628,6 +628,24 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                     "Search in External Libraries", 
                                     lambda:None)
 
+    def create_item(self,parent,text):
+
+        _new_item = self.custom_model.insertRow(0, parent, text)
+
+        self.scrollToItem(_new_item)
+
+        self.selectionModel().clear()
+
+        self.selectionModel().select(_new_item,QItemSelectionModel.Select)
+
+        self.edit(_new_item)
+
+        self.itemDelegate().closeEditor.connect(self.clbk_edit_done)
+
+    def clbk_edit_done(self,editor):
+
+        print("activated")
+        
 """******************************************************************************************
 *********************************************************************************************
 ******************************************************************************************"""

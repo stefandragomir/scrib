@@ -276,7 +276,7 @@ class SCR_WDG_Tree_Model(QAbstractItemModel):
 
         if index.isValid():
 
-            _flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            _flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
 
         return _flags
 
@@ -387,6 +387,22 @@ class SCR_WDG_Tree_Model(QAbstractItemModel):
                                 _index_root)
 
         return _finds
+
+    def insertRow(self,row,parent,text):
+
+        self.beginInsertRows(parent,row,row)
+
+        _parent_item = parent.internalPointer()
+
+        _new_item = SCR_WDG_Tree_Item(
+                                        data=[text],
+                                        parent=_parent_item)
+
+        _parent_item.add_child(_new_item)
+
+        self.endInsertRows()
+
+        return self.index(_parent_item.child_count() - 1,0,parent)
 
 """*************************************************************************************************
 ****************************************************************************************************

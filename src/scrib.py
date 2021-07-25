@@ -81,8 +81,6 @@ class SCR_UI(QMainWindow):
 
         self.wdg_toolbar = SCR_WDG_ToolBar(self.config)
 
-
-
         self.wdg_toolbar.add_button(
                                         "load testfolder",
                                         "b28971455cf45af0e2e37a9c33ca8ca01d5a660f",
