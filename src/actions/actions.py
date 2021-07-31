@@ -14,11 +14,11 @@ class SCR_Actions_File():
 
         self.scrib = scrib
 
-    def clbk_new(self):
+    def new(self):
 
         pass
 
-    def clbk_load_testfolder(self,state):
+    def load_testfolder(self,state):
 
         _cwd = self.scrib.preferences.get("cwd")
 
@@ -34,7 +34,7 @@ class SCR_Actions_File():
 
             self.load_testfolder(_path)
 
-    def clbk_save(self,state):
+    def save(self,state):
 
         pass
 
@@ -82,15 +82,15 @@ class SCR_Actions_Help():
 
         self.scrib = scrib
 
-    def clbk_help_documentation(self):
+    def help_documentation(self):
 
         QDesktopServices.openUrl(QUrl("https://github.com/stefandragomir/scrib/wiki"))
 
-    def clbk_help_issue(self):
+    def help_issue(self):
 
         QDesktopServices.openUrl(QUrl("https://github.com/stefandragomir/scrib/issues"))
 
-    def clbk_help_about(self):
+    def help_about(self):
 
         pass
 
@@ -103,30 +103,310 @@ class SCR_Actions_Tree_TestFolder():
 
         self.scrib     = scrib
 
-    def clbk_new_test_suite(self,tree_item,data):
+    def new_test_suite(self,tree_item,data):
 
         self.scrib.wdg_tree_test.create_item(tree_item,"NewTestSuite")
 
-    def clbk_new_resource(self,tree_item,data):
+    def new_resource(self,tree_item,data):
 
         pass
 
-    def clbk_new_library(self,tree_item,data):
+    def new_library(self,tree_item,data):
 
         pass
 
-    def clbk_delete(self,tree_item,data):
+    def new_folder(self,tree_item,data):
 
         pass
 
-    def clbk_rename(self,tree_item,data):
+    def delete(self,tree_item,data):
 
         pass
 
-    def clbk_open(self,tree_item,data):
+    def rename(self,tree_item,data):
 
         pass
 
-    def clbk_search(self,tree_item,data):
+    def sel_all(self,tree_item,data):
+
+        pass
+
+    def sel_all_failed(self,tree_item,data):
+
+        pass
+
+    def sel_all_passed(self,tree_item,data):
+
+        pass
+
+    def desel_all(self,tree_item,data):
+
+        pass
+
+    def desel_all_failed(self,tree_item,data):
+
+        pass
+
+    def desel_all_passed(self,tree_item,data):
+
+        pass        
+
+    def open(self,tree_item,data):
+
+        pass
+
+    def search(self,tree_item,data):
+
+        pass
+
+    def new_folder(self,tree_item,data):
+
+        pass
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Actions_Tree_TestSuite():
+
+    def __init__(self,scrib):
+
+        self.scrib     = scrib
+
+    def new_testcase(self,tree_item,data):
+
+        pass
+
+    def new_keyword(self,tree_item,data):
+
+        pass
+
+    def new_var_scalar(self,tree_item,data):
+
+        pass
+
+    def new_var_list(self,tree_item,data):
+
+        pass
+
+    def new_var_dict(self,tree_item,data):
+
+        pass
+
+    def delete(self,tree_item,data):
+
+        pass
+
+    def rename(self,tree_item,data):
+
+        pass
+
+    def sel_all(self,tree_item,data):
+
+        pass
+
+    def sel_all_failed(self,tree_item,data):
+
+        pass
+
+    def sel_all_passed(self,tree_item,data):
+
+        pass
+
+    def desel_all(self,tree_item,data):
+
+        pass
+
+    def desel_all_failed(self,tree_item,data):
+
+        pass
+
+    def desel_all_passed(self,tree_item,data):
+
+        pass        
+
+    def open(self,tree_item,data):
+
+        pass
+
+    def search(self,tree_item,data):
+
+        pass
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Actions_Tree_Resource():
+
+    def __init__(self,scrib):
+
+        self.scrib     = scrib
+
+    def new_keyword(self,tree_item,data):
+
+        pass
+
+    def new_var_scalar(self,tree_item,data):
+
+        pass
+
+    def new_var_list(self,tree_item,data):
+
+        pass
+
+    def new_var_dict(self,tree_item,data):
+
+        pass
+
+    def delete(self,tree_item,data):
+
+        pass
+
+    def rename(self,tree_item,data):
+
+        pass
+
+    def open(self,tree_item,data):
+
+        pass
+
+    def search(self,tree_item,data):
+
+        pass
+
+    def find_usage(self,tree_item,data):
+
+        pass
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Actions_Tree_TestCase():
+
+    def __init__(self,scrib):
+
+        self.scrib     = scrib
+
+    def delete(self,tree_item,data):
+
+        pass
+
+    def rename(self,tree_item,data):
+
+        pass
+
+    def moveup(self,tree_item,data):
+
+        pass
+
+    def movedown(self,tree_item,data):
+
+        pass
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Actions_Tree_Keyword():
+
+    def __init__(self,scrib):
+
+        self.scrib     = scrib
+
+    def delete(self,tree_item,data):
+
+        pass
+
+    def rename(self,tree_item,data):
+
+        pass
+
+    def moveup(self,tree_item,data):
+
+        pass
+
+    def movedown(self,tree_item,data):
+
+        pass
+
+    def find_usage(self,tree_item,data):
+
+        pass
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Actions_Tree_Variable():
+
+    def __init__(self,scrib):
+
+        self.scrib     = scrib
+
+    def delete(self,tree_item,data):
+
+        pass
+
+    def rename(self,tree_item,data):
+
+        pass
+
+    def moveup(self,tree_item,data):
+
+        pass
+
+    def movedown(self,tree_item,data):
+
+        pass
+
+    def find_usage(self,tree_item,data):
+
+        pass
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Actions_Tree_Library():
+
+    def __init__(self,scrib):
+
+        self.scrib     = scrib
+
+    def delete(self,tree_item,data):
+
+        pass
+
+    def rename(self,tree_item,data):
+
+        pass
+
+    def open(self,tree_item,data):
+
+        pass
+
+    def find_usage(self,tree_item,data):
+
+        pass
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Actions_Tree_ExtResources():
+
+    def __init__(self,scrib):
+
+        self.scrib     = scrib
+
+    def search(self,tree_item,data):
+
+        pass
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Actions_Tree_ExtLibraries():
+
+    def __init__(self,scrib):
+
+        self.scrib     = scrib
+
+    def search(self,tree_item,data):
 
         pass

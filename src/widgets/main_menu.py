@@ -35,21 +35,21 @@ class SCR_WDG_MainMenu(QMenuBar):
                         "New",              
                         "f35b5975f6d636d7a6418bb4941edbdf89b80b55", 
                         QKeySequence(Qt.CTRL + Qt.Key_N), 
-                        self.scrib.act_file.clbk_new)
+                        self.scrib.act_file.new)
 
         self.add_action(
                         _menu_file, 
                         "Open Test Folder", 
                         "b28971455cf45af0e2e37a9c33ca8ca01d5a660f", 
                         QKeySequence(Qt.CTRL + Qt.Key_O), 
-                        self.scrib.act_file.clbk_load_testfolder)
+                        self.scrib.act_file.load_testfolder)
 
         self.add_action(
                         _menu_file, 
                         "Save",             
                         "eb1729093812c3f38a5e4eb2714f2bde148f6eba", 
                         QKeySequence(Qt.CTRL + Qt.Key_S), 
-                        self.scrib.act_file.clbk_save)
+                        self.scrib.act_file.save)
 
         _menu_file.addSeparator()
 
@@ -95,21 +95,21 @@ class SCR_WDG_MainMenu(QMenuBar):
                         "Documentation",             
                         "edaf568e98a4c6023a1d9eb657bc737cff2ef279", 
                         QKeySequence(Qt.CTRL + Qt.Key_F1), 
-                        self.scrib.act_help.clbk_help_documentation)
+                        self.scrib.act_help.help_documentation)
 
         self.add_action(
                         _menu_help, 
                         "Issue or Idea",             
                         "68887170a19a6b6eb82e9a9346dd81efa8a67f4d", 
                         None, 
-                        self.scrib.act_help.clbk_help_issue)
+                        self.scrib.act_help.help_issue)
 
         self.add_action(
                         _menu_help, 
                         "About",             
                         "fd2cf51bcbd304d61dbae1fdd954d4d1ec41e535", 
                         None, 
-                        self.scrib.act_help.clbk_help_about)
+                        self.scrib.act_help.help_about)
 
     def add_action(self,parent,text,icon,shortcut,callback):
 
