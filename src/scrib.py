@@ -11,8 +11,7 @@ from widgets.widgets       import SCR_WDG_ToolBar
 from widgets.widgets       import SCR_WDG_ActionBar
 from widgets.main_menu     import SCR_WDG_MainMenu
 from icons.icons           import SCR_GetIcon
-from widgets.test_tree     import SCR_WDG_TestTree
-from widgets.test_tree     import SCR_WDG_TestTree_Find
+from widgets.test_tree     import SCR_WDG_TestTree_Widget
 from widgets.test_tab      import SCR_WDG_Test_Tab
 from widgets.status_bar    import SCR_WDG_Status_Bar
 from control.control       import SCR_Control
@@ -52,7 +51,6 @@ class SCR_UI(QMainWindow):
 
         self.ly   = QVBoxLayout()
         self.ly_h = QHBoxLayout()
-        self.ly_t = QVBoxLayout()
 
         self.draw_toolbar()
         self.draw_test_tree() 
@@ -61,10 +59,6 @@ class SCR_UI(QMainWindow):
         self.draw_action_bar()
         self.draw_status_bar()
 
-        self.ly_t.addWidget(self.wdg_tree_test)
-        self.ly_t.addWidget(self.wdg_test_tree_find)
-
-        self.ly_h.addLayout(self.ly_t)
         self.ly_h.addWidget(self.wdg_test_tab)
 
         self.ly.addWidget(self.wdg_toolbar)
@@ -98,17 +92,15 @@ class SCR_UI(QMainWindow):
 
     def draw_test_tree(self):
 
-        self.wdg_tree_test = SCR_WDG_TestTree(self,self.config,lambda:self.wdg_test_tree_find.show())
+        self.wdg_tree_test = SCR_WDG_TestTree_Widget(self,self.config)
 
-        _policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        self.dock_tree_test = QDockWidget("Test Tree")
 
-        _policy.setHorizontalStretch(1)
+        self.dock_tree_test.setWidget(self.wdg_tree_test)
 
-        self.wdg_tree_test.setSizePolicy(_policy)
+        self.dock_tree_test.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
 
-        self.wdg_test_tree_find = SCR_WDG_TestTree_Find(self.config,self.wdg_tree_test)
-
-        self.wdg_test_tree_find.hide()
+        self.addDockWidget(Qt.LeftDockWidgetArea,self.dock_tree_test)
 
     def draw_test_tab(self):
 

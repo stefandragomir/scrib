@@ -18,6 +18,45 @@ from actions.actions       import SCR_Actions_Tree_ExtResources
 from actions.actions       import SCR_Actions_Tree_ExtLibraries
 from functools             import partial
 
+
+
+"""******************************************************************************************
+*********************************************************************************************
+******************************************************************************************"""
+class SCR_WDG_TestTree_Widget(QWidget):
+
+    def __init__(self, scrib, config):
+
+        QWidget.__init__(self)
+
+        self.scrib  = scrib 
+        self.config = config
+
+        self.draw()
+
+    def draw(self):
+
+        self.ly = QVBoxLayout()
+
+        self.wdg_tree = SCR_WDG_TestTree(self,self.config,lambda:self.wdg_search.show())
+
+        self.wdg_tree.setHeaderHidden(True)
+
+        _policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+
+        _policy.setHorizontalStretch(1)
+
+        self.wdg_tree.setSizePolicy(_policy)
+
+        self.wdg_search = SCR_WDG_TestTree_Find(self.config,self.wdg_tree)
+
+        self.wdg_search.hide()
+
+        self.ly.addWidget(self.wdg_tree)
+        self.ly.addWidget(self.wdg_search)
+
+        self.setLayout(self.ly)
+
 """******************************************************************************************
 *********************************************************************************************
 ******************************************************************************************"""

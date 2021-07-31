@@ -67,7 +67,7 @@ class SCR_WDG_MainMenu(QMenuBar):
                                 _name,             
                                 "b28971455cf45af0e2e37a9c33ca8ca01d5a660f", 
                                 None, 
-                                partial(self.scrib.act_file.load_testfolder,_recent))
+                                partial(self.scrib.act_file.load_testfolder_by_path,_recent))
 
         _menu_file.addSeparator()
 

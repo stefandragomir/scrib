@@ -29,16 +29,15 @@ class SCR_Actions_File():
                                                 self.scrib,
                                                 "Open Test Folder",
                                                 _cwd)
-
         if os.path.exists(_path):
 
-            self.load_testfolder(_path)
+            self.load_testfolder_by_path(_path)
 
     def save(self,state):
 
         pass
 
-    def load_testfolder(self,path):
+    def load_testfolder_by_path(self,path):
 
         if os.path.exists(path):
 
@@ -48,11 +47,11 @@ class SCR_Actions_File():
 
             self.scrib.ctrl.read(path,self.scrib.action_bar)
 
-            self.scrib.wdg_tree_test.clear()
+            self.scrib.wdg_tree_test.wdg_tree.clear()
 
             self.scrib.action_bar.msg("drawing test tree...")
 
-            self.scrib.wdg_tree_test.populate(self.scrib.ctrl,["Tests"])
+            self.scrib.wdg_tree_test.wdg_tree.populate(self.scrib.ctrl,[""])
 
             self.scrib.action_bar.stop()
 
