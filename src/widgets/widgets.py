@@ -232,12 +232,12 @@ class SCR_WDG_Tree_Model(QAbstractItemModel):
         _data = None
 
         if index.isValid():
-            if role == Qt.DisplayRole:
+            if role == Qt.ItemDataRole.DisplayRole:
 
                 _item = index.internalPointer()
                 _data = _item.data(index.column())
             else:
-                if role == Qt.DecorationRole:
+                if role == Qt.ItemDataRole.DecorationRole:
                     _item = index.internalPointer()
                     if _item.icon != None:
                         if type(_item.icon) != list:
@@ -251,16 +251,16 @@ class SCR_WDG_Tree_Model(QAbstractItemModel):
                     else:
                         _data = None
                 else:
-                    if role == Qt.ToolTipRole:
+                    if role == Qt.ItemDataRole.ToolTipRole:
                         if index.column() == 0:
                             _item = index.internalPointer()
                             _data = _item.tooltip
                     else:
-                        if role == Qt.UserRole:
+                        if role == Qt.ItemDataRole.UserRole:
                             _item = index.internalPointer()
                             _data = _item.userdata
                         else:
-                            if role == Qt.BackgroundRole:
+                            if role == Qt.ItemDataRole.BackgroundRole:
                                 _item = index.internalPointer()
                                 _data = _item.background_color
                             else:
@@ -272,11 +272,11 @@ class SCR_WDG_Tree_Model(QAbstractItemModel):
 
     def flags(self, index):
 
-        _flags = Qt.NoItemFlags
+        _flags = Qt.ItemFlag.NoItemFlags
 
         if index.isValid():
 
-            _flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+            _flags = Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable
 
         return _flags
 
@@ -284,7 +284,7 @@ class SCR_WDG_Tree_Model(QAbstractItemModel):
 
         _hader_data = None
 
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+        if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
 
             _hader_data = self.root.data(section)
 
@@ -370,7 +370,7 @@ class SCR_WDG_Tree_Model(QAbstractItemModel):
 
         _finds = []
         _index = self.index(row, column, parent)
-        _data  = _index.data(Qt.DisplayRole)
+        _data  = _index.data(Qt.ItemDataRole.DisplayRole)
 
         if text.lower() in _data.lower():
 
@@ -479,7 +479,7 @@ class SCR_WDG_Tree(QTreeView):
     def get_user_data(self,item):
 
         if self.with_metadata:
-            _serial_data = item.data(Qt.UserRole)
+            _serial_data = item.data(Qt.ItemDataRole.UserRole)
         else:
             _serial_data = None
 

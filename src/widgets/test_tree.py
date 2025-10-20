@@ -425,7 +425,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
 
                     self.draw_menu_ext_libraries(_user_data["data"])
 
-                self.context_menu.exec_(self.mapToGlobal(point)) 
+                self.context_menu.exec(self.mapToGlobal(point)) 
 
             else:
                 self.context_menu = QMenu()
@@ -435,7 +435,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                             "Search in Test Tree", 
                                             self.scrib.wdg_test_tree_find.show)
 
-                self.context_menu.exec_(self.mapToGlobal(point)) 
+                self.context_menu.exec(self.mapToGlobal(point)) 
 
     def draw_menu_testfolder(self,data):
 
