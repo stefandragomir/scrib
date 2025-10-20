@@ -29,28 +29,22 @@ This module also provides :func:`testdoc` and :func:`testdoc_cli` functions
 that can be used programmatically. Other code is for internal usage.
 """
 
-import os.path
 import sys
 import time
+from pathlib import Path
 
-# Allows running as a script. __name__ check needed with multiprocessing:
-# https://github.com/robotframework/robotframework/issues/1137
-if 'robot' not in sys.modules and __name__ == '__main__':
-    import pythonpathsetter
+if __name__ == "__main__" and "robot" not in sys.modules:
+    from pythonpathsetter import set_pythonpath
+
+    set_pythonpath()
 
 from robot.conf import RobotSettings
-from robot.htmldata import HtmlFileWriter, ModelWriter, JsonWriter, TESTDOC
+from robot.htmldata import HtmlFileWriter, JsonWriter, ModelWriter, TESTDOC
 from robot.running import TestSuiteBuilder
-from robot.utils import (abspath, Application, file_writer, get_link_path,
-                         html_escape, html_format, IRONPYTHON, is_string,
-                         PY_VERSION, secs_to_timestr, seq2str2,
-                         timestr_to_secs, unescape)
-
-
-# http://ironpython.codeplex.com/workitem/31549
-if IRONPYTHON and PY_VERSION < (2, 7, 2):
-    int = long
-
+from robot.utils import (
+    abspath, Application, file_writer, get_link_path, html_escape, html_format,
+    is_list_like, secs_to_timestr, seq2str2, timestr_to_secs, unescape
+)
 
 USAGE = """robot.testdoc -- Robot Framework test data documentation tool
 
@@ -103,15 +97,14 @@ Data can be given as a single file, directory, or as multiple files and
 directories. In all these cases, the last argument must be the file where
 to write the output. The output is always created in HTML format.
 
-Testdoc works with all interpreters supported by Robot Framework (Python,
-Jython and IronPython). It can be executed as an installed module like
+Testdoc works with all interpreters supported by Robot Framework.
+It can be executed as an installed module like
 `python -m robot.testdoc` or as a script like `python path/robot/testdoc.py`.
 
 Examples:
 
   python -m robot.testdoc my_test.robot testdoc.html
-  jython -m robot.testdoc -N smoke_tests -i smoke path/to/my_tests smoke.html
-  ipy path/to/robot/testdoc.py first_suite.txt second_suite.txt output.html
+  python path/to/robot/testdoc.py first_suite.txt second_suite.txt output.html
 
 For more information about Testdoc and other built-in tools, see
 http://robotframework.org/robotframework/#built-in-tools.
@@ -130,14 +123,14 @@ class TestDoc(Application):
         self.console(outfile)
 
     def _write_test_doc(self, suite, outfile, title):
-        with file_writer(outfile, usage='Testdoc output') as output:
+        with file_writer(outfile, usage="Testdoc output") as output:
             model_writer = TestdocModelWriter(output, suite, title)
             HtmlFileWriter(output, model_writer).write(TESTDOC)
 
 
 def TestSuiteFactory(datasources, **options):
     settings = RobotSettings(options)
-    if is_string(datasources):
+    if not is_list_like(datasources):
         datasources = [datasources]
     suite = TestSuiteBuilder(process_curdir=False).build(*datasources)
     suite.configure(**settings.suite_config)
@@ -148,25 +141,25 @@ class TestdocModelWriter(ModelWriter):
 
     def __init__(self, output, suite, title=None):
         self._output = output
-        self._output_path = getattr(output, 'name', None)
+        self._output_path = getattr(output, "name", None)
         self._suite = suite
-        self._title = title.replace('_', ' ') if title else suite.name
+        self._title = title.replace("_", " ") if title else suite.name
 
     def write(self, line):
         self._output.write('<script type="text/javascript">\n')
         self.write_data()
-        self._output.write('</script>\n')
+        self._output.write("</script>\n")
 
     def write_data(self):
         model = {
-            'suite': JsonConverter(self._output_path).convert(self._suite),
-            'title': self._title,
-            'generated': int(time.time() * 1000)
+            "suite": JsonConverter(self._output_path).convert(self._suite),
+            "title": self._title,
+            "generated": int(time.time() * 1000),
         }
-        JsonWriter(self._output).write_json('testdoc = ', model)
+        JsonWriter(self._output).write_json("testdoc = ", model)
 
 
-class JsonConverter(object):
+class JsonConverter:
 
     def __init__(self, output_path=None):
         self._output_path = output_path
@@ -176,24 +169,26 @@ class JsonConverter(object):
 
     def _convert_suite(self, suite):
         return {
-            'source': suite.source or '',
-            'relativeSource': self._get_relative_source(suite.source),
-            'id': suite.id,
-            'name': self._escape(suite.name),
-            'fullName': self._escape(suite.longname),
-            'doc': self._html(suite.doc),
-            'metadata': [(self._escape(name), self._html(value))
-                         for name, value in suite.metadata.items()],
-            'numberOfTests': suite.test_count   ,
-            'suites': self._convert_suites(suite),
-            'tests': self._convert_tests(suite),
-            'keywords': list(self._convert_keywords((suite.setup, suite.teardown)))
+            "source": str(suite.source or ""),
+            "relativeSource": self._get_relative_source(suite.source),
+            "id": suite.id,
+            "name": self._escape(suite.name),
+            "fullName": self._escape(suite.full_name),
+            "doc": self._html(suite.doc),
+            "metadata": [
+                (self._escape(name), self._html(value))
+                for name, value in suite.metadata.items()
+            ],
+            "numberOfTests": suite.test_count,
+            "suites": self._convert_suites(suite),
+            "tests": self._convert_tests(suite),
+            "keywords": list(self._convert_keywords((suite.setup, suite.teardown))),
         }
 
     def _get_relative_source(self, source):
         if not source or not self._output_path:
-            return ''
-        return get_link_path(source, os.path.dirname(self._output_path))
+            return ""
+        return get_link_path(source, Path(self._output_path).parent)
 
     def _escape(self, item):
         return html_escape(item)
@@ -213,63 +208,80 @@ class JsonConverter(object):
         if test.teardown:
             test.body.append(test.teardown)
         return {
-            'name': self._escape(test.name),
-            'fullName': self._escape(test.longname),
-            'id': test.id,
-            'doc': self._html(test.doc),
-            'tags': [self._escape(t) for t in test.tags],
-            'timeout': self._get_timeout(test.timeout),
-            'keywords': list(self._convert_keywords(test.body))
+            "name": self._escape(test.name),
+            "fullName": self._escape(test.full_name),
+            "id": test.id,
+            "doc": self._html(test.doc),
+            "tags": [self._escape(t) for t in test.tags],
+            "timeout": self._get_timeout(test.timeout),
+            "keywords": list(self._convert_keywords(test.body)),
         }
 
     def _convert_keywords(self, keywords):
         for kw in keywords:
             if not kw:
                 continue
-            if kw.type == kw.SETUP:
-                yield self._convert_keyword(kw, 'SETUP')
-            elif kw.type == kw.TEARDOWN:
-                yield self._convert_keyword(kw, 'TEARDOWN')
+            if kw.type in kw.KEYWORD_TYPES:
+                yield self._convert_keyword(kw)
             elif kw.type == kw.FOR:
                 yield self._convert_for(kw)
+            elif kw.type == kw.WHILE:
+                yield self._convert_while(kw)
             elif kw.type == kw.IF_ELSE_ROOT:
-                for branch in self._convert_if(kw):
-                    yield branch
-            else:
-                yield self._convert_keyword(kw, 'KEYWORD')
+                yield from self._convert_if(kw)
+            elif kw.type == kw.TRY_EXCEPT_ROOT:
+                yield from self._convert_try(kw)
+            elif kw.type == kw.VAR:
+                yield self._convert_var(kw)
 
     def _convert_for(self, data):
-        name = '%s %s %s' % (', '.join(data.variables), data.flavor,
-                             seq2str2(data.values))
-        return {
-            'name': self._escape(name),
-            'arguments': '',
-            'type': 'FOR'
-        }
+        name = f"{', '.join(data.assign)} {data.flavor} {seq2str2(data.values)}"
+        return {"type": "FOR", "name": self._escape(name), "arguments": ""}
+
+    def _convert_while(self, data):
+        return {"type": "WHILE", "name": self._escape(data.condition), "arguments": ""}
 
     def _convert_if(self, data):
         for branch in data.body:
             yield {
-                'name': self._escape(branch.condition or ''),
-                'arguments': '',
-                'type': branch.type
+                "type": branch.type,
+                "name": self._escape(branch.condition or ""),
+                "arguments": "",
             }
 
-    def _convert_keyword(self, kw, kw_type):
+    def _convert_try(self, data):
+        for branch in data.body:
+            if branch.type == branch.EXCEPT:
+                patterns = ", ".join(branch.patterns)
+                as_var = f"AS {branch.assign}" if branch.assign else ""
+                name = f"{patterns} {as_var}".strip()
+            else:
+                name = ""
+            yield {"type": branch.type, "name": name, "arguments": ""}
+
+    def _convert_var(self, data):
+        if data.name[0] == "$" and len(data.value) == 1:
+            value = data.value[0]
+        else:
+            value = "[" + ", ".join(data.value) + "]"
+        return {"type": "VAR", "name": f"{data.name} = {value}"}
+
+    def _convert_keyword(self, kw):
         return {
-            'name': self._escape(self._get_kw_name(kw)),
-            'arguments': self._escape(', '.join(kw.args)),
-            'type': kw_type
+            "type": kw.type,
+            "name": self._escape(self._get_kw_name(kw)),
+            "arguments": self._escape(", ".join(kw.args)),
         }
 
     def _get_kw_name(self, kw):
         if kw.assign:
-            return '%s = %s' % (', '.join(a.rstrip('= ') for a in kw.assign), kw.name)
+            assign = ", ".join(a.rstrip("= ") for a in kw.assign)
+            return f"{assign} = {kw.name}"
         return kw.name
 
     def _get_timeout(self, timeout):
         if timeout is None:
-            return ''
+            return ""
         try:
             tout = secs_to_timestr(timestr_to_secs(timeout))
         except ValueError:
@@ -310,5 +322,5 @@ def testdoc(*arguments, **options):
     TestDoc().execute(*arguments, **options)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     testdoc_cli(sys.argv[1:])

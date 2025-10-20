@@ -19,12 +19,12 @@ from robot.model import SuiteVisitor
 class SuiteTeardownFailureHandler(SuiteVisitor):
 
     def end_suite(self, suite):
-        teardown = suite.teardown
-        # Both 'PASS' and 'NOT RUN' statuses are OK.
-        if teardown and teardown.status == teardown.FAIL:
-            suite.suite_teardown_failed(teardown.message)
-        if teardown and teardown.status == teardown.SKIP:
-            suite.suite_teardown_skipped(teardown.message)
+        if suite.has_teardown:
+            teardown = suite.teardown
+            if teardown.status == teardown.FAIL:
+                suite.suite_teardown_failed(teardown.message)
+            if teardown.status == teardown.SKIP:
+                suite.suite_teardown_skipped(teardown.message)
 
     def visit_test(self, test):
         pass
@@ -34,26 +34,33 @@ class SuiteTeardownFailureHandler(SuiteVisitor):
 
 
 class SuiteTeardownFailed(SuiteVisitor):
-    _normal_msg = 'Parent suite teardown failed:\n%s'
-    _also_msg = '\n\nAlso parent suite teardown failed:\n%s'
-    _normal_skip_msg = 'Skipped in parent suite teardown:\n%s'
-    _also_skip_msg = 'Skipped in parent suite teardown:\n%s\n\nEarlier message:\n%s'
+    _normal_msg = "Parent suite teardown failed:\n%s"
+    _also_msg = "\n\nAlso parent suite teardown failed:\n%s"
+    _normal_skip_msg = "Skipped in parent suite teardown:\n%s"
+    _also_skip_msg = "Skipped in parent suite teardown:\n%s\n\nEarlier message:\n%s"
 
     def __init__(self, message, skipped=False):
-        self._skipped = skipped
-        self._message = message
+        self.message = message
+        self.skipped = skipped
 
     def visit_test(self, test):
-        if not self._skipped:
-            test.status = test.FAIL
-            prefix = self._also_msg if test.message else self._normal_msg
-            test.message += prefix % self._message
+        if not self.skipped:
+            self._suite_teardown_failed(test)
         else:
-            test.status = test.SKIP
-            if test.message:
-                test.message = self._also_skip_msg % (self._message, test.message)
-            else:
-                test.message = self._normal_skip_msg % self._message
+            self._suite_teardown_skipped(test)
+
+    def _suite_teardown_failed(self, test):
+        if not test.skipped:
+            test.status = test.FAIL
+        prefix = self._also_msg if test.message else self._normal_msg
+        test.message += prefix % self.message
+
+    def _suite_teardown_skipped(self, test):
+        test.status = test.SKIP
+        if test.message:
+            test.message = self._also_skip_msg % (self.message, test.message)
+        else:
+            test.message = self._normal_skip_msg % self.message
 
     def visit_keyword(self, keyword):
         pass

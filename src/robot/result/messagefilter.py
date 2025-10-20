@@ -13,18 +13,24 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from robot.output.loggerhelper import IsLogged
+from robot import output
 
-from robot.model import SuiteVisitor
+from .visitor import ResultVisitor
 
 
-class MessageFilter(SuiteVisitor):
+class MessageFilter(ResultVisitor):
 
-    def __init__(self, loglevel=None):
-        self.loglevel = loglevel or 'TRACE'
+    def __init__(self, level="TRACE"):
+        log_level = output.LogLevel(level or "TRACE")
+        self.log_all = log_level.level == "TRACE"
+        self.is_logged = log_level.is_logged
 
-    def start_keyword(self, keyword):
-        def is_logged_or_not_message(item):
-            return item.type != item.MESSAGE or is_logged(item.level)
-        is_logged = IsLogged(self.loglevel)
-        keyword.body = keyword.body.filter(predicate=is_logged_or_not_message)
+    def start_suite(self, suite):
+        if self.log_all:
+            return False
+
+    def start_body_item(self, item):
+        if hasattr(item, "body"):
+            for msg in item.body.filter(messages=True):
+                if not self.is_logged(msg):
+                    item.body.remove(msg)

@@ -5,7 +5,13 @@ function toggleSuite(suiteId) {
 }
 
 function toggleTest(testId) {
-    toggleElement(testId, ['keyword']);
+    var test = window.testdata.findLoaded(testId);
+    var autoExpand = test.status == "FAIL" || test.status == "SKIP";
+    var closed = $('#' + testId).children('.element-header').hasClass('closed');
+    if (autoExpand && closed)
+        expandFailed(test);
+    else
+        toggleElement(testId, ['keyword']);
 }
 
 function toggleKeyword(kwId) {
@@ -42,10 +48,10 @@ function drawCallback(element, childElement, childrenNames) {
 }
 
 function expandSuite(suite) {
-    if (suite.status == "PASS")
-        expandElement(suite);
-    else
+    if (suite.status == "FAIL")
         expandFailed(suite);
+    else
+        expandElement(suite);
 }
 
 function expandElement(item, retryCount) {
@@ -79,7 +85,7 @@ function loadAndExpandElementIds(ids) {
 }
 
 function expandFailed(element) {
-    if (element.status == "FAIL") {
+    if (element.status == "FAIL" || (element.type == "test" && element.status == "SKIP")) {
         window.elementsToExpand = [element];
         window.expandDecider = function (e) {
             return e.status == "FAIL";
@@ -106,8 +112,9 @@ function expandRecursively() {
     element.callWhenChildrenReady(function () {
         var children = element.children();
         for (var i = children.length-1; i >= 0; i--) {
-            if (window.expandDecider(children[i]))
-                window.elementsToExpand.push(children[i]);
+            var child = children[i];
+            if (child.type != 'message' && window.expandDecider(child))
+                window.elementsToExpand.push(child);
         }
         if (window.elementsToExpand.length)
             setTimeout(expandRecursively, 0);

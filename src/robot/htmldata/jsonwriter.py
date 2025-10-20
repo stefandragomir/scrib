@@ -13,23 +13,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from robot.utils import PY2
 
+class JsonWriter:
 
-class JsonWriter(object):
-
-    def __init__(self, output, separator=''):
+    def __init__(self, output, separator=""):
         self._writer = JsonDumper(output)
         self._separator = separator
 
-    def write_json(self, prefix, data, postfix=';\n', mapping=None,
-                   separator=True):
+    def write_json(self, prefix, data, postfix=";\n", mapping=None, separator=True):
         self._writer.write(prefix)
         self._writer.dump(data, mapping)
         self._writer.write(postfix)
         self._write_separator(separator)
 
-    def write(self, string, postfix=';\n', separator=True):
+    def write(self, string, postfix=";\n", separator=True):
         self._writer.write(string + postfix)
         self._write_separator(separator)
 
@@ -38,29 +35,28 @@ class JsonWriter(object):
             self._writer.write(self._separator)
 
 
-class JsonDumper(object):
+class JsonDumper:
 
     def __init__(self, output):
-        self._output = output
-        self._dumpers = (MappingDumper(self),
-                         IntegerDumper(self),
-                         TupleListDumper(self),
-                         StringDumper(self),
-                         NoneDumper(self),
-                         DictDumper(self))
+        self.write = output.write
+        self._dumpers = (
+            MappingDumper(self),
+            IntegerDumper(self),
+            TupleListDumper(self),
+            StringDumper(self),
+            NoneDumper(self),
+            DictDumper(self),
+        )
 
     def dump(self, data, mapping=None):
         for dumper in self._dumpers:
             if dumper.handles(data, mapping):
                 dumper.dump(data, mapping)
                 return
-        raise ValueError('Dumping %s not supported.' % type(data))
-
-    def write(self, data):
-        self._output.write(data)
+        raise ValueError(f"Dumping {type(data)} not supported.")
 
 
-class _Dumper(object):
+class _Dumper:
     _handled_types = None
 
     def __init__(self, jsondumper):
@@ -75,12 +71,19 @@ class _Dumper(object):
 
 
 class StringDumper(_Dumper):
-    _handled_types = (str, unicode) if PY2 else str
-    _search_and_replace = [('\\', '\\\\'), ('"', '\\"'), ('\t', '\\t'),
-                           ('\n', '\\n'), ('\r', '\\r'), ('</', '\\x3c/')]
+    _handled_types = str
+    _search_and_replace = [
+        ("\\", "\\\\"),
+        ('"', '\\"'),
+        ("\t", "\\t"),
+        ("\n", "\\n"),
+        ("\r", "\\r"),
+        ("</", "\\x3c/"),
+    ]
 
     def dump(self, data, mapping):
-        self._write('"%s"' % (self._escape(data) if data else ''))
+        data = self._escape(data) if data else ""
+        self._write(f'"{data}"')
 
     def _escape(self, string):
         for search, replace in self._search_and_replace:
@@ -91,7 +94,7 @@ class StringDumper(_Dumper):
 
 class IntegerDumper(_Dumper):
     # Handles also bool
-    _handled_types = (int, long) if PY2 else int
+    _handled_types = int
 
     def dump(self, data, mapping):
         self._write(str(data).lower())
@@ -101,28 +104,32 @@ class DictDumper(_Dumper):
     _handled_types = dict
 
     def dump(self, data, mapping):
-        self._write('{')
+        write = self._write
+        dump = self._dump
+        write("{")
         last_index = len(data) - 1
         for index, key in enumerate(sorted(data)):
-            self._dump(key, mapping)
-            self._write(':')
-            self._dump(data[key], mapping)
+            dump(key, mapping)
+            write(":")
+            dump(data[key], mapping)
             if index < last_index:
-                self._write(',')
-        self._write('}')
+                write(",")
+        write("}")
 
 
 class TupleListDumper(_Dumper):
     _handled_types = (tuple, list)
 
     def dump(self, data, mapping):
-        self._write('[')
+        write = self._write
+        dump = self._dump
+        write("[")
         last_index = len(data) - 1
         for index, item in enumerate(data):
-            self._dump(item, mapping)
+            dump(item, mapping)
             if index < last_index:
-                self._write(',')
-        self._write(']')
+                write(",")
+        write("]")
 
 
 class MappingDumper(_Dumper):
@@ -143,4 +150,4 @@ class NoneDumper(_Dumper):
         return data is None
 
     def dump(self, data, mapping):
-        self._write('null')
+        self._write("null")

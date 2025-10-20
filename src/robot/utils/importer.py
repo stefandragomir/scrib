@@ -13,28 +13,23 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import os
-import sys
+import importlib
 import inspect
+import os.path
+import sys
+from collections.abc import Sequence
+from pathlib import Path
+from typing import NoReturn
 
 from robot.errors import DataError
 
-from .encoding import system_decode, system_encode
 from .error import get_error_details
-from .platform import JYTHON, IRONPYTHON, PY2, PY3, PYPY
+from .robotinspect import is_init
 from .robotpath import abspath, normpath
-from .robotinspect import is_java_init, is_init
-from .robottypes import type_name, is_unicode
-
-if PY3:
-    from importlib import invalidate_caches as invalidate_import_caches
-else:
-    invalidate_import_caches = lambda: None
-if JYTHON:
-    from java.lang.System import getProperty
+from .robottypes import type_name
 
 
-class Importer(object):
+class Importer:
     """Utility that can import modules and classes based on names and paths.
 
     Imported classes can optionally be instantiated automatically.
@@ -49,25 +44,34 @@ class Importer(object):
             Currently only needs the ``info`` method, but other level specific
             methods may be needed in the future. If not given, logging is disabled.
         """
-        self._type = type or ''
-        self._logger = logger or NoLogger()
-        self._importers = (ByPathImporter(logger),
-                           NonDottedImporter(logger),
-                           DottedImporter(logger))
+        self.type = type or ""
+        self.logger = logger or NoLogger()
+        library_import = type and type.upper() == "LIBRARY"
+        self._importers = (
+            ByPathImporter(self.logger, library_import),
+            NonDottedImporter(self.logger, library_import),
+            DottedImporter(self.logger, library_import),
+        )
         self._by_path_importer = self._importers[0]
 
-    def import_class_or_module(self, name_or_path, instantiate_with_args=None,
-                               return_source=False):
-        """Imports Python class/module or Java class based on the given name or path.
+    def import_class_or_module(
+        self,
+        name_or_path: "str|Path",
+        instantiate_with_args: "Sequence|None" = None,
+        return_source: bool = False,
+    ):
+        """Imports Python class or module based on the given name or path.
 
         :param name_or_path:
-            Name or path of the module or class to import.
+            Name or path of the module or class to import. If a path is given as
+            a string, it must be absolute. Paths given as ``Path`` objects can be
+            relative starting from Robot Framework 7.3.
         :param instantiate_with_args:
             When arguments are given, imported classes are automatically initialized
             using them.
         :param return_source:
             When true, returns a tuple containing the imported module or class
-            and a path to it. By default returns only the imported module or class.
+            and a path to it. By default, returns only the imported module or class.
 
         The class or module to import can be specified either as a name, in which
         case it must be in the module search path, or as a path to the file or
@@ -88,9 +92,11 @@ class Importer(object):
         the name or path like ``Example:arg1:arg2``, separate
         :func:`~robot.utils.text.split_args_from_name_or_path` function can be
         used to split them before calling this method.
+
+        Use :meth:`import_module` if only a module needs to be imported.
         """
         try:
-            imported, source = self._import_class_or_module(name_or_path)
+            imported, source = self._import(name_or_path)
             self._log_import_succeeded(imported, name_or_path, source)
             imported = self._instantiate_if_needed(imported, instantiate_with_args)
         except DataError as err:
@@ -98,10 +104,37 @@ class Importer(object):
         else:
             return self._handle_return_values(imported, source, return_source)
 
-    def _import_class_or_module(self, name):
+    def import_module(self, name_or_path: "str|Path"):
+        """Imports Python module based on the given name or path.
+
+        :param name_or_path:
+            Name or path of the module to import. If a path is given as a string,
+            it must be absolute. Paths given as ``Path`` objects can be relative
+            starting from Robot Framework 7.3.
+
+        The module to import can be specified either as a name, in which
+        case it must be in the module search path, or as a path to the file or
+        directory implementing the module. See :meth:`import_class_or_module_by_path`
+        for more information about importing modules by path.
+
+        Use :meth:`import_class_or_module` if it is desired to get a class
+        from the imported module automatically.
+
+        New in Robot Framework 6.0.
+        """
+        try:
+            imported, source = self._import(name_or_path, get_class=False)
+            self._log_import_succeeded(imported, name_or_path, source)
+        except DataError as err:
+            self._raise_import_failed(name_or_path, err)
+        else:
+            return imported
+
+    def _import(self, name, get_class=True):
         for importer in self._importers:
             if importer.handles(name):
-                return importer.import_(name)
+                return importer.import_(name, get_class)
+        assert False
 
     def _handle_return_values(self, imported, source, return_source=False):
         if not return_source:
@@ -113,30 +146,30 @@ class Importer(object):
     def _sanitize_source(self, source):
         source = normpath(source)
         if os.path.isdir(source):
-            candidate = os.path.join(source, '__init__.py')
-        elif source.endswith('.pyc'):
-            candidate = source[:-4] + '.py'
-        elif source.endswith('$py.class'):
-            candidate = source[:-9] + '.py'
-        elif source.endswith('.class'):
-            candidate = source[:-6] + '.java'
+            candidate = os.path.join(source, "__init__.py")
+        elif source.endswith(".pyc"):
+            candidate = source[:-4] + ".py"
         else:
             return source
         return candidate if os.path.exists(candidate) else source
 
-    def import_class_or_module_by_path(self, path, instantiate_with_args=None):
-        """Import a Python module or Java class using a file system path.
+    def import_class_or_module_by_path(
+        self,
+        path: "str|Path",
+        instantiate_with_args: "Sequence|None" = None,
+    ):
+        """Import a Python module or class using a file system path.
 
         :param path:
-            Path to the module or class to import.
+            Path to the module or class to import. If a path is given as a string,
+            it must be absolute. Paths given as ``Path`` objects can be relative
+            starting from Robot Framework 7.3.
         :param instantiate_with_args:
             When arguments are given, imported classes are automatically initialized
             using them.
 
         When importing a Python file, the path must end with :file:`.py` and the
-        actual file must also exist. When importing Java classes, the path must
-        end with :file:`.java` or :file:`.class`. The Java class file must exist
-        in both cases and in the former case also the source file must exist.
+        actual file must also exist.
 
         Use :meth:`import_class_or_module` to support importing also using name,
         not only path. See the documentation of that function for more information
@@ -150,30 +183,14 @@ class Importer(object):
             self._raise_import_failed(path, err)
 
     def _log_import_succeeded(self, item, name, source):
-        import_type = '%s ' % self._type.lower() if self._type else ''
-        item_type = 'module' if inspect.ismodule(item) else 'class'
-        location = ("'%s'" % source) if source else 'unknown location'
-        self._logger.info("Imported %s%s '%s' from %s."
-                          % (import_type, item_type, name, location))
+        prefix = f"Imported {self.type.lower()}" if self.type else "Imported"
+        item_type = "module" if inspect.ismodule(item) else "class"
+        source = f"'{source}'" if source else "unknown location"
+        self.logger.info(f"{prefix} {item_type} '{name}' from {source}.")
 
-    def _raise_import_failed(self, name, error):
-        import_type = '%s ' % self._type.lower() if self._type else ''
-        msg = "Importing %s'%s' failed: %s" % (import_type, name, error.message)
-        if not error.details:
-            raise DataError(msg)
-        msg = [msg, error.details]
-        msg.extend(self._get_items_in('PYTHONPATH', sys.path))
-        if JYTHON:
-            classpath = getProperty('java.class.path').split(os.path.pathsep)
-            msg.extend(self._get_items_in('CLASSPATH', classpath))
-        raise DataError('\n'.join(msg))
-
-    def _get_items_in(self, type, items):
-        yield '%s:' % type
-        for item in items:
-            if item:
-                yield '  %s' % (item if is_unicode(item)
-                                else system_decode(item))
+    def _raise_import_failed(self, name, error) -> NoReturn:
+        prefix = f"Importing {self.type.lower()}" if self.type else "Importing"
+        raise DataError(f"{prefix} '{name}' failed: {error}")
 
     def _instantiate_if_needed(self, imported, args):
         if args is None:
@@ -192,59 +209,65 @@ class Importer(object):
             raise DataError(err.args[0])
         try:
             return imported(*positional, **dict(named))
-        except:
-            raise DataError('Creating instance failed: %s\n%s' % get_error_details())
+        except Exception:
+            message, traceback = get_error_details()
+            raise DataError(f"Creating instance failed: {message}\n{traceback}")
 
     def _get_arg_spec(self, imported):
         # Avoid cyclic import. Yuck.
         from robot.running.arguments import ArgumentSpec, PythonArgumentParser
 
-        init = getattr(imported, '__init__', None)
+        init = getattr(imported, "__init__", None)
         name = imported.__name__
         if not is_init(init):
-            return ArgumentSpec(name, self._type)
-        if is_java_init(init):
-            return ArgumentSpec(name, self._type, var_positional='varargs')
-        return PythonArgumentParser(self._type).parse(init, name)
+            return ArgumentSpec(name, self.type)
+        return PythonArgumentParser(self.type).parse(init, name)
 
 
-class _Importer(object):
+class _Importer:
 
-    def __init__(self, logger):
-        self._logger = logger
+    def __init__(self, logger, library_import=False):
+        self.logger = logger
+        self.library_import = library_import
 
-    def _import(self, name, fromlist=None, retry=True):
+    def _import(self, name, fromlist=None):
         if name in sys.builtin_module_names:
-            raise DataError('Cannot import custom module with same name as '
-                            'Python built-in module.')
-        invalidate_import_caches()
+            raise DataError(
+                "Cannot import custom module with same name as Python built-in module."
+            )
+        importlib.invalidate_caches()
         try:
-            try:
-                return __import__(name, fromlist=fromlist)
-            except ImportError:
-                # Hack to support standalone Jython. For more information, see:
-                # https://github.com/robotframework/robotframework/issues/515
-                # http://bugs.jython.org/issue1778514
-                if JYTHON and fromlist and retry:
-                    __import__('%s.%s' % (name, fromlist[0]))
-                    return self._import(name, fromlist, retry=False)
-                # IronPython loses traceback when using plain raise.
-                # https://github.com/IronLanguages/main/issues/989
-                if IRONPYTHON:
-                    exec('raise sys.exc_type, sys.exc_value, sys.exc_traceback')
-                raise
-        except:
-            raise DataError(*get_error_details())
+            return __import__(name, fromlist=fromlist)
+        except Exception:
+            message, traceback = get_error_details(full_traceback=False)
+            path = "\n".join(f"  {p}" for p in sys.path)
+            raise DataError(f"{message}\n{traceback}\nPYTHONPATH:\n{path}")
 
     def _verify_type(self, imported):
         if inspect.isclass(imported) or inspect.ismodule(imported):
             return imported
-        raise DataError('Expected class or module, got %s.'
-                        % type_name(imported))
+        raise DataError(f"Expected class or module, got {type_name(imported)}.")
 
-    def _get_class_from_module(self, module, name=None):
-        klass = getattr(module, name or module.__name__, None)
-        return klass if inspect.isclass(klass) else None
+    def _get_possible_class(self, module, name=None):
+        cls = self._get_class_matching_module_name(module, name)
+        if not cls and self.library_import:
+            cls = self._get_decorated_library_class_in_imported_module(module)
+        return cls or module
+
+    def _get_class_matching_module_name(self, module, name):
+        cls = getattr(module, name or module.__name__, None)
+        return cls if inspect.isclass(cls) else None
+
+    def _get_decorated_library_class_in_imported_module(self, module):
+        def predicate(item):
+            return (
+                inspect.isclass(item)
+                and hasattr(item, "ROBOT_AUTO_KEYWORDS")
+                and item.__module__ == module.__name__
+            )
+
+        classes = [cls for _, cls in inspect.getmembers(module, predicate)]
+        return classes[0] if len(classes) == 1 else None
 
     def _get_source(self, imported):
         try:
@@ -255,65 +278,67 @@ class _Importer(object):
 
 
 class ByPathImporter(_Importer):
-    _valid_import_extensions = ('.py', '.java', '.class', '')
+    _valid_import_extensions = (".py", "")
 
     def handles(self, path):
-        return os.path.isabs(path)
+        return os.path.isabs(path) or isinstance(path, Path)
 
-    def import_(self, path):
-        self._verify_import_path(path)
+    def import_(self, path, get_class=True):
+        path = self._verify_import_path(path)
         self._remove_wrong_module_from_sys_modules(path)
-        module = self._import_by_path(path)
-        imported = self._get_class_from_module(module) or module
+        imported = self._import_by_path(path)
+        if get_class:
+            imported = self._get_possible_class(imported)
         return self._verify_type(imported), path
 
     def _verify_import_path(self, path):
         if not os.path.exists(path):
-            raise DataError('File or directory does not exist.')
+            raise DataError("File or directory does not exist.")
         if not os.path.isabs(path):
-            raise DataError('Import path must be absolute.')
-        if not os.path.splitext(path)[1] in self._valid_import_extensions:
-            raise DataError('Not a valid file or directory to import.')
+            if isinstance(path, Path):
+                path = path.absolute()
+            else:
+                raise DataError("Import path must be absolute.")
+        if os.path.splitext(path)[1] not in self._valid_import_extensions:
+            raise DataError("Not a valid file or directory to import.")
+        return os.path.normpath(path)
 
     def _remove_wrong_module_from_sys_modules(self, path):
         importing_from, name = self._split_path_to_module(path)
-        importing_package = os.path.splitext(path)[1] == ''
+        importing_package = os.path.splitext(path)[1] == ""
         if self._wrong_module_imported(name, importing_from, importing_package):
             del sys.modules[name]
-            self._logger.info("Removed module '%s' from sys.modules to import "
-                              "fresh module." % name)
+            self.logger.info(
+                f"Removed module '{name}' from sys.modules to import a fresh module."
+            )
 
     def _split_path_to_module(self, path):
         module_dir, module_file = os.path.split(abspath(path))
         module_name = os.path.splitext(module_file)[0]
-        if module_name.endswith('$py'):
-            module_name = module_name[:-3]
         return module_dir, module_name
 
     def _wrong_module_imported(self, name, importing_from, importing_package):
         if name not in sys.modules:
             return False
-        source = getattr(sys.modules[name], '__file__', None)
-        if not source:  # play safe (occurs at least with java based modules)
+        source = getattr(sys.modules[name], "__file__", None)
+        if not source:  # play safe
             return True
         imported_from, imported_package = self._get_import_information(source)
-        return (normpath(importing_from, case_normalize=True) !=
-                normpath(imported_from, case_normalize=True) or
-                importing_package != imported_package)
+        return (
+            normpath(importing_from, case_normalize=True)
+            != normpath(imported_from, case_normalize=True)
+            or importing_package != imported_package
+        )
 
     def _get_import_information(self, source):
         imported_from, imported_file = self._split_path_to_module(source)
-        imported_package = imported_file == '__init__'
+        imported_package = imported_file == "__init__"
         if imported_package:
             imported_from = os.path.dirname(imported_from)
         return imported_from, imported_package
 
     def _import_by_path(self, path):
         module_dir, module_name = self._split_path_to_module(path)
-        # Other interpreters work also with Unicode paths.
-        # https://bitbucket.org/pypy/pypy/issues/3112
-        if PYPY and PY2:
-            module_dir = system_encode(module_dir)
         sys.path.insert(0, module_dir)
         try:
             return self._import(module_name)
@@ -324,30 +349,31 @@ class ByPathImporter(_Importer):
 class NonDottedImporter(_Importer):
 
     def handles(self, name):
-        return '.' not in name
+        return "." not in name
 
-    def import_(self, name):
-        module = self._import(name)
-        imported = self._get_class_from_module(module) or module
+    def import_(self, name, get_class=True):
+        imported = self._import(name)
+        if get_class:
+            imported = self._get_possible_class(imported)
         return self._verify_type(imported), self._get_source(imported)
 
 
 class DottedImporter(_Importer):
 
     def handles(self, name):
-        return '.' in name
+        return "." in name
 
-    def import_(self, name):
-        parent_name, lib_name = name.rsplit('.', 1)
+    def import_(self, name, get_class=True):
+        parent_name, lib_name = name.rsplit(".", 1)
         parent = self._import(parent_name, fromlist=[str(lib_name)])
         try:
             imported = getattr(parent, lib_name)
         except AttributeError:
-            raise DataError("Module '%s' does not contain '%s'."
-                            % (parent_name, lib_name))
-        imported = self._get_class_from_module(imported, lib_name) or imported
+            raise DataError(f"Module '{parent_name}' does not contain '{lib_name}'.")
+        if get_class:
+            imported = self._get_possible_class(imported, lib_name)
         return self._verify_type(imported), self._get_source(imported)
 
 
-class NoLogger(object):
+class NoLogger:
     error = warn = info = debug = trace = lambda self, *args, **kws: None

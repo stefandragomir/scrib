@@ -31,19 +31,20 @@ that can be used programmatically. Other code is for internal usage.
 """
 
 import sys
+from threading import current_thread
 
-# Allows running as a script. __name__ check needed with multiprocessing:
-# https://github.com/robotframework/robotframework/issues/1137
-if 'robot' not in sys.modules and __name__ == '__main__':
-    import pythonpathsetter
+if __name__ == "__main__" and "robot" not in sys.modules:
+    from pythonpathsetter import set_pythonpath
+
+    set_pythonpath()
 
 from robot.conf import RobotSettings
+from robot.errors import DataError
 from robot.model import ModelModifier
-from robot.output import LOGGER, pyloggingconf
+from robot.output import librarylogger, LOGGER, pyloggingconf
 from robot.reporting import ResultWriter
 from robot.running.builder import TestSuiteBuilder
-from robot.utils import Application, unic, text
-
+from robot.utils import Application, text
 
 USAGE = """Robot Framework -- A generic automation framework
 
@@ -52,22 +53,19 @@ Version:  <VERSION>
 Usage:  robot [options] paths
    or:  python -m robot [options] paths
    or:  python path/to/robot [options] paths
-   or:  java -jar robotframework.jar [options] paths
 
 Robot Framework is a generic open source automation framework for acceptance
 testing, acceptance test-driven development (ATDD) and robotic process
 automation (RPA). It has simple, easy-to-use syntax that utilizes the
 keyword-driven automation approach. Keywords adding new capabilities are
-implemented in libraries using either Python or Java. New higher level
+implemented in libraries using Python. New higher level
 keywords can also be created using Robot Framework's own syntax.
 
 The easiest way to execute Robot Framework is using the `robot` command created
 as part of the normal installation. Alternatively it is possible to execute
 the `robot` module directly like `python -m robot`, where `python` can be
-replaced with any supported Python interpreter such as `jython`, `ipy` or
-`python3`. Yet another alternative is running the `robot` directory like
-`python path/to/robot`. Finally, there is a standalone JAR distribution
-available.
+replaced with any supported Python interpreter. Yet another alternative
+is running the `robot` directory like `python path/to/robot`.
 
 Tests (or tasks in RPA terminology) are created in files typically having the
 `*.robot` extension. Files automatically create test (or task) suites and
@@ -88,27 +86,38 @@ see http://robotframework.org/.
 Options
 =======
 
-    --rpa                 Turn the on generic automation mode. Mainly affects
+    --rpa                 Turn on the generic automation mode. Mainly affects
                           terminology so that "test" is replaced with "task"
                           in logs and reports. By default the mode is got
-                          from test/task header in data files. New in RF 3.1.
+                          from test/task header in data files.
+    --language lang *     Activate localization. `lang` can be a name or a code
+                          of a built-in language, or a path or a module name of
+                          a custom language file.
  -F --extension value     Parse only files with this extension when executing
                           a directory. Has no effect when running individual
                           files or when using resource files. If more than one
                           extension is needed, separate them with a colon.
                           Examples: `--extension txt`, `--extension robot:txt`
-                          Starting from RF 3.2 only `*.robot` files are parsed
-                          by default.
+                          Only `*.robot` files are parsed by default.
+ -I --parseinclude pattern *  Parse only files matching `pattern`. It can be:
+                          - a file name or pattern like `example.robot` or
+                            `*.robot` to parse all files matching that name,
+                          - a file path like `path/to/example.robot`, or
+                          - a directory path like `path/to/example` to parse
+                            all files in that directory, recursively.
  -N --name name           Set the name of the top level suite. By default the
                           name is created based on the executed file or
                           directory.
  -D --doc documentation   Set the documentation of the top level suite.
                           Simple formatting is supported (e.g. *bold*). If the
                           documentation contains spaces, it must be quoted.
-                          Example: --doc "Very *good* example"
+                          If the value is path to an existing file, actual
+                          documentation is read from that file.
+                          Examples: --doc "Very *good* example"
+                                    --doc doc_from_file.txt
  -M --metadata name:value *  Set metadata of the top level suite. Value can
-                          contain formatting similarly as --doc.
-                          Example: --metadata Version:1.2
+                          contain formatting and be read from a file similarly
+                          as --doc. Example: --metadata Version:1.2
  -G --settag tag *        Sets given tag(s) to all executed tests.
  -t --test name *         Select tests by name or by long name containing also
                           parent suite name like `Parent.Test`. Name is case
@@ -143,19 +152,17 @@ Options
                           e.g. with --include/--exclude when it is not an error
                           that no test matches the condition.
     --skip tag *          Tests having given tag will be skipped. Tag can be
-                          a pattern. New in RF 4.0.
+                          a pattern.
     --skiponfailure tag *  Tests having given tag will be skipped if they fail.
-                          Tag can be a pattern. New in RF 4.0.
- -n --noncritical tag *   Alias for --skiponfailure. Deprecated since RF 4.0.
- -c --critical tag *      Opposite of --noncritical. Deprecated since RF 4.0.
+                          Tag can be a pattern
  -v --variable name:value *  Set variables in the test data. Only scalar
                           variables with string value are supported and name is
                           given without `${}`. See --variablefile for a more
                           powerful variable setting mechanism.
                           Examples:
-                          --variable str:Hello       =>  ${str} = `Hello`
-                          -v hi:Hi_World -E space:_  =>  ${hi} = `Hi World`
-                          -v x: -v y:42              =>  ${x} = ``, ${y} = `42`
+                          --variable name:Robot  =>  ${name} = `Robot`
+                          -v "hello:Hello world" =>  ${hello} = `Hello world`
+                          -v x: -v y:42          =>  ${x} = ``, ${y} = `42`
  -V --variablefile path *  Python or YAML file file to read variables from.
                           Possible arguments to the variable file can be given
                           after the path using colon or semicolon as separator.
@@ -172,6 +179,8 @@ Options
                           can also be further processed with Rebot tool. Can be
                           disabled by giving a special value `NONE`.
                           Default: output.xml
+    --legacyoutput        Create XML output file in format compatible with
+                          Robot Framework 6.x and earlier.
  -l --log file            HTML log file. Can be disabled by giving a special
                           value `NONE`. Default: log.html
                           Examples: `--log mylog.html`, `-l NONE`
@@ -179,7 +188,6 @@ Options
                           similarly as --log. Default: report.html
  -x --xunit file          xUnit compatible result file. Not created unless this
                           option is specified.
-    --xunitskipnoncritical  Deprecated since RF 4.0 and has no effect anymore.
  -b --debugfile file      Debug file written during execution. Not created
                           unless this option is specified.
  -T --timestampoutputs    When this option is used, timestamp in a format
@@ -191,17 +199,22 @@ Options
     --splitlog            Split the log file into smaller pieces that open in
                           browsers transparently.
     --logtitle title      Title for the generated log file. The default title
-                          is `<SuiteName> Test Log`.
+                          is `<SuiteName> Log`.
     --reporttitle title   Title for the generated report file. The default
-                          title is `<SuiteName> Test Report`.
+                          title is `<SuiteName> Report`.
     --reportbackground colors  Background colors to use in the report file.
-                          Order is `passed:failed:skipped`. Both color names
-                          and codes work. `skipped` can be omitted.
+                          Given in format `passed:failed:skipped` where the
+                          `:skipped` part can be omitted. Both color names and
+                          codes work.
                           Examples: --reportbackground green:red:yellow
                                     --reportbackground #00E:#E00
     --maxerrorlines lines  Maximum number of error message lines to show in
                           report when tests fail. Default is 40, minimum is 10
                           and `NONE` can be used to show the full message.
+    --maxassignlength characters  Maximum number of characters to show in log
+                          when variables are assigned. Zero or negative values
+                          can be used to avoid showing assigned values at all.
+                          Default is 200.
  -L --loglevel level      Threshold level for logging. Available levels: TRACE,
                           DEBUG, INFO (default), WARN, NONE (no logging). Use
                           syntax `LOGLEVEL:DEFAULT` to define the default
@@ -228,7 +241,6 @@ Options
                           pattern. Documentation is shown in `Test Details` and
                           also as a tooltip in `Statistics by Tag`. Pattern can
                           use `*`, `?` and `[]` as wildcards like --test.
-                          Documentation can contain formatting like --doc.
                           Examples: --tagdoc mytag:Example
                                     --tagdoc "owner-*:Original author"
     --tagstatlink pattern:link:title *  Add external links into `Statistics by
@@ -244,7 +256,6 @@ Options
                           work using same rules as with --removekeywords.
                           Examples: --expandkeywords name:BuiltIn.Log
                                     --expandkeywords tag:expand
-                          New in RF 3.2.
     --removekeywords all|passed|for|wuks|name:<pattern>|tag:<pattern> *
                           Remove keyword data from the generated log file.
                           Keywords containing warnings are not removed except
@@ -252,7 +263,8 @@ Options
                           all:     remove data from all keywords
                           passed:  remove data only from keywords in passed
                                    test cases and suites
-                          for:     remove passed iterations from for loops
+                          for:     remove passed iterations from FOR loops
+                          while:   remove passed iterations from WHILE loops
                           wuks:    remove all but the last failing keyword
                                    inside `BuiltIn.Wait Until Keyword Succeeds`
                           name:<pattern>:  remove data from keywords that match
@@ -271,29 +283,25 @@ Options
                                    `OR`, and `NOT` operators.
                                    Examples: --removekeywords foo
                                              --removekeywords fooANDbar*
-    --flattenkeywords for|foritem|name:<pattern>|tag:<pattern> *
+    --flattenkeywords for|while|iteration|name:<pattern>|tag:<pattern> *
                           Flattens matching keywords in the generated log file.
                           Matching keywords get all log messages from their
                           child keywords and children are discarded otherwise.
-                          for:     flatten for loops fully
-                          foritem: flatten individual for loop iterations
+                          for:     flatten FOR loops fully
+                          while:   flatten WHILE loops fully
+                          iteration: flatten FOR/WHILE loop iterations
+                          foritem: deprecated alias for `iteration`
                           name:<pattern>:  flatten matched keywords using same
                                    matching rules as with
                                    `--removekeywords name:<pattern>`
                           tag:<pattern>:  flatten matched keywords using same
                                    matching rules as with
                                    `--removekeywords tag:<pattern>`
-    --listener class *    A class for monitoring test execution. Gets
-                          notifications e.g. when tests start and end.
-                          Arguments to the listener class can be given after
-                          the name using a colon or a semicolon as a separator.
-                          Examples: --listener MyListenerClass
-                                    --listener path/to/Listener.py:arg1:arg2
     --nostatusrc          Sets the return code to zero regardless of failures
                           in test cases. Error codes are returned normally.
     --dryrun              Verifies test data and runs tests so that library
                           keywords are not executed.
- -X --exitonfailure       Stops test execution if any critical test fails.
+ -X --exitonfailure       Stops test execution if any test fails.
     --exitonerror         Stops test execution if any error occurs when parsing
                           test data, importing libraries, and so on.
     --skipteardownonexit  Causes teardowns to be skipped if test execution is
@@ -307,15 +315,24 @@ Options
                           The seed must be an integer.
                           Examples: --randomize all
                                     --randomize tests:1234
-    --prerunmodifier class *  Class to programmatically modify the test suite
-                          structure before execution.
-    --prerebotmodifier class *  Class to programmatically modify the result
-                          model before creating reports and logs.
+    --listener listener *  Class or module for monitoring test execution.
+                          Gets notifications e.g. when tests start and end.
+                          Arguments to the listener class can be given after
+                          the name using a colon or a semicolon as a separator.
+                          Examples: --listener MyListener
+                                    --listener path/to/Listener.py:arg1:arg2
+    --prerunmodifier modifier *  Class to programmatically modify the suite
+                          structure before execution. Accepts arguments the
+                          same way as with --listener.
+    --prerebotmodifier modifier *  Class to programmatically modify the result
+                          model before creating reports and logs. Accepts
+                          arguments the same way as with --listener.
+    --parser parser *     Custom parser class or module. Parser classes accept
+                          arguments the same way as with --listener.
     --console type        How to report execution on the console.
                           verbose:  report every suite and test (default)
-                          dotted:   only show `.` for passed test, `f` for
-                                    failed non-critical tests, and `F` for
-                                    failed critical tests
+                          dotted:   only show `.` for passed test, `s` for
+                                    skipped tests, and `F` for failed tests
                           quiet:    no output except for errors and warnings
                           none:     no output whatsoever
  -. --dotted              Shortcut for `--console dotted`.
@@ -326,19 +343,20 @@ Options
                           on:   always use colors
                           ansi: like `on` but use ANSI colors also on Windows
                           off:  disable colors altogether
-                          Note that colors do not work with Jython on Windows.
+    --consolelinks auto|off  Control making paths to results files hyperlinks.
+                          auto: use links when colors are enabled (default)
+                          off: disable links unconditionally
  -K --consolemarkers auto|on|off  Show markers on the console when top level
                           keywords in a test case end. Values have same
                           semantics as with --consolecolors.
- -P --pythonpath path *   Additional locations (directories, ZIPs, JARs) where
-                          to search test libraries and other extensions when
-                          they are imported. Multiple paths can be given by
-                          separating them with a colon (`:`) or by using this
-                          option several times. Given path can also be a glob
-                          pattern matching multiple paths.
-                          Examples:
-                          --pythonpath libs/ --pythonpath resources/*.jar
-                          --pythonpath /opt/testlibs:mylibs.zip:yourlibs
+ -P --pythonpath path *   Additional locations (directories, ZIPs) where to
+                          search libraries and other extensions when they are
+                          imported. Multiple paths can be given by separating
+                          them with a colon (`:`) or by using this option
+                          several times. Given path can also be a glob pattern
+                          matching multiple paths.
+                          Examples: --pythonpath libs/
+                                    --pythonpath /opt/libs:libraries.zip
  -A --argumentfile path *  Text file to read more arguments from. Use special
                           path `STDIN` to read contents from the standard input
                           stream. File can have both options and input files
@@ -350,7 +368,7 @@ Options
                           |  --include regression
                           |  --name Regression Tests
                           |  # This is a comment line
-                          |  my_tests.robot
+                          |  tests.robot
                           |  path/to/test/directory/
                           Examples:
                           --argumentfile argfile.txt --argumentfile STDIN
@@ -367,11 +385,9 @@ has precedence regardless of how many times options are used. For example,
 `--dryrun --dryrun --nodryrun --nostatusrc --statusrc` would not activate the
 dry-run mode and would return a normal return code.
 
-Long option format is case-insensitive. For example, --SuiteStatLevel is
-equivalent to but easier to read than --suitestatlevel. Long options can
-also be shortened as long as they are unique. For example, `--logti Title`
-works while `--lo log.html` does not because the former matches only --logtitle
-but the latter matches --log, --loglevel and --logtitle.
+Long option names are case and hyphen insensitive. For example, --TagStatLink
+and --tag-stat-link are equivalent to, but easier to read than, --tagstatlink.
+Long options can also be shortened as long as they are unique.
 
 Environment Variables
 =====================
@@ -389,6 +405,17 @@ ROBOT_SYSLOG_LEVEL        Log level to use when writing to the syslog file.
 ROBOT_INTERNAL_TRACES     When set to any non-empty value, Robot Framework's
                           internal methods are included in error tracebacks.
 
+Return Codes
+============
+
+0                         All tests passed.
+1-249                     Returned number of tests failed.
+250                       250 or more failures.
+251                       Help or version information printed.
+252                       Invalid data or command line options.
+253                       Execution stopped by user.
+255                       Unexpected internal error.
+
 Examples
 ========
 
@@ -400,9 +427,6 @@ $ robot --include smoke --name "Smoke Tests" path/to/tests.robot
 
 # Executing `robot` module using Python.
 $ python -m robot path/to/tests
-
-# Running `robot` directory with Jython.
-$ jython /opt/robot tests.robot
 
 # Executing multiple test case files and using case-insensitive long options.
 $ robot --SuiteStatLevel 2 --Metadata Version:3 tests/*.robot more/tests.robot
@@ -417,41 +441,61 @@ $ robot tests.robot
 class RobotFramework(Application):
 
     def __init__(self):
-        Application.__init__(self, USAGE, arg_limits=(1,),
-                             env_options='ROBOT_OPTIONS', logger=LOGGER)
+        super().__init__(
+            USAGE,
+            arg_limits=(1,),
+            env_options="ROBOT_OPTIONS",
+            logger=LOGGER,
+        )
 
     def main(self, datasources, **options):
-        settings = RobotSettings(options)
+        try:
+            settings = RobotSettings(options)
+        except DataError:
+            LOGGER.register_console_logger(
+                stdout=options.get("stdout"),
+                stderr=options.get("stderr"),
+            )
+            raise
         LOGGER.register_console_logger(**settings.console_output_config)
-        if settings['Critical'] or settings['NonCritical']:
-            LOGGER.warn("Command line options --critical and --noncritical have been "
-                        "deprecated. Use --skiponfailure instead.")
-        if settings['XUnitSkipNonCritical']:
-            LOGGER.warn("Command line option --xunitskipnoncritical has been "
-                        "deprecated and has no effect.")
-        LOGGER.info('Settings:\n%s' % unic(settings))
-        builder = TestSuiteBuilder(settings['SuiteNames'],
-                                   included_extensions=settings.extension,
-                                   rpa=settings.rpa,
-                                   allow_empty_suite=settings.run_empty_suite)
+        LOGGER.info(f"Settings:\n{settings}")
+        if settings.pythonpath:
+            sys.path = settings.pythonpath + sys.path
+        builder = TestSuiteBuilder(
+            included_extensions=settings.extension,
+            included_files=settings.parse_include,
+            custom_parsers=settings.parsers,
+            rpa=settings.rpa,
+            lang=settings.languages,
+            allow_empty_suite=settings.run_empty_suite,
+        )
         suite = builder.build(*datasources)
-        settings.rpa = suite.rpa
         if settings.pre_run_modifiers:
-            suite.visit(ModelModifier(settings.pre_run_modifiers,
-                                      settings.run_empty_suite, LOGGER))
+            modifier = ModelModifier(
+                settings.pre_run_modifiers,
+                settings.run_empty_suite,
+                LOGGER,
+            )
+            suite.visit(modifier)
         suite.configure(**settings.suite_config)
+        settings.rpa = suite.validate_execution_mode()
         with pyloggingconf.robot_handler_enabled(settings.log_level):
             old_max_error_lines = text.MAX_ERROR_LINES
+            old_max_assign_length = text.MAX_ASSIGN_LENGTH
             text.MAX_ERROR_LINES = settings.max_error_lines
+            text.MAX_ASSIGN_LENGTH = settings.max_assign_length
+            librarylogger.LOGGING_THREADS[0] = current_thread().name
             try:
                 result = suite.run(settings)
             finally:
                 text.MAX_ERROR_LINES = old_max_error_lines
-            LOGGER.info("Tests execution ended. Statistics:\n%s"
-                        % result.suite.stat_message)
+                text.MAX_ASSIGN_LENGTH = old_max_assign_length
+                librarylogger.LOGGING_THREADS[0] = "MainThread"
+            LOGGER.info(
+                f"Tests execution ended. Statistics:\n{result.suite.stat_message}"
+            )
             if settings.log or settings.report or settings.xunit:
-                writer = ResultWriter(settings.output if settings.log
-                                      else result)
+                writer = ResultWriter(settings.output if settings.log else result)
                 writer.write_results(settings.get_rebot_settings())
         return result.return_code
 
@@ -459,15 +503,14 @@ class RobotFramework(Application):
         return self._filter_options_without_value(options), arguments
 
     def _filter_options_without_value(self, options):
-        return dict((name, value) for name, value in options.items()
-                    if value not in (None, []))
+        return {n: v for n, v in options.items() if v not in (None, [])}
 
 
 def run_cli(arguments=None, exit=True):
     """Command line execution entry point for running tests.
 
     :param arguments: Command line options and arguments as a list of strings.
-        Starting from RF 3.1, defaults to ``sys.argv[1:]`` if not given.
+        Defaults to ``sys.argv[1:]`` if not given.
     :param exit: If ``True``, call ``sys.exit`` with the return code denoting
         execution status, otherwise just return the rc.
 
@@ -531,9 +574,9 @@ def run(*tests, **options):
     respectively.
 
     A return code is returned similarly as when running on the command line.
-    Zero means that tests were executed and no critical test failed, values up
-    to 250 denote the number of failed critical tests, and values between
-    251-255 are for other statuses documented in the Robot Framework User Guide.
+    Zero means that tests were executed and no test failed, values up to 250
+    denote the number of failed tests, and values between 251-255 are for other
+    statuses documented in the Robot Framework User Guide.
 
     Example::
 
@@ -553,5 +596,5 @@ def run(*tests, **options):
     return RobotFramework().execute(*tests, **options)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_cli(sys.argv[1:])

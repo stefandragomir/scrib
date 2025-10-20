@@ -13,65 +13,78 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from robot.errors import (ExecutionFailed, ExecutionStatus, DataError,
-                          HandlerExecutionFailed, KeywordError, VariableError)
-from robot.utils import ErrorDetails, get_timestamp
+from datetime import datetime
 
-from .modelcombiner import ModelCombiner
+from robot.errors import (
+    BreakLoop, ContinueLoop, DataError, ExecutionFailed, ExecutionStatus,
+    HandlerExecutionFailed, ReturnFromKeyword
+)
+from robot.utils import ErrorDetails
 
 
-class StatusReporter(object):
+class StatusReporter:
 
-    def __init__(self, data, result, context, run=True):
+    def __init__(
+        self,
+        data,
+        result,
+        context,
+        run=True,
+        suppress=False,
+        implementation=None,
+    ):
         self.data = data
         self.result = result
+        self.implementation = implementation
         self.context = context
         if run:
             self.pass_status = result.PASS
             result.status = result.NOT_SET
         else:
             self.pass_status = result.status = result.NOT_RUN
-        self.test_passed = None
+        self.suppress = suppress
+        self.initial_test_status = None
 
     def __enter__(self):
-        if self.context.test:
-            self.test_passed = self.context.test.passed
-        self.result.starttime = get_timestamp()
-        self.context.start_keyword(ModelCombiner(self.data, self.result))
-        self._warn_if_deprecated(self.result.doc, self.result.name)
+        context = self.context
+        result = self.result
+        self.initial_test_status = context.test.status if context.test else None
+        if not result.start_time:
+            result.start_time = datetime.now()
+        context.start_body_item(self.data, result, self.implementation)
+        if result.type in result.KEYWORD_TYPES:
+            self._warn_if_deprecated(result.doc, result.full_name)
         return self
 
     def _warn_if_deprecated(self, doc, name):
-        if doc.startswith('*DEPRECATED') and '*' in doc[1:]:
-            message = ' ' + doc.split('*', 2)[-1].strip()
-            self.context.warn("Keyword '%s' is deprecated.%s" % (name, message))
+        if doc.startswith("*DEPRECATED") and "*" in doc[1:]:
+            message = " " + doc.split("*", 2)[-1].strip()
+            self.context.warn(f"Keyword '{name}' is deprecated.{message}")
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_value, exc_traceback):
         context = self.context
         result = self.result
-        failure = self._get_failure(exc_type, exc_val, exc_tb, context)
+        failure = self._get_failure(exc_value, context)
         if failure is None:
             result.status = self.pass_status
         else:
             result.status = failure.status
-            if result.type == result.TEARDOWN:
+            if not isinstance(failure, (BreakLoop, ContinueLoop, ReturnFromKeyword)):
                 result.message = failure.message
-        if context.test:
-            status = self._get_status(result)
-            context.test.status = status
-        result.endtime = get_timestamp()
-        context.end_keyword(ModelCombiner(self.data, result))
-        if failure is not exc_val:
+        if self.initial_test_status == "PASS" and result.status != "NOT RUN":
+            context.test.status = result.status
+        result.elapsed_time = datetime.now() - result.start_time
+        orig_status = (result.status, result.message)
+        context.end_body_item(self.data, result, self.implementation)
+        if orig_status != (result.status, result.message):
+            if result.passed or result.not_run:
+                return True
+            raise ExecutionFailed(result.message, skip=result.skipped)
+        if failure is not exc_value and not self.suppress:
             raise failure
+        return self.suppress
 
-    def _get_status(self, result):
-        if result.status == 'SKIP':
-            return 'SKIP'
-        if self.test_passed and result.passed:
-            return 'PASS'
-        return 'FAIL'
-
-    def _get_failure(self, exc_type, exc_value, exc_tb, context):
+    def _get_failure(self, exc_value, context):
         if exc_value is None:
             return None
         if isinstance(exc_value, ExecutionStatus):
@@ -79,16 +92,15 @@ class StatusReporter(object):
         if isinstance(exc_value, DataError):
             msg = exc_value.message
             context.fail(msg)
-            syntax = not isinstance(exc_value, (KeywordError, VariableError))
-            return ExecutionFailed(msg, syntax=syntax)
-        exc_info = (exc_type, exc_value, exc_tb)
-        failure = HandlerExecutionFailed(ErrorDetails(exc_info))
+            return ExecutionFailed(msg, syntax=exc_value.syntax)
+        error = ErrorDetails(exc_value)
+        failure = HandlerExecutionFailed(error)
         if failure.timeout:
             context.timeout_occurred = True
         if failure.skip:
-            context.skip(failure.full_message)
+            context.skip(error.message)
         else:
-            context.fail(failure.full_message)
-        if failure.traceback:
-            context.debug(failure.traceback)
+            context.fail(error.message)
+        if error.traceback:
+            context.debug(error.traceback)
         return failure

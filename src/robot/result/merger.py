@@ -31,97 +31,111 @@ class Merger(SuiteVisitor):
         self.result.errors.add(merged.errors)
 
     def start_suite(self, suite):
-        try:
-            self.current = self._find_suite(self.current, suite.name)
-        except IndexError:
+        if self.current is None:
+            old = self._find_root(suite.name)
+        else:
+            old = self._find(self.current.suites, suite.name)
+        if old is not None:
+            old.start_time = old.end_time = old.elapsed_time = None
+            old.doc = suite.doc
+            old.metadata.update(suite.metadata)
+            old.setup = suite.setup
+            old.teardown = suite.teardown
+            self.current = old
+        else:
             suite.message = self._create_add_message(suite, suite=True)
             self.current.suites.append(suite)
-            return False
-
-    def _find_suite(self, parent, name):
-        if not parent:
-            suite = self._find_root(name)
-        else:
-            suite = self._find(parent.suites, name)
-        suite.starttime = suite.endtime = None
-        return suite
+        return old is not None
 
     def _find_root(self, name):
         root = self.result.suite
         if root.name != name:
-            raise DataError("Cannot merge outputs containing different root "
-                            "suites. Original suite is '%s' and merged is "
-                            "'%s'." % (root.name, name))
+            raise DataError(
+                f"Cannot merge outputs containing different root suites. "
+                f"Original suite is '{root.name}' and merged is '{name}'."
+            )
         return root
 
     def _find(self, items, name):
         for item in items:
             if item.name == name:
                 return item
-        raise IndexError
+        return None
 
     def end_suite(self, suite):
         self.current = self.current.parent
 
     def visit_test(self, test):
-        try:
-            old = self._find(self.current.tests, test.name)
-        except IndexError:
+        old = self._find(self.current.tests, test.name)
+        if old is None:
             test.message = self._create_add_message(test)
             self.current.tests.append(test)
+        elif test.skipped:
+            old.message = self._create_skip_message(old, test)
         else:
             test.message = self._create_merge_message(test, old)
             index = self.current.tests.index(old)
             self.current.tests[index] = test
 
     def _create_add_message(self, item, suite=False):
-        item_type = 'Suite' if suite else test_or_task('{Test}', self.rpa)
-        prefix = '*HTML* %s added from merged output.' % item_type
+        item_type = "Suite" if suite else test_or_task("Test", self.rpa)
+        prefix = f"*HTML* {item_type} added from merged output."
         if not item.message:
             return prefix
-        return ''.join([prefix, '<hr>', self._html_escape(item.message)])
+        return "".join([prefix, "<hr>", self._html(item.message)])
 
-    def _html_escape(self, message):
-        if message.startswith('*HTML*'):
+    def _html(self, message):
+        if message.startswith("*HTML*"):
             return message[6:].lstrip()
-        else:
-            return html_escape(message)
+        return html_escape(message)
 
     def _create_merge_message(self, new, old):
-        header = test_or_task('*HTML* <span class="merge">'
-                              '{Test} has been re-executed and results merged.'
-                              '</span>', self.rpa)
-        return ''.join([
+        header = (
+            f'*HTML* <span class="merge">{test_or_task("Test", self.rpa)} '
+            f"has been re-executed and results merged.</span>"
+        )
+        parts = [
             header,
-            '<hr>',
-            self._format_status_and_message('New', new),
-            '<hr>',
-            self._format_old_status_and_message(old, header)
-        ])
+            "<hr>",
+            self._format_status_and_message("New", new),
+            "<hr>",
+            self._format_old_status_and_message(old, header),
+        ]
+        return "".join(parts)
 
     def _format_status_and_message(self, state, test):
-        message = '%s %s<br>' % (self._status_header(state),
-                                 self._status_text(test.status))
+        msg = f"{self._status_header(state)} {self._status_text(test.status)}<br>"
         if test.message:
-            message += '%s %s<br>' % (self._message_header(state),
-                                      self._html_escape(test.message))
-        return message
+            msg += f"{self._message_header(state)} {self._html(test.message)}<br>"
+        return msg
 
     def _status_header(self, state):
-        return '<span class="%s-status">%s status:</span>' % (state.lower(), state)
+        return f'<span class="{state.lower()}-status">{state} status:</span>'
 
     def _status_text(self, status):
-        return '<span class="%s">%s</span>' % (status.lower(), status)
+        return f'<span class="{status.lower()}">{status}</span>'
 
     def _message_header(self, state):
-        return '<span class="%s-message">%s message:</span>' % (state.lower(), state)
+        return f'<span class="{state.lower()}-message">{state} message:</span>'
 
     def _format_old_status_and_message(self, test, merge_header):
         if not test.message.startswith(merge_header):
-            return self._format_status_and_message('Old', test)
-        status_and_message = test.message.split('<hr>', 1)[1]
-        return (
-            status_and_message
-            .replace(self._status_header('New'), self._status_header('Old'))
-            .replace(self._message_header('New'), self._message_header('Old'))
+            return self._format_status_and_message("Old", test)
+        status_and_message = test.message.split("<hr>", 1)[1]
+        return status_and_message.replace(
+            self._status_header("New"),
+            self._status_header("Old"),
+        ).replace(
+            self._message_header("New"),
+            self._message_header("Old"),
         )
+
+    def _create_skip_message(self, test, new):
+        msg = (
+            f"*HTML* {test_or_task('Test', self.rpa)} has been re-executed and "
+            f"results merged. Latter result had {self._status_text('SKIP')} "
+            f"status and was ignored. Message:\n{self._html(new.message)}"
+        )
+        if test.message:
+            msg += f"<hr>Original message:\n{self._html(test.message)}"
+        return msg

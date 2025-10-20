@@ -13,34 +13,36 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import locale
 import os
 import sys
-import locale
 
-from .compat import isatty
-from .platform import JYTHON, PY2, PY3, PY_VERSION, UNIXY, WINDOWS
-
+from .misc import isatty
+from .platform import PY_VERSION, UNIXY, WINDOWS
 
 if UNIXY:
-    DEFAULT_CONSOLE_ENCODING = 'UTF-8'
-    DEFAULT_SYSTEM_ENCODING = 'UTF-8'
+    DEFAULT_CONSOLE_ENCODING = "UTF-8"
+    DEFAULT_SYSTEM_ENCODING = "UTF-8"
 else:
-    DEFAULT_CONSOLE_ENCODING = 'cp437'
-    DEFAULT_SYSTEM_ENCODING = 'cp1252'
+    DEFAULT_CONSOLE_ENCODING = "cp437"
+    DEFAULT_SYSTEM_ENCODING = "cp1252"
 
 
 def get_system_encoding():
-    platform_getters = [(True, _get_python_system_encoding),
-                        (JYTHON, _get_java_system_encoding),
-                        (UNIXY, _get_unixy_encoding),
-                        (WINDOWS, _get_windows_system_encoding)]
+    platform_getters = [
+        (True, _get_python_system_encoding),
+        (UNIXY, _get_unixy_encoding),
+        (WINDOWS, _get_windows_system_encoding),
+    ]
     return _get_encoding(platform_getters, DEFAULT_SYSTEM_ENCODING)
 
 
 def get_console_encoding():
-    platform_getters = [(True, _get_stream_output_encoding),
-                        (UNIXY, _get_unixy_encoding),
-                        (WINDOWS, _get_windows_console_encoding)]
+    platform_getters = [
+        (True, _get_stream_output_encoding),
+        (UNIXY, _get_unixy_encoding),
+        (WINDOWS, _get_windows_console_encoding),
+    ]
     return _get_encoding(platform_getters, DEFAULT_CONSOLE_ENCODING)
 
 
@@ -54,72 +56,62 @@ def _get_encoding(platform_getters, default):
 
 
 def _get_python_system_encoding():
-    # `locale.getpreferredencoding(False)` should return exactly what we want,
-    # but it doesn't seem to work outside Windows on Python 2. Luckily on these
-    # platforms `sys.getfilesystemencoding()` seems to do the right thing.
-    # Jython 2.7.1+ actually uses UTF-8 regardless the system encoding, but
-    # that's handled by `system_decode/encode` utilities separately.
-    if PY2 and not WINDOWS:
-        return sys.getfilesystemencoding()
-    return locale.getpreferredencoding(False)
-
-
-def _get_java_system_encoding():
-    # This is only used with Jython 2.7.0, others get encoding already
-    # from `_get_python_system_encoding`.
-    from java.lang import System
-    return System.getProperty('file.encoding')
+    if PY_VERSION >= (3, 11):
+        return locale.getencoding()
+    # ValueError occurs with PyPy 3.10 if language config is invalid.
+    # https://foss.heptapod.net/pypy/pypy/-/issues/3975
+    try:
+        return locale.getpreferredencoding(False)
+    except ValueError:
+        return None
 
 
 def _get_unixy_encoding():
-    # Cannot use `locale.getdefaultlocale()` because it raises ValueError
-    # if encoding is invalid. Using same environment variables here anyway.
+    # Cannot use `locale.getdefaultlocale()` because it is deprecated.
+    # Using same environment variables here anyway.
     # https://docs.python.org/3/library/locale.html#locale.getdefaultlocale
-    for name in 'LC_ALL', 'LC_CTYPE', 'LANG', 'LANGUAGE':
+    for name in "LC_ALL", "LC_CTYPE", "LANG", "LANGUAGE":
         if name in os.environ:
             # Encoding can be in format like `UTF-8` or `en_US.UTF-8`
-            encoding = os.environ[name].split('.')[-1]
+            encoding = os.environ[name].split(".")[-1]
             if _is_valid(encoding):
                 return encoding
     return None
 
 
 def _get_stream_output_encoding():
-    # Python 3.6+ uses UTF-8 as encoding with output streams.
+    # Python uses UTF-8 as encoding with output streams.
     # We want the real console encoding regardless the platform.
-    if WINDOWS and PY_VERSION >= (3, 6):
+    if WINDOWS:
         return None
     for stream in sys.__stdout__, sys.__stderr__, sys.__stdin__:
         if isatty(stream):
-            encoding = getattr(stream, 'encoding', None)
+            encoding = getattr(stream, "encoding", None)
             if _is_valid(encoding):
                 return encoding
     return None
 
 
 def _get_windows_system_encoding():
-    return _get_code_page('GetACP')
+    return _get_code_page("GetACP")
 
 
 def _get_windows_console_encoding():
-    return _get_code_page('GetConsoleOutputCP')
+    return _get_code_page("GetConsoleOutputCP")
 
 
 def _get_code_page(method_name):
     from ctypes import cdll
-    try:
-        method = getattr(cdll.kernel32, method_name)
-    except TypeError:       # Occurred few times with IronPython on CI.
-        return None
-    method.argtypes = ()    # Needed with Jython.
-    return 'cp%s' % method()
+
+    method = getattr(cdll.kernel32, method_name)
+    return f"cp{method()}"
 
 
 def _is_valid(encoding):
     if not encoding:
         return False
     try:
-        'test'.encode(encoding)
+        "test".encode(encoding)
     except LookupError:
         return False
     else:

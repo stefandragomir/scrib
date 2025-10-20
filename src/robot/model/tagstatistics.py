@@ -13,42 +13,43 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from itertools import chain
 import re
 
-from robot.utils import NormalizedDict, unicode
+from robot.utils import NormalizedDict
 
 from .stats import CombinedTagStat, TagStat
-from .tags import SingleTagPattern, TagPatterns
+from .tags import TagPatterns
 
 
-class TagStatistics(object):
+class TagStatistics:
     """Container for tag statistics."""
 
     def __init__(self, combined_stats):
-        #: Dictionary, where key is the name of the tag as a string and value
-        #: is an instance of :class:`~robot.model.stats.TagStat`.
-        self.tags = NormalizedDict(ignore='_')
-        #: List of :class:`~robot.model.stats.CombinedTagStat` objects.
+        self.tags = NormalizedDict(ignore="_")
         self.combined = combined_stats
 
     def visit(self, visitor):
         visitor.visit_tag_statistics(self)
 
     def __iter__(self):
-        return iter(sorted(chain(self.combined, self.tags.values())))
+        return iter(sorted([*self.combined, *self.tags.values()]))
 
 
-class TagStatisticsBuilder(object):
+class TagStatisticsBuilder:
 
-    def __init__(self, included=None, excluded=None,
-                 combined=None, docs=None, links=None):
+    def __init__(
+        self,
+        included=None,
+        excluded=None,
+        combined=None,
+        docs=None,
+        links=None,
+    ):
         self._included = TagPatterns(included)
         self._excluded = TagPatterns(excluded)
+        self._reserved = TagPatterns("robot:*")
         self._info = TagStatInfo(docs, links)
-        self.stats = TagStatistics(
-            self._info.get_combined_stats(combined)
-        )
+        self.stats = TagStatistics(self._info.get_combined_stats(combined))
 
     def add_test(self, test):
         self._add_tags_to_statistics(test)
@@ -56,15 +57,18 @@ class TagStatisticsBuilder(object):
 
     def _add_tags_to_statistics(self, test):
         for tag in test.tags:
-            if self._is_included(tag):
+            if self._is_included(tag) and not self._suppress_reserved(tag):
                 if tag not in self.stats.tags:
                     self.stats.tags[tag] = self._info.get_stat(tag)
                 self.stats.tags[tag].add_test(test)
 
     def _is_included(self, tag):
-        if self._included and not self._included.match(tag):
+        if self._included and tag not in self._included:
             return False
-        return not self._excluded.match(tag)
+        return tag not in self._excluded
+
+    def _suppress_reserved(self, tag):
+        return tag in self._reserved and tag not in self._included
 
     def _add_to_combined_statistics(self, test):
         for stat in self.stats.combined:
@@ -72,7 +76,7 @@ class TagStatisticsBuilder(object):
                 stat.add_test(test)
 
 
-class TagStatInfo(object):
+class TagStatInfo:
 
     def __init__(self, docs=None, links=None):
         self._docs = [TagStatDoc(*doc) for doc in docs or []]
@@ -86,17 +90,21 @@ class TagStatInfo(object):
 
     def _get_combined_stat(self, pattern, name=None):
         name = name or pattern
-        return CombinedTagStat(pattern, name, self.get_doc(name),
-                               self.get_links(name))
+        return CombinedTagStat(
+            pattern,
+            name,
+            self.get_doc(name),
+            self.get_links(name),
+        )
 
     def get_doc(self, tag):
-        return ' & '.join(doc.text for doc in self._docs if doc.match(tag))
+        return " & ".join(doc.text for doc in self._docs if doc.match(tag))
 
     def get_links(self, tag):
         return [link.get_link(tag) for link in self._links if link.match(tag)]
 
 
-class TagStatDoc(object):
+class TagStatDoc:
 
     def __init__(self, pattern, doc):
         self._matcher = TagPatterns(pattern)
@@ -106,13 +114,13 @@ class TagStatDoc(object):
         return self._matcher.match(tag)
 
 
-class TagStatLink(object):
-    _match_pattern_tokenizer = re.compile(r'(\*|\?+)')
+class TagStatLink:
+    _match_pattern_tokenizer = re.compile(r"(\*|\?+)")
 
     def __init__(self, pattern, link, title):
         self._regexp = self._get_match_regexp(pattern)
         self._link = link
-        self._title = title.replace('_', ' ')
+        self._title = title.replace("_", " ")
 
     def match(self, tag):
         return self._regexp.match(tag) is not None
@@ -125,21 +133,23 @@ class TagStatLink(object):
         return link, title
 
     def _replace_groups(self, link, title, match):
-        for index, group in enumerate(match.groups()):
-            placefolder = '%%%d' % (index+1)
+        for index, group in enumerate(match.groups(), start=1):
+            placefolder = f"%{index}"
             link = link.replace(placefolder, group)
             title = title.replace(placefolder, group)
         return link, title
 
     def _get_match_regexp(self, pattern):
-        pattern = '^%s$' % ''.join(self._yield_match_pattern(pattern))
+        pattern = "".join(self._yield_match_pattern(pattern))
         return re.compile(pattern, re.IGNORECASE)
 
     def _yield_match_pattern(self, pattern):
+        yield "^"
         for token in self._match_pattern_tokenizer.split(pattern):
-            if token.startswith('?'):
-                yield '(%s)' % ('.'*len(token))
-            elif token == '*':
-                yield '(.*)'
+            if token.startswith("?"):
+                yield f"({'.' * len(token)})"
+            elif token == "*":
+                yield "(.*)"
             else:
                 yield re.escape(token)
+        yield "$"

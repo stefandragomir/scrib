@@ -13,12 +13,12 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from operator import eq, lt, le, gt, ge
+from operator import eq, ge, gt, le, lt
 
 from .robottypes import type_name
 
 
-class Sortable(object):
+class Sortable:
     """Base class for sorting based self._sort_key"""
 
     _sort_key = NotImplemented
@@ -28,14 +28,10 @@ class Sortable(object):
             return operator(self._sort_key, other._sort_key)
         if not require_sortable:
             return False
-        raise TypeError("Cannot sort '%s' and '%s'."
-                        % (type_name(self), type_name(other)))
+        raise TypeError(f"Cannot sort '{type_name(self)}' and '{type_name(other)}'.")
 
     def __eq__(self, other):
         return self.__test(eq, other, require_sortable=False)
-
-    def __ne__(self, other):
-        return not self == other
 
     def __lt__(self, other):
         return self.__test(lt, other)

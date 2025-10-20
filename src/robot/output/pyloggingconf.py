@@ -13,20 +13,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from contextlib import contextmanager
 import logging
-import traceback
+from contextlib import contextmanager
 
-from robot.utils import get_error_details, unic
+from robot.utils import get_error_details, safe_str
 
 from . import librarylogger
 
-
-LEVELS = {'TRACE': logging.NOTSET,
-          'DEBUG': logging.DEBUG,
-          'INFO': logging.INFO,
-          'WARN': logging.WARNING,
-          'ERROR': logging.ERROR}
+LEVELS = {
+    "TRACE": logging.NOTSET,
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARN": logging.WARNING,
+    "ERROR": logging.ERROR,
+}
 
 
 @contextmanager
@@ -37,6 +37,7 @@ def robot_handler_enabled(level):
         return
     handler = RobotHandler()
     old_raise = logging.raiseExceptions
+    old_level = root.level
     root.addHandler(handler)
     logging.raiseExceptions = False
     set_level(level)
@@ -44,6 +45,7 @@ def robot_handler_enabled(level):
         yield
     finally:
         root.removeHandler(handler)
+        root.setLevel(old_level)
         logging.raiseExceptions = old_raise
 
 
@@ -57,32 +59,34 @@ def set_level(level):
 
 class RobotHandler(logging.Handler):
 
+    def __init__(self, level=logging.NOTSET, library_logger=librarylogger):
+        super().__init__(level)
+        self.library_logger = library_logger
+
     def emit(self, record):
         message, error = self._get_message(record)
-        if record.exc_info:
-            tb_lines = traceback.format_exception(*record.exc_info)
-            message = ''.join([message, '\n'] + tb_lines).rstrip()
         method = self._get_logger_method(record.levelno)
         method(message)
         if error:
-            librarylogger.debug(error)
+            self.library_logger.debug(error)
 
     def _get_message(self, record):
         try:
-            return record.getMessage(), None
-        except:
-            message = 'Failed to log following message properly: %s' \
-                        % unic(record.msg)
-            error = '\n'.join(get_error_details())
+            return self.format(record), None
+        except Exception:
+            message = (
+                f"Failed to log following message properly: {safe_str(record.msg)}"
+            )
+            error = "\n".join(get_error_details())
             return message, error
 
     def _get_logger_method(self, level):
         if level >= logging.ERROR:
-            return librarylogger.error
+            return self.library_logger.error
         if level >= logging.WARNING:
-            return librarylogger.warn
+            return self.library_logger.warn
         if level >= logging.INFO:
-            return librarylogger.info
+            return self.library_logger.info
         if level >= logging.DEBUG:
-            return librarylogger.debug
-        return librarylogger.trace
+            return self.library_logger.debug
+        return self.library_logger.trace

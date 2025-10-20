@@ -16,17 +16,20 @@
 from robot.htmldata import JsonWriter
 
 
-class JsResultWriter(object):
-    _output_attr = 'window.output'
-    _settings_attr = 'window.settings'
-    _suite_key = 'suite'
-    _strings_key = 'strings'
+class JsResultWriter:
+    _output_attr = "window.output"
+    _settings_attr = "window.settings"
+    _suite_key = "suite"
+    _strings_key = "strings"
 
-    def __init__(self, output,
-                 start_block='<script type="text/javascript">\n',
-                 end_block='</script>\n',
-                 split_threshold=9500):
-        writer = JsonWriter(output, separator=end_block+start_block)
+    def __init__(
+        self,
+        output,
+        start_block='<script type="text/javascript">\n',
+        end_block="</script>\n",
+        split_threshold=9500,
+    ):
+        writer = JsonWriter(output, separator=end_block + start_block)
         self._write = writer.write
         self._write_json = writer.write_json
         self._start_block = start_block
@@ -41,8 +44,8 @@ class JsResultWriter(object):
         self._write_settings_and_end_output_block(settings)
 
     def _start_output_block(self):
-        self._write(self._start_block, postfix='', separator=False)
-        self._write('%s = {}' % self._output_attr)
+        self._write(self._start_block, postfix="", separator=False)
+        self._write(f"{self._output_attr} = {{}}")
 
     def _write_suite(self, suite):
         writer = SuiteWriter(self._write_json, self._split_threshold)
@@ -50,27 +53,26 @@ class JsResultWriter(object):
 
     def _write_strings(self, strings):
         variable = self._output_var(self._strings_key)
-        self._write('%s = []' % variable)
-        prefix = '%s = %s.concat(' % (variable, variable)
-        postfix = ');\n'
+        self._write(f"{variable} = []")
+        prefix = f"{variable} = {variable}.concat("
+        postfix = ");\n"
         threshold = self._split_threshold
         for index in range(0, len(strings), threshold):
-            self._write_json(prefix, strings[index:index+threshold], postfix)
+            self._write_json(prefix, strings[index : index + threshold], postfix)
 
     def _write_data(self, data):
         for key in data:
-            self._write_json('%s = ' % self._output_var(key), data[key])
+            self._write_json(f"{self._output_var(key)} = ", data[key])
 
     def _write_settings_and_end_output_block(self, settings):
-        self._write_json('%s = ' % self._settings_attr, settings,
-                         separator=False)
-        self._write(self._end_block, postfix='', separator=False)
+        self._write_json(f"{self._settings_attr} = ", settings, separator=False)
+        self._write(self._end_block, postfix="", separator=False)
 
     def _output_var(self, key):
-        return '%s["%s"]' % (self._output_attr, key)
+        return f'{self._output_attr}["{key}"]'
 
 
-class SuiteWriter(object):
+class SuiteWriter:
 
     def __init__(self, write_json, split_threshold):
         self._write_json = write_json
@@ -79,30 +81,31 @@ class SuiteWriter(object):
     def write(self, suite, variable):
         mapping = {}
         self._write_parts_over_threshold(suite, mapping)
-        self._write_json('%s = ' % variable, suite, mapping=mapping)
+        self._write_json(f"{variable} = ", suite, mapping=mapping)
 
     def _write_parts_over_threshold(self, data, mapping):
         if not isinstance(data, tuple):
             return 1
-        not_written = 1 + sum(self._write_parts_over_threshold(item, mapping)
-                              for item in data)
+        not_written = 1
+        for item in data:
+            not_written += self._write_parts_over_threshold(item, mapping)
         if not_written > self._split_threshold:
             self._write_part(data, mapping)
             return 1
         return not_written
 
     def _write_part(self, data, mapping):
-        part_name = 'window.sPart%d' % len(mapping)
-        self._write_json('%s = ' % part_name, data, mapping=mapping)
+        part_name = f"window.sPart{len(mapping)}"
+        self._write_json(f"{part_name} = ", data, mapping=mapping)
         mapping[data] = part_name
 
 
-class SplitLogWriter(object):
+class SplitLogWriter:
 
     def __init__(self, output):
         self._writer = JsonWriter(output)
 
     def write(self, keywords, strings, index, notify):
-        self._writer.write_json('window.keywords%d = ' % index, keywords)
-        self._writer.write_json('window.strings%d = ' % index, strings)
-        self._writer.write('window.fileLoading.notify("%s")' % notify)
+        self._writer.write_json(f"window.keywords{index} = ", keywords)
+        self._writer.write_json(f"window.strings{index} = ", strings)
+        self._writer.write(f'window.fileLoading.notify("{notify}")')
