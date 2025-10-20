@@ -1,7 +1,7 @@
 
-from PyQt5.QtCore          import *
-from PyQt5.QtGui           import *
-from PyQt5.QtWidgets       import * 
+from PyQt6.QtCore          import *
+from PyQt6.QtGui           import *
+from PyQt6.QtWidgets       import * 
 from icons.icons           import SCR_GetIcon
 from abc                   import abstractmethod
 
@@ -426,7 +426,7 @@ class SCR_WDG_Tree(QTreeView):
 
         self.setStyleSheet(_css)
 
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
         self.search_clbk   = search_clbk
         self.root          =  SCR_WDG_Tree_Item(data=[""],parent=None)
@@ -535,7 +535,7 @@ class SCR_WDG_Selection(QComboBox):
 
         self.completer = QCompleter()
 
-        self.completer.setFilterMode(Qt.MatchContains)
+        self.completer.setFilterMode(Qt.MatchFlag.MatchContains)
 
         self.setCompleter(self.completer)        
 
@@ -547,9 +547,9 @@ class SCR_WDG_Selection(QComboBox):
 
         self.model.setStringList(self._model_items)
 
-        self.completer.setModelSorting(QCompleter.CaseInsensitivelySortedModel)
-        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
-        self.completer.setCompletionRole(Qt.DisplayRole)
+        self.completer.setModelSorting(QCompleter.ModelSorting.CaseInsensitivelySortedModel)
+        self.completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        self.completer.setCompletionRole(Qt.ItemDataRole.DisplayRole)
 
     def populate(self,data,defaultvalue=None):
 

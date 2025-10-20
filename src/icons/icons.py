@@ -3,9 +3,9 @@ import sys
 import itertools
 import sqlite3
 
-from PyQt5.QtGui    import QIcon
-from PyQt5.QtGui    import QPixmap
-from PyQt5.QtCore   import QByteArray
+from PyQt6.QtGui    import QIcon
+from PyQt6.QtGui    import QPixmap
+from PyQt6.QtCore   import QByteArray
 
 """*************************************************************************************************
 ****************************************************************************************************

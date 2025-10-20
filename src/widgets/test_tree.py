@@ -1,7 +1,7 @@
 
-from PyQt5.QtCore          import *
-from PyQt5.QtGui           import *
-from PyQt5.QtWidgets       import * 
+from PyQt6.QtCore          import *
+from PyQt6.QtGui           import *
+from PyQt6.QtWidgets       import * 
 from icons.icons           import SCR_GetIcon
 from widgets.widgets       import SCR_WDG_Tree
 from widgets.widgets       import SCR_WDG_Tree_Model
@@ -42,7 +42,7 @@ class SCR_WDG_TestTree_Widget(QWidget):
 
         self.wdg_tree.setHeaderHidden(True)
 
-        _policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        _policy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
 
         _policy.setHorizontalStretch(1)
 
@@ -370,7 +370,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                 with_metadata=True,
                                 model_class=SCR_WDG_TestTree_Model)
 
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.draw_menu)
 
     def find_items_by_type(self,text,datatype):
@@ -828,7 +828,7 @@ class SCR_WDG_TestTree_Find(QWidget):
             
         #write line
         self.line = QLineEdit()
-        self.line.setContextMenuPolicy(Qt.NoContextMenu)    
+        self.line.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)    
         self.line.setStyleSheet('border: 1px solid gray;')
         self.line.returnPressed.connect(self._find_next) 
         self.line.textEdited.connect(self._textedited)
@@ -879,7 +879,7 @@ class SCR_WDG_TestTree_Find(QWidget):
         box.addWidget(self._find_next_button)
         box.addWidget(self._find_prev_button)        
         box.addWidget(self._close_button)
-        box.setSizeConstraint(3)
+        box.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
         box.setContentsMargins(8, 8, 5, 5)
         self.setLayout(box)
 

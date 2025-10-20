@@ -2,9 +2,9 @@
 import os
 import sys
 import error.error
-from PyQt5.QtCore          import *
-from PyQt5.QtGui           import *
-from PyQt5.QtWidgets       import * 
+from PyQt6.QtCore          import *
+from PyQt6.QtGui           import *
+from PyQt6.QtWidgets       import * 
 from config.config         import SCR_Config
 from widgets.widgets       import SCR_WDG_DockWidget
 from widgets.widgets       import SCR_WDG_ToolBar
@@ -64,7 +64,7 @@ class SCR_UI(QMainWindow):
         self.ly.addWidget(self.wdg_toolbar)
         self.ly.addLayout(self.ly_h)
         self.ly.addWidget(self.action_bar)
-        self.ly.setAlignment(Qt.AlignTop)
+        self.ly.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         self.wdg_central.setLayout(self.ly)
 
@@ -98,15 +98,17 @@ class SCR_UI(QMainWindow):
 
         self.dock_tree_test.setWidget(self.wdg_tree_test)
 
-        self.dock_tree_test.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
+        self.dock_tree_test.setFeatures(
+                                        QDockWidget.DockWidgetFeature.DockWidgetMovable | 
+                                        QDockWidget.DockWidgetFeature.DockWidgetFloatable)
 
-        self.addDockWidget(Qt.LeftDockWidgetArea,self.dock_tree_test)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea,self.dock_tree_test)
 
     def draw_test_tab(self):
 
         self.wdg_test_tab = SCR_WDG_Test_Tab(self.config)
 
-        _policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        _policy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
 
         _policy.setHorizontalStretch(3)
 
@@ -145,7 +147,7 @@ def SCR():
 
     _ui.show()
 
-    sys.exit(_app.exec_())
+    sys.exit(_app.exec())
 
 """*************************************************************************************************
 ****************************************************************************************************

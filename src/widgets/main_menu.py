@@ -1,7 +1,7 @@
 
-from PyQt5.QtCore          import *
-from PyQt5.QtGui           import *
-from PyQt5.QtWidgets       import * 
+from PyQt6.QtCore          import *
+from PyQt6.QtGui           import *
+from PyQt6.QtWidgets       import * 
 from icons.icons           import SCR_GetIcon
 from functools             import partial
 
@@ -34,21 +34,21 @@ class SCR_WDG_MainMenu(QMenuBar):
                         _menu_file, 
                         "New",              
                         "f35b5975f6d636d7a6418bb4941edbdf89b80b55", 
-                        QKeySequence(Qt.CTRL + Qt.Key_N), 
+                        QKeySequence("Ctrl+N"), 
                         self.scrib.act_file.new)
 
         self.add_action(
                         _menu_file, 
                         "Open Test Folder", 
                         "b28971455cf45af0e2e37a9c33ca8ca01d5a660f", 
-                        QKeySequence(Qt.CTRL + Qt.Key_O), 
+                        QKeySequence("Ctrl+O"), 
                         self.scrib.act_file.load_testfolder)
 
         self.add_action(
                         _menu_file, 
                         "Save",             
                         "eb1729093812c3f38a5e4eb2714f2bde148f6eba", 
-                        QKeySequence(Qt.CTRL + Qt.Key_S), 
+                        QKeySequence("Ctrl+S"), 
                         self.scrib.act_file.save)
 
         _menu_file.addSeparator()
@@ -75,7 +75,7 @@ class SCR_WDG_MainMenu(QMenuBar):
                         _menu_file, 
                         "Exit",             
                         "325eab1e2242ef8223f4b2506db6da27384f3789", 
-                        QKeySequence(Qt.CTRL + Qt.Key_Q), 
+                        QKeySequence("Ctrl+Q"), 
                         self.scrib.close)
 
     def populate_search(self):
@@ -94,7 +94,7 @@ class SCR_WDG_MainMenu(QMenuBar):
                         _menu_help, 
                         "Documentation",             
                         "edaf568e98a4c6023a1d9eb657bc737cff2ef279", 
-                        QKeySequence(Qt.CTRL + Qt.Key_F1), 
+                        QKeySequence("Ctrl+F1"), 
                         self.scrib.act_help.help_documentation)
 
         self.add_action(

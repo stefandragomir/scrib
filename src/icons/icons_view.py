@@ -10,9 +10,9 @@ from PIL              import Image
 from hashlib          import sha1
 from functools        import partial
 from datetime         import datetime
-from PyQt5.QtCore     import * 
-from PyQt5.QtGui      import * 
-from PyQt5.QtWidgets  import * 
+from PyQt6.QtCore     import * 
+from PyQt6.QtGui      import * 
+from PyQt6.QtWidgets  import * 
 
 try:
     _path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
