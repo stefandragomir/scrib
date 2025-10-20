@@ -229,14 +229,14 @@ class SCR_IconsViewer(QWidget):
         self.toolbar_layout = QGridLayout()
         self.toolbar_layout.addWidget(self._tags_label, 0,0)
         self.toolbar_layout.addWidget(self._tags)
-        self.toolbar_layout.setAlignment(Qt.AlignLeft )
+        self.toolbar_layout.setAlignment(Qt.AlignmentFlag.AlignLeft )
 
         self.tree_area = QVBoxLayout() 
         self.tree_area.addLayout(self.toolbar_layout) 
         self.tree_area.addWidget(self._Tree_Icons) 
         self.TreeAreaWidget.setLayout(self.tree_area)
 
-        _splitter = QSplitter(Qt.Horizontal)
+        _splitter = QSplitter(Qt.Orientation.Horizontal)
         _splitter.addWidget(self.TreeAreaWidget)
         _splitter.addWidget(self._Icons_Attribute)
         
@@ -323,33 +323,33 @@ class SCR_IconsAtributes(QWidget):
         self.setMaximumWidth(750)
 
         _spacer = QWidget()             
-        _spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Ignored)
+        _spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Ignored)
 
         # Labels
         self._small_icon_label  = QLabel('Small (15x15)')       
         self._small_icon_label.setFont(font)
-        self._small_icon_label.setAlignment(Qt.AlignCenter)
+        self._small_icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self._medium_icon_label  = QLabel('Medium (30x30)')         
         self._medium_icon_label.setFont(font)
-        self._medium_icon_label.setAlignment(Qt.AlignCenter)
+        self._medium_icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self._large_icon_label  = QLabel('Large (50x50)')           
         self._large_icon_label.setFont(font)
-        self._large_icon_label.setAlignment(Qt.AlignCenter)
+        self._large_icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self._small_icon = QLabel()
         self._small_icon.setPixmap(SCR_As_Pixmap(self._parent.databaseConnection.get_row_by_name('fd2cf51bcbd304d61dbae1fdd954d4d1ec41e535')[3]))
-        self._small_icon.setAlignment(Qt.AlignCenter)
+        self._small_icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
         self._medium_icon = QLabel()
         self._medium_icon.setPixmap(SCR_As_Pixmap(self._parent.databaseConnection.get_row_by_name('fd2cf51bcbd304d61dbae1fdd954d4d1ec41e535')[4]))
-        self._medium_icon.setAlignment(Qt.AlignCenter)
+        self._medium_icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self._large_icon = QLabel()
         self._large_icon.setPixmap(SCR_As_Pixmap(self._parent.databaseConnection.get_row_by_name('fd2cf51bcbd304d61dbae1fdd954d4d1ec41e535')[5]))
-        self._large_icon.setAlignment(Qt.AlignCenter)
+        self._large_icon.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
         self.IconCode_label  = QLabel("Code")           
@@ -362,17 +362,17 @@ class SCR_IconsAtributes(QWidget):
         self.IconCode = QPlainTextEdit()
         self.IconCode.setAcceptDrops(False)
         self.IconCode.setFont(self._font)
-        self.IconCode.setContextMenuPolicy(Qt.NoContextMenu)
+        self.IconCode.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         self.IconCode.setMinimumSize(650, 450)
 
         self.IconCode_layout = QGridLayout()
         self.IconCode_layout.addWidget(self.IconCode_label, 0,0)
         self.IconCode_layout.addWidget(self.IconCode)
-        self.IconCode_layout.setAlignment(Qt.AlignLeft )
+        self.IconCode_layout.setAlignment(Qt.AlignmentFlag.AlignLeft )
 
         _preview_group_box = QGroupBox("Icons")
         _preview_group_box.setFont(font)
-        _preview_group_box.setAlignment(Qt.AlignLeft)
+        _preview_group_box.setAlignment(Qt.AlignmentFlag.AlignLeft)
         _preview_group_box.setMinimumSize(650, 150)     
 
         _preview_Icons_layout = QGridLayout()   
@@ -393,7 +393,7 @@ class SCR_IconsAtributes(QWidget):
 
         _tag_group_box = QGroupBox("Name")
         _tag_group_box.setFont(font)
-        _tag_group_box.setAlignment(Qt.AlignLeft)
+        _tag_group_box.setAlignment(Qt.AlignmentFlag.AlignLeft)
         _tag_group_box.setMinimumSize(650, 70)  
         _tag_group_box.setLayout(_ly_tag)
 
@@ -461,22 +461,22 @@ class SCR_Tree_Icons(QTreeWidget):
 
         self.create_gui()
 
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self.treeContextMenu)
 
     def create_gui(self):
 
-        _header_font = QFont("" , 10 , QFont.Bold )      
+        _header_font = QFont("" , 10 , QFont.Weight.Bold )      
         self.setHeaderLabels(self._headers)              
         self.setSortingEnabled(True)
 
         self.setColumnCount(len(self._headers))                         
-        self.setSelectionBehavior(QAbstractItemView.SelectRows)    
+        self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)    
         self.setAnimated(True)  
 
         self.itemClicked.connect(self._display_icon_selected)
 
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.__resize_cols()
         self._add_to_watch()
 
@@ -497,12 +497,11 @@ class SCR_Tree_Icons(QTreeWidget):
         for _icon_name in sw_iconsNames:
 
             item = QTreeWidgetItem()
-            item.setChildIndicatorPolicy(QTreeWidgetItem.DontShowIndicatorWhenChildless)   
             self.addTopLevelItem(item)
 
             _column = 0 
             item.setIcon(_column, SCR_As_Icon(self._parent.databaseConnection.get_row_by_name(_icon_name)[3]))  
-            item.setData(_column, Qt.EditRole, _icon_name)
+            item.setData(_column, Qt.ItemDataRole.EditRole, _icon_name)
             self.invisibleRootItem().addChild(item)                       
             self.__resize_cols() 
 
@@ -606,7 +605,7 @@ class SCR_TreeContextMenu(QMenu):
 ******************************************************************************************"""
 class SCR_Info(QMessageBox):
 
-    def __init__(self,parent,title,text,boxType = QMessageBox.Critical):
+    def __init__(self,parent,title,text,boxType = QMessageBox.critical):
 
         self.boxType   = boxType
         QInputDialog.__init__(self,self.boxType,title,text,QMessageBox.Ok)
@@ -626,4 +625,4 @@ if __name__ == "__main__":
 
     _window.show()
 
-    sys.exit(_app.exec_())  
+    sys.exit(_app.exec())  
