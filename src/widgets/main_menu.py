@@ -5,19 +5,39 @@ File contains all UI widgets regarding the Main Menu
 from PyQt6.QtCore          import *
 from PyQt6.QtGui           import *
 from PyQt6.QtWidgets       import * 
+from widgets.widgets       import SCR_WDG_MenuBar
 from icons.icons           import SCR_GetIcon
 from functools             import partial
 
 """******************************************************************************************
 *********************************************************************************************
 ******************************************************************************************"""
-class SCR_WDG_MainMenu(QMenuBar):
+class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
 
     def __init__(self,scrib):
 
-        QMenuBar.__init__(self,scrib)
+        SCR_WDG_MenuBar.__init__(self,scrib)
 
         self.scrib = scrib
+
+        _css  = """
+                    QMenu::item /{
+                        background-color: %s;
+                        color: %s;
+                        padding: 4px 20px 4px 20px; 
+                    /}
+
+                    QMenu::item:selected /{
+                        background-color: #0078D4; 
+                        color: white;
+                    /}
+                """
+
+        _css = _css % (
+                            self.scrib.config.get_theme_background(),
+                            self.scrib.config.get_theme_foreground())
+
+        self.setStyleSheet(_css)
 
     def populate(self,):
 

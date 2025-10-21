@@ -15,6 +15,15 @@ from abc                   import abstractmethod
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
+class SCR_WDG_MenuBar(QMenuBar):
+
+    def __init__(self,*args):
+
+        QMenuBar.__init__(self,*args)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
 class SCR_WDG_ToolButton(QToolButton):
 
     def __init__(self):
@@ -453,8 +462,8 @@ class SCR_WDG_Tree(QTreeView):
         self.config = config
 
         _css  = ""
-        _css += "background-color: %s;" % (self.config.get_theme_background(),)
-        _css += "color: %s;" % (self.config.get_theme_foreground(),)  
+        _css += "background-color: {};".format(self.config.get_theme_background(),)
+        _css += "color: {};".format(self.config.get_theme_foreground(),)  
         _css += "selection-color: #000000;"
         _css += "selection-background-color: #c2d2ed;"
         _css += "font-family: Arial;"
