@@ -1,9 +1,43 @@
+"""
+File contains all UI base widgets that will be used.
+It is not allowed to use Qt Widgets direclty in Srib code.
+Instead a Qt widget must be wrapper in a class and then used.
+This will ensure easy global changes and some degree of isolation 
+from future changes in the Qt library.
+"""
 
 from PyQt6.QtCore          import *
 from PyQt6.QtGui           import *
 from PyQt6.QtWidgets       import * 
 from icons.icons           import SCR_GetIcon
 from abc                   import abstractmethod
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_WDG_ToolButton(QToolButton):
+
+    def __init__(self):
+
+        QToolButton.__init__(self)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_WDG_LineEdit(QLineEdit):
+
+    def __init__(self):
+
+        QLineEdit.__init__(self)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_WDG_Widget(QWidget):
+
+    def __init__(self,*args):
+
+        QWidget.__init__(self,*args)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -142,7 +176,7 @@ class SCR_WDG_PopUp(QMessageBox):
 *************************************************************************************************"""
 class SCR_WDG_Tree_Item(object):
 
-    def __init__(self, data, parent=None):
+    def __init__(self, data, config, parent=None):
 
         self.parent_item      = parent
         self.item_data        = data
@@ -150,7 +184,7 @@ class SCR_WDG_Tree_Item(object):
         self.icon             = None
         self.tooltip          = None
         self.userdata         = None
-        self.background_color = QColor("#ffffff")
+        self.background_color = config.get_theme_background()
 
     def add_child(self, item):
 
@@ -207,11 +241,13 @@ class SCR_WDG_Tree_Model(QAbstractItemModel):
     # this class cannot be used as is
     # it must be inherited and certain methods reimplemented
 
-    def __init__(self, parent=None):
+    def __init__(self, config, parent=None):
 
         QAbstractItemModel.__init__(self)
 
         self.root = None
+
+        self.config = config
 
     @abstractmethod
     def load(self, data, parent):
@@ -396,6 +432,7 @@ class SCR_WDG_Tree_Model(QAbstractItemModel):
 
         _new_item = SCR_WDG_Tree_Item(
                                         data=[text],
+                                        config=self.config,
                                         parent=_parent_item)
 
         _parent_item.add_child(_new_item)
@@ -429,9 +466,12 @@ class SCR_WDG_Tree(QTreeView):
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
         self.search_clbk   = search_clbk
-        self.root          =  SCR_WDG_Tree_Item(data=[""],parent=None)
+        self.root          = SCR_WDG_Tree_Item(
+                                                data=[""],                                                    
+                                                config=self.config,
+                                                parent=None,)
         self.with_metadata = with_metadata
-        self.custom_model  = model_class(parent=self)
+        self.custom_model  = model_class(config=self.config, parent=self)
 
     def expandChildren(self,item):
 
@@ -465,6 +505,7 @@ class SCR_WDG_Tree(QTreeView):
 
         self.root = SCR_WDG_Tree_Item(
                                             data=header,
+                                            config=self.config,
                                             parent=None)
 
         self.custom_model.root = self.root

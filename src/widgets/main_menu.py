@@ -1,3 +1,6 @@
+"""
+File contains all UI widgets regarding the Main Menu
+"""
 
 from PyQt6.QtCore          import *
 from PyQt6.QtGui           import *
@@ -20,9 +23,9 @@ class SCR_WDG_MainMenu(QMenuBar):
 
         self.populate_file()
 
-        # self.populate_search()
+        self.populate_search()
 
-        # self.populate_plugins()
+        self.populate_plugins()
 
         self.populate_help()
 
@@ -57,10 +60,14 @@ class SCR_WDG_MainMenu(QMenuBar):
         _recents      = self.scrib.preferences.get("recents")
 
         if _recents != None:
+
             for _recent in _recents:
+
                 _name = _recent
+
                 if len(_recent) > 100:
-                    _name = "...%s" % (_recent[100:])
+
+                    _name = "...{}".format(_recent[100:])
 
                 self.add_action(
                                 _menu_recents, 

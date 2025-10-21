@@ -1,3 +1,6 @@
+"""
+File contains all UI widgets regarding the Test Tree
+"""
 
 from PyQt6.QtCore          import *
 from PyQt6.QtGui           import *
@@ -7,6 +10,9 @@ from widgets.widgets       import SCR_WDG_Tree
 from widgets.widgets       import SCR_WDG_Tree_Model
 from widgets.widgets       import SCR_WDG_Tree_Item
 from widgets.widgets       import SCR_WDG_Selection
+from widgets.widgets       import SCR_WDG_Widget
+from widgets.widgets       import SCR_WDG_LineEdit
+from widgets.widgets       import SCR_WDG_ToolButton
 from actions.actions       import SCR_Actions_Tree_TestFolder
 from actions.actions       import SCR_Actions_Tree_TestSuite
 from actions.actions       import SCR_Actions_Tree_Resource
@@ -19,15 +25,14 @@ from actions.actions       import SCR_Actions_Tree_ExtLibraries
 from functools             import partial
 
 
-
 """******************************************************************************************
 *********************************************************************************************
 ******************************************************************************************"""
-class SCR_WDG_TestTree_Widget(QWidget):
+class SCR_WDG_TestTree_Widget(SCR_WDG_Widget):
 
     def __init__(self, scrib, config):
 
-        QWidget.__init__(self)
+        SCR_WDG_Widget.__init__(self)
 
         self.scrib  = scrib 
         self.config = config
@@ -77,9 +82,9 @@ class SCR_Tree_Types():
 ******************************************************************************************"""
 class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
-    def __init__(self,parent):
+    def __init__(self,config,parent):
 
-        SCR_WDG_Tree_Model.__init__(self,parent)
+        SCR_WDG_Tree_Model.__init__(self,config,parent)
 
     def load(self,data,parent):
 
@@ -97,6 +102,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         _tree_testsuite = SCR_WDG_Tree_Item(
                                                 data=_labels,
+                                                config=self.config,
                                                 parent=parent)
 
         _tree_testsuite.icon     = "8e205a227046baee2a67b75fb12c95813784c484"
@@ -118,6 +124,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         _tree_testfolder = SCR_WDG_Tree_Item(
                                                 data=_labels,
+                                                config=self.config,
                                                 parent=parent)
 
         _tree_testfolder.icon     = "585ba3e6f845cb67ef8a6098bed724e247278a5b"
@@ -163,6 +170,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         _tree_testcase = SCR_WDG_Tree_Item(
                                                 data=_labels,
+                                                config=self.config,
                                                 parent=parent)
 
         _tree_testcase.icon     = "ca211c47afa3b991350a6c183d8aaf3f33db15a0"
@@ -191,8 +199,9 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                   ]
 
         _tree_testcase = SCR_WDG_Tree_Item(
-                                                data=_labels,
-                                                parent=parent)
+                                            data=_labels,
+                                            config=self.config,
+                                            parent=parent)
 
         if data.name[0] == "$":
             _tree_testcase.icon     = "de99afcb2a785eea0974463ae9e7e063a5482b4a"
@@ -226,8 +235,9 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                   ]
 
         _tree_keyword = SCR_WDG_Tree_Item(
-                                                data=_labels,
-                                                parent=parent)
+                                            data=_labels,
+                                            config=self.config,
+                                            parent=parent)
 
         _tree_keyword.icon     = "14b802564477e8b8f64dc869c92a4b983edc1001"
         _tree_keyword.userdata = {"data":data,"type": SCR_Tree_Types.KEYWORD}
@@ -241,8 +251,9 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                   ]
 
         _tree_resource = SCR_WDG_Tree_Item(
-                                                data=_labels,
-                                                parent=parent)
+                                            data=_labels,
+                                            config=self.config,
+                                            parent=parent)
 
         _tree_resource.icon     = "26b41084d7c558d94b50f5e1c40cdfd362f05478"
         _tree_resource.userdata = {"data":data,"type": SCR_Tree_Types.RESOURCE}
@@ -260,8 +271,9 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                   ]
 
         _tree_library = SCR_WDG_Tree_Item(
-                                                data=_labels,
-                                                parent=parent)
+                                            data=_labels,
+                                            config=self.config,
+                                            parent=parent)
 
         _tree_library.icon     = "66a73259d66004e2b9c7180030bc347836ddcb82"
         _tree_library.userdata = {"data":data,"type": SCR_Tree_Types.LIBRARY}
@@ -274,6 +286,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         _tree_ext_resources = SCR_WDG_Tree_Item(
                                                 data=_labels,
+                                                config=self.config,
                                                 parent=parent)
 
         _tree_ext_resources.icon     = "616b77c9b4e3020bee662e34c6feb5e8ddcd2b7d"
@@ -291,6 +304,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         _tree_ext_libraries = SCR_WDG_Tree_Item(
                                                 data=_labels,
+                                                config=self.config,
                                                 parent=parent)
 
         _tree_ext_libraries.icon     = "66a73259d66004e2b9c7180030bc347836ddcb82"
@@ -812,11 +826,11 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
 """******************************************************************************************
 *********************************************************************************************
 ******************************************************************************************"""
-class SCR_WDG_TestTree_Find(QWidget):
+class SCR_WDG_TestTree_Find(SCR_WDG_Widget):
 
     def __init__(self,config,tree):
 
-        QWidget.__init__(self,tree)
+        SCR_WDG_Widget.__init__(self,tree)
 
         self.config = config
 
@@ -827,28 +841,28 @@ class SCR_WDG_TestTree_Find(QWidget):
         self.selection_type  = "all"  
             
         #write line
-        self.line = QLineEdit()
+        self.line = SCR_WDG_LineEdit()
         self.line.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)    
         self.line.setStyleSheet('border: 1px solid gray;')
         self.line.returnPressed.connect(self._find_next) 
         self.line.textEdited.connect(self._textedited)
 
         #find previous button
-        self._find_prev_button = QToolButton()
+        self._find_prev_button = SCR_WDG_ToolButton()
         self._find_prev_button.setStyleSheet("background: transparent; border-radius: 0px")
         self._find_prev_button.setIcon(SCR_GetIcon('85905e29412dc4ee1bca3b78beeca05a0ea1d14b'))
         self._find_prev_button.setToolTip("Find Previous Item")
         self._find_prev_button.clicked.connect(self._find_prev)                 
 
         #find next button
-        self._find_next_button = QToolButton()
+        self._find_next_button = SCR_WDG_ToolButton()
         self._find_next_button.setStyleSheet("background: transparent; border-radius: 0px")
         self._find_next_button.setIcon(SCR_GetIcon('47d97a19678ecbc93257bfc890b71cc62f4ae908'))
         self._find_prev_button.setToolTip("Find Next Item")
         self._find_next_button.clicked.connect(self._find_next)           
 
         #close button
-        self._close_button = QToolButton()
+        self._close_button = SCR_WDG_ToolButton()
         self._close_button.setStyleSheet("background: transparent; border-radius: 0px")
         self._close_button.setIcon(SCR_GetIcon('779d79bcda4833c45d97b063d0041af2e47265e4'))
         self._find_prev_button.setToolTip("Close Test Tree Search Bar")

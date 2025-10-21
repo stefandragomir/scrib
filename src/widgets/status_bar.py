@@ -1,4 +1,6 @@
-
+"""
+File contains all UI widgets regarding the Status Bar
+"""
 
 from PyQt6.QtCore          import *
 from PyQt6.QtGui           import *
