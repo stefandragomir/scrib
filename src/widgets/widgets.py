@@ -1,9 +1,10 @@
 """
 File contains all UI base widgets that will be used.
-It is not allowed to use Qt Widgets direclty in Srib code.
+It is not allowed to use Qt Widgets directly in Srib code.
 Instead a Qt widget must be wrapper in a class and then used.
 This will ensure easy global changes and some degree of isolation 
 from future changes in the Qt library.
+The theme colors can easilly be applied from the wrapper widget.
 """
 
 from PyQt6.QtCore          import *
@@ -12,32 +13,133 @@ from PyQt6.QtWidgets       import *
 from icons.icons           import SCR_GetIcon
 from abc                   import abstractmethod
 
+"""******************************************************************************************
+*********************************************************************************************
+******************************************************************************************"""
+class SCR_WDG_StatusBar(QStatusBar):
+
+    def __init__(self,config):
+
+        self.config = config
+
+        QStatusBar.__init__(self)
+
+        self.lbl = QLabel()
+
+        self.addPermanentWidget(self.lbl)
+
+    def message(self,msg):
+
+        self.lbl.setText(msg)
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
 class SCR_WDG_MenuBar(QMenuBar):
 
-    def __init__(self,*args):
+    def __init__(self,config,*args):
 
         QMenuBar.__init__(self,*args)
+
+        self.config = config
+
+        _css  = """
+                    QMenuBar::item {
+                        background-color: %s;
+                        color: %s;
+                        padding: 4px 20px 4px 20px; 
+                    }
+
+                    QMenuBar::item:selected {
+                        background-color: %s; 
+                        color: %s;
+                    }
+                """
+
+        _css = _css % (
+                            self.config.get_theme_background(),
+                            self.config.get_theme_foreground(),
+                            self.config.get_theme_sel_background(),
+                            self.config.get_theme_sel_foreground())
+
+        self.setStyleSheet(_css)
+
+    def add_menu(self,parent,name):
+
+        _menu = parent.addMenu(name)
+
+        _css  = """
+                    QMenu::item {
+                        background-color: %s;
+                        color: %s;
+                        padding: 4px 20px 4px 20px; 
+                    }
+
+                    QMenu::item:selected {
+                        background-color: %s; 
+                        color: %s;
+                    }
+                """
+
+        _css = _css % (
+                            self.config.get_theme_background(),
+                            self.config.get_theme_foreground(),
+                            self.config.get_theme_sel_background(),
+                            self.config.get_theme_sel_foreground())
+
+        _menu.setStyleSheet(_css)
+
+        return _menu
+
+    def add_action(self,parent,text,icon,shortcut,callback):
+
+        _action = QAction(parent)
+        _action.setText(text)
+        _action.setIcon(SCR_GetIcon(icon))
+
+        if shortcut != None:
+            _action.setShortcut(shortcut)
+
+        _action.triggered.connect(callback)
+        parent.addAction(_action)
+
+        return _action
 
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
 class SCR_WDG_ToolButton(QToolButton):
 
-    def __init__(self):
+    def __init__(self,config):
 
         QToolButton.__init__(self)
+
+        self.config = config
+
+        _css  = """
+        background-color: %s;
+        color: %s; 
+        """ % (self.config.get_theme_background(),self.config.get_theme_foreground())
+
+        self.setStyleSheet(_css)
 
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
 class SCR_WDG_LineEdit(QLineEdit):
 
-    def __init__(self):
+    def __init__(self,config):
 
         QLineEdit.__init__(self)
+
+        self.config = config
+
+        _css  = """
+        background-color: %s;
+        color: %s; 
+        """ % (self.config.get_theme_background(),self.config.get_theme_foreground())
+
+        self.setStyleSheet(_css)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -53,9 +155,19 @@ class SCR_WDG_Widget(QWidget):
 *************************************************************************************************"""
 class SCR_WDG_DockWidget(QDockWidget):
 
-    def __init__(self):
+    def __init__(self,config):
 
         QDockWidget.__init__(self)
+
+
+        self.config = config
+
+        _css  = """
+        background-color: %s;
+        color: %s; 
+        """ % (self.config.get_theme_background(),self.config.get_theme_foreground())
+
+        self.setStyleSheet(_css)
 
 """*************************************************************************************************
 ****************************************************************************************************

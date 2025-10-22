@@ -2,22 +2,23 @@
 import os
 import sys
 import error.error
-from PyQt6.QtCore          import *
-from PyQt6.QtGui           import *
-from PyQt6.QtWidgets       import * 
-from config.config         import SCR_Config
-from widgets.widgets       import SCR_WDG_DockWidget
-from widgets.widgets       import SCR_WDG_ToolBar
-from widgets.widgets       import SCR_WDG_ActionBar
-from widgets.main_menu     import SCR_WDG_MainMenu
-from icons.icons           import SCR_GetIcon
-from widgets.test_tree     import SCR_WDG_TestTree_Widget
-from widgets.test_tab      import SCR_WDG_Test_Tab
-from widgets.status_bar    import SCR_WDG_Status_Bar
-from control.control       import SCR_Control
-from cache.preferences     import SCR_Preferences
-from actions.actions       import SCR_Actions_File
-from actions.actions       import SCR_Actions_Help
+from PyQt6.QtCore             import *
+from PyQt6.QtGui              import *
+from PyQt6.QtWidgets          import * 
+from config.config            import SCR_Config
+from widgets.widgets          import SCR_WDG_DockWidget
+from widgets.widgets          import SCR_WDG_ToolBar
+from widgets.widgets          import SCR_WDG_ActionBar
+from widgets.widgets          import SCR_WDG_StatusBar
+from widgets.main_menu        import SCR_WDG_MainMenu
+from icons.icons              import SCR_GetIcon
+from widgets.test_tree        import SCR_WDG_TestTree_Widget
+from widgets.test_tab         import SCR_WDG_Test_Tab
+from control.control          import SCR_Control
+from preferences.preferences  import SCR_Preferences
+from actions.actions          import SCR_Actions_File
+from actions.actions          import SCR_Actions_Appearance
+from actions.actions          import SCR_Actions_Help
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -34,12 +35,15 @@ class SCR_UI(QMainWindow):
         self.preferences = SCR_Preferences()
         self.act_file    = SCR_Actions_File(self)
         self.act_help    = SCR_Actions_Help(self)
+        self.act_appearance = SCR_Actions_Appearance(self)
 
         self.preferences.load()
 
         self.draw_gui() 
 
     def draw_gui(self):
+
+        self.config.theme = self.preferences.get("theme")
 
         self.setWindowTitle("Robot Framework Scrib")
         self.setMinimumSize(1300, 800)       
@@ -92,9 +96,9 @@ class SCR_UI(QMainWindow):
 
     def draw_test_tree(self):
 
-        self.wdg_tree_test = SCR_WDG_TestTree_Widget(self,self.config)
+        self.wdg_tree_test = SCR_WDG_TestTree_Widget(self.config,self)
 
-        self.dock_tree_test = QDockWidget("Test Tree")
+        self.dock_tree_test = SCR_WDG_DockWidget(self.config)
 
         self.dock_tree_test.setWidget(self.wdg_tree_test)
 
@@ -116,7 +120,7 @@ class SCR_UI(QMainWindow):
 
     def draw_main_menu(self):
 
-        self.main_menu = SCR_WDG_MainMenu(self)
+        self.main_menu = SCR_WDG_MainMenu(self.config,self)
 
         self.main_menu.populate()
 
@@ -128,7 +132,7 @@ class SCR_UI(QMainWindow):
 
     def draw_status_bar(self):
 
-        self.status_bar = SCR_WDG_Status_Bar(self.config)
+        self.status_bar = SCR_WDG_StatusBar(self.config)
 
         self.setStatusBar(self.status_bar)
 

@@ -30,7 +30,7 @@ from functools             import partial
 ******************************************************************************************"""
 class SCR_WDG_TestTree_Widget(SCR_WDG_Widget):
 
-    def __init__(self, scrib, config):
+    def __init__(self,config, scrib):
 
         SCR_WDG_Widget.__init__(self)
 
@@ -43,7 +43,7 @@ class SCR_WDG_TestTree_Widget(SCR_WDG_Widget):
 
         self.ly = QVBoxLayout()
 
-        self.wdg_tree = SCR_WDG_TestTree(self,self.config,lambda:self.wdg_search.show())
+        self.wdg_tree = SCR_WDG_TestTree(self.config,self,lambda:self.wdg_search.show())
 
         self.wdg_tree.setHeaderHidden(True)
 
@@ -364,7 +364,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 ******************************************************************************************"""
 class SCR_WDG_TestTree(SCR_WDG_Tree):
 
-    def __init__(self, scrib, config, search_clbk):
+    def __init__(self, config, scrib, search_clbk):
 
         self.scrib             = scrib
         self.act_testfolder    = SCR_Actions_Tree_TestFolder(self.scrib)
@@ -841,28 +841,28 @@ class SCR_WDG_TestTree_Find(SCR_WDG_Widget):
         self.selection_type  = "all"  
             
         #write line
-        self.line = SCR_WDG_LineEdit()
+        self.line = SCR_WDG_LineEdit(self.config)
         self.line.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)    
         self.line.setStyleSheet('border: 1px solid gray;')
         self.line.returnPressed.connect(self._find_next) 
         self.line.textEdited.connect(self._textedited)
 
         #find previous button
-        self._find_prev_button = SCR_WDG_ToolButton()
+        self._find_prev_button = SCR_WDG_ToolButton(self.config)
         self._find_prev_button.setStyleSheet("background: transparent; border-radius: 0px")
         self._find_prev_button.setIcon(SCR_GetIcon('85905e29412dc4ee1bca3b78beeca05a0ea1d14b'))
         self._find_prev_button.setToolTip("Find Previous Item")
         self._find_prev_button.clicked.connect(self._find_prev)                 
 
         #find next button
-        self._find_next_button = SCR_WDG_ToolButton()
+        self._find_next_button = SCR_WDG_ToolButton(self.config)
         self._find_next_button.setStyleSheet("background: transparent; border-radius: 0px")
         self._find_next_button.setIcon(SCR_GetIcon('47d97a19678ecbc93257bfc890b71cc62f4ae908'))
         self._find_prev_button.setToolTip("Find Next Item")
         self._find_next_button.clicked.connect(self._find_next)           
 
         #close button
-        self._close_button = SCR_WDG_ToolButton()
+        self._close_button = SCR_WDG_ToolButton(self.config)
         self._close_button.setStyleSheet("background: transparent; border-radius: 0px")
         self._close_button.setIcon(SCR_GetIcon('779d79bcda4833c45d97b063d0041af2e47265e4'))
         self._find_prev_button.setToolTip("Close Test Tree Search Bar")

@@ -1,3 +1,9 @@
+"""
+File contains handlers for the Scrib user preferences for UI and functionality
+All preferences configuration is saved the folder .scrib that can be found in the OS user folder
+The preferences configuration will be cached (binary, not human readable)
+"""
+
 import os
 from utils.utils     import scr_get_settings_dir
 from cache.serialize import SCR_Serialiser
@@ -9,10 +15,13 @@ class SCR_Preferences():
 
 	def __init__(self):
 
-		self.preferences = {
+		self.default = {
 								"recents": [],
 								"cwd"    : "",
+								"theme"  : "light",
 							}
+
+		self.preferences = self.default
 
 	def load(self):
 
@@ -45,6 +54,11 @@ class SCR_Preferences():
 		if name in list(self.preferences.keys()):
 
 			_value = self.preferences[name]
+
+		else:
+			if name in list(self.default.keys()):
+
+				_value = self.default[name]
 
 		return _value
 

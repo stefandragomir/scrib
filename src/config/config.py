@@ -16,13 +16,17 @@ class SCR_Config(object):
         self.theme  = "light"
         self.themes = {
                         "light"  : {
-                                    "background"        : "#FFFFFF",
-                                    "foreground"        : "#000000",
+                                    "background"          : "#FFFFFF",
+                                    "foreground"          : "#000000",
+                                    "selection_background": "#272932",
+                                    "selection_foreground": "#FFFFFF",
                                    },
                                   
                         "dark" : {
-                                    "background"        : "#272932",
-                                    "foreground"        : "#FFFFFF",
+                                    "background"          : "#272932",
+                                    "foreground"          : "#FFFFFF",
+                                    "selection_background": "#FFFFFF",
+                                    "selection_foreground": "#000000",
                                  },
                       }
 
@@ -33,6 +37,14 @@ class SCR_Config(object):
     def get_theme_foreground(self):
 
         return self.themes[self.theme]["foreground"]
+
+    def get_theme_sel_background(self):
+
+        return self.themes[self.theme]["selection_background"]
+
+    def get_theme_sel_foreground(self):
+
+        return self.themes[self.theme]["selection_foreground"]
 
 """*************************************************************************************************
 ****************************************************************************************************

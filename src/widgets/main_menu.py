@@ -6,7 +6,6 @@ from PyQt6.QtCore          import *
 from PyQt6.QtGui           import *
 from PyQt6.QtWidgets       import * 
 from widgets.widgets       import SCR_WDG_MenuBar
-from icons.icons           import SCR_GetIcon
 from functools             import partial
 
 """******************************************************************************************
@@ -14,44 +13,28 @@ from functools             import partial
 ******************************************************************************************"""
 class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
 
-    def __init__(self,scrib):
+    def __init__(self,config,scrib):
 
-        SCR_WDG_MenuBar.__init__(self,scrib)
+        SCR_WDG_MenuBar.__init__(self,config)
 
-        self.scrib = scrib
-
-        _css  = """
-                    QMenu::item /{
-                        background-color: %s;
-                        color: %s;
-                        padding: 4px 20px 4px 20px; 
-                    /}
-
-                    QMenu::item:selected /{
-                        background-color: #0078D4; 
-                        color: white;
-                    /}
-                """
-
-        _css = _css % (
-                            self.scrib.config.get_theme_background(),
-                            self.scrib.config.get_theme_foreground())
-
-        self.setStyleSheet(_css)
+        self.scrib  = scrib
+        self.config = config
 
     def populate(self,):
 
         self.populate_file()
 
-        self.populate_search()
+        self.populate_tools()
 
         self.populate_plugins()
+
+        self.populate_appearance()
 
         self.populate_help()
 
     def populate_file(self):
 
-        _menu_file    = self.addMenu("File")
+        _menu_file    = self.add_menu(self,"File")
 
         self.add_action(
                         _menu_file, 
@@ -76,7 +59,7 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
 
         _menu_file.addSeparator()
 
-        _menu_recents = _menu_file.addMenu("&Open Recent")
+        _menu_recents = self.add_menu(_menu_file,"&Open Recent")
         _recents      = self.scrib.preferences.get("recents")
 
         if _recents != None:
@@ -105,17 +88,35 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
                         QKeySequence("Ctrl+Q"), 
                         self.scrib.close)
 
-    def populate_search(self):
+    def populate_tools(self):
 
-        _menu_search = self.addMenu("&Search")
+        _menu_search = self.add_menu(self,"&Tools")
+
+    def populate_appearance(self):
+
+        _menu_appearance = self.add_menu(self,"&Appearance")
+
+        _title = ""
+
+        if self.scrib.preferences.get("theme") == "light":
+            _title = "Theme Dark"
+        else:
+            _title = "Theme Light"
+
+        self.add_action(
+                        _menu_appearance, 
+                        _title,              
+                        "f35b5975f6d636d7a6418bb4941edbdf89b80b55", 
+                        None, 
+                        self.scrib.act_appearance.change_theme)
 
     def populate_plugins(self):
 
-        _menu_plugins = self.addMenu("&Plugins")
+        _menu_plugins = self.add_menu(self,"&Plugins")
 
     def populate_help(self):
 
-        _menu_help = self.addMenu("&Help")
+        _menu_help = self.add_menu(self,"&Help")
 
         self.add_action(
                         _menu_help, 
@@ -138,17 +139,7 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
                         None, 
                         self.scrib.act_help.help_about)
 
-    def add_action(self,parent,text,icon,shortcut,callback):
 
-        _action = QAction(parent)
-        _action.setText(text)
-        _action.setIcon(SCR_GetIcon(icon))
-
-        if shortcut != None:
-            _action.setShortcut(shortcut)
-
-        _action.triggered.connect(callback)
-        parent.addAction(_action)
 
 
 
