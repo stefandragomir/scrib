@@ -81,15 +81,15 @@ class SCR_UI(QMainWindow):
 
         self.wdg_toolbar.add_button(
                                         "load testfolder",
-                                        "b28971455cf45af0e2e37a9c33ca8ca01d5a660f",
-                                        "c9c73609abb7d353a69882826114ab5d501cc2bf",
+                                        self.config.get_theme_icon_folder(),
+                                        self.config.get_theme_icon_folder(),
                                         "Load Tests Folder",
                                         self.act_file.load_testfolder)
         
         self.wdg_toolbar.add_button(
                                         "save",
-                                        "eb1729093812c3f38a5e4eb2714f2bde148f6eba",
-                                        "0b5ff6fecdc20faffd3884561995dfa5bab539fd",
+                                        self.config.get_theme_icon_save(),
+                                        self.config.get_theme_icon_save(),
                                         "Save",
                                         self.act_file.save)
         self.wdg_toolbar.draw()

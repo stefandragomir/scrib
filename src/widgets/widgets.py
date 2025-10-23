@@ -649,7 +649,7 @@ class SCR_WDG_Tree(QTreeView):
 
     def keyPressEvent(self, event):
 
-        _find_shortcut = (event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_F)  
+        _find_shortcut = (event.modifiers() == Qt.KeyboardModifier.ControlModifier and event.key() == Qt.Key_F)  
 
         if _find_shortcut:
 

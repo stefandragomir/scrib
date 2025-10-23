@@ -39,21 +39,21 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
         self.add_action(
                         _menu_file, 
                         "New",              
-                        "f35b5975f6d636d7a6418bb4941edbdf89b80b55", 
+                        self.config.get_theme_icon_new(), 
                         QKeySequence("Ctrl+N"), 
                         self.scrib.act_file.new)
 
         self.add_action(
                         _menu_file, 
                         "Open Test Folder", 
-                        "b28971455cf45af0e2e37a9c33ca8ca01d5a660f", 
+                        self.config.get_theme_icon_folder(),
                         QKeySequence("Ctrl+O"), 
                         self.scrib.act_file.load_testfolder)
 
         self.add_action(
                         _menu_file, 
                         "Save",             
-                        "eb1729093812c3f38a5e4eb2714f2bde148f6eba", 
+                        self.config.get_theme_icon_save(),
                         QKeySequence("Ctrl+S"), 
                         self.scrib.act_file.save)
 
@@ -75,7 +75,7 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
                 self.add_action(
                                 _menu_recents, 
                                 _name,             
-                                "b28971455cf45af0e2e37a9c33ca8ca01d5a660f", 
+                                self.config.get_theme_icon_folder(), 
                                 None, 
                                 partial(self.scrib.act_file.load_testfolder_by_path,_recent))
 
@@ -84,7 +84,7 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
         self.add_action(
                         _menu_file, 
                         "Exit",             
-                        "325eab1e2242ef8223f4b2506db6da27384f3789", 
+                        self.config.get_theme_icon_exit(), 
                         QKeySequence("Ctrl+Q"), 
                         self.scrib.close)
 
@@ -106,7 +106,7 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
         self.add_action(
                         _menu_appearance, 
                         _title,              
-                        "f35b5975f6d636d7a6418bb4941edbdf89b80b55", 
+                        self.config.get_theme_icon_theme(),
                         None, 
                         self.scrib.act_appearance.change_theme)
 
@@ -121,21 +121,21 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
         self.add_action(
                         _menu_help, 
                         "Documentation",             
-                        "edaf568e98a4c6023a1d9eb657bc737cff2ef279", 
+                        self.config.get_theme_icon_doc(), 
                         QKeySequence("Ctrl+F1"), 
                         self.scrib.act_help.help_documentation)
 
         self.add_action(
                         _menu_help, 
                         "Issue or Idea",             
-                        "68887170a19a6b6eb82e9a9346dd81efa8a67f4d", 
+                        self.config.get_theme_icon_bug(), 
                         None, 
                         self.scrib.act_help.help_issue)
 
         self.add_action(
                         _menu_help, 
                         "About",             
-                        "fd2cf51bcbd304d61dbae1fdd954d4d1ec41e535", 
+                        self.config.get_theme_icon_info(), 
                         None, 
                         self.scrib.act_help.help_about)
 
