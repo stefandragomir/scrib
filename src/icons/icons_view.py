@@ -122,7 +122,7 @@ class SCR_IconInserter(QDialog):
         self.myDict = {}
         for image in self.imagesPath:
             img = Image.open(image)
-            img.thumbnail((50,50), Image.ANTIALIAS)
+            img.thumbnail((50,50), Image.Resampling.LANCZOS)
             img.save(r"resized.png", "PNG")
             imageLabel = QLabel("Image")
             newImage = QLabel()
@@ -144,7 +144,7 @@ class SCR_IconInserter(QDialog):
             os.remove(r"resized.png")
 
         self.buttons = QDialogButtonBox()
-        self.buttons.setStandardButtons(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
+        self.buttons.setStandardButtons(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel)
         self.layout.addWidget(self.buttons ,position,1)
 
         self.buttons.accepted.connect(partial(self.saveImages,True))
@@ -154,7 +154,7 @@ class SCR_IconInserter(QDialog):
 
     def saveImages(self,save):
         if save:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
+            QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
             for key in self.myDict.keys():
                 base64Dict = {}
                 timestampStr = datetime.now().strftime("%d-%b-%Y (%H:%M:%S.%f)")
@@ -168,7 +168,7 @@ class SCR_IconInserter(QDialog):
                 #create the 3 images in format 15*15, 30*30 nad 50*50 and save them in the new created directory
                 for size in ((15,15),(30,30),(50,50)):
                     img = Image.open(key)
-                    img.thumbnail(size, Image.ANTIALIAS)
+                    img.thumbnail(size, Image.Resampling.LANCZOS)
                     newFilePath = newPath + "\\" + str(size[0])+"_"+str(size[1])+".png"
                     img.save(newFilePath, "PNG")
                     base64Dict[str(size[0])+"_"+str(size[1])] = base64.b64encode(open(newFilePath, "rb").read()).decode('ascii')
@@ -554,11 +554,7 @@ class SCR_TreeContextMenu(QMenu):
 
         _path = "%s_%s.png" % (name,size)
 
-        _file = QFile(_path)
-
-        _file.open(QIODevice.WriteOnly)
-
-        pixmap.save(_file, "PNG");
+        pixmap.save(_path, "PNG");
 
         os.startfile(_path)
             

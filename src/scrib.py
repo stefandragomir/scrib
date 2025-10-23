@@ -29,12 +29,12 @@ class SCR_UI(QMainWindow):
 
         QMainWindow.__init__(self)
 
-        self.config      = config
-        self.ctrl        = SCR_Control()
-        self.app         = app
-        self.preferences = SCR_Preferences()
-        self.act_file    = SCR_Actions_File(self)
-        self.act_help    = SCR_Actions_Help(self)
+        self.config         = config
+        self.ctrl           = SCR_Control()
+        self.app            = app
+        self.preferences    = SCR_Preferences()
+        self.act_file       = SCR_Actions_File(self)
+        self.act_help       = SCR_Actions_Help(self)
         self.act_appearance = SCR_Actions_Appearance(self)
 
         self.preferences.load()
