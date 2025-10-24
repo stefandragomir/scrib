@@ -44,16 +44,28 @@ class SCR_WDG_MenuBar(QMenuBar):
         self.config = config
 
         _css  = """
-                    QMenuBar::item {
+                    QMenuBar::item 
+                    {
                         background-color: %s;
                         color: %s;
-                        padding: 4px 20px 4px 20px; 
+                        padding: 4px 20px 4px 20px;
                     }
 
-                    QMenuBar::item:selected {
+                    QMenuBar::item:selected 
+                    {
                         background-color: %s; 
                         color: %s;
                     }
+
+                    QMenuBar QAbstractItemView::item
+                    {
+
+                        border-width: 3px;
+                        border-style: solid;
+                        border-color: #E74C3C; 
+                        border-radius: 5px;
+                    }
+
                 """
 
         _css = _css % (

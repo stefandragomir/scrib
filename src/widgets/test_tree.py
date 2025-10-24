@@ -70,7 +70,9 @@ class SCR_Tree_Types():
     TESTFOLDER   = "testfolder"
     TESTSUITE    = "testsuite"
     TESTCASE     = "testcase"
+    KEYWORDS     = "keywords"
     KEYWORD      = "keyword"
+    VARIABLES    = "variables"
     VARIABLE     = "variable"
     RESOURCE     = "resource"
     LIBRARY      = "library"
@@ -110,9 +112,9 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         parent.add_child(_tree_testsuite)
 
-        self.load_variables(data,_tree_testsuite)
-
         self.load_testcases(data,_tree_testsuite)
+
+        self.load_variables(data,_tree_testsuite)        
 
         self.load_keywords(data,_tree_testsuite)
 
@@ -127,7 +129,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 config=self.config,
                                                 parent=parent)
 
-        _tree_testfolder.icon     = "585ba3e6f845cb67ef8a6098bed724e247278a5b"
+        _tree_testfolder.icon     = self.config.get_theme_icon_folder()
         _tree_testfolder.userdata = {"data":data,"type": SCR_Tree_Types.TESTFOLDER}
 
         for _testfolder in data.testfolders:
@@ -173,7 +175,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 config=self.config,
                                                 parent=parent)
 
-        _tree_testcase.icon     = "ca211c47afa3b991350a6c183d8aaf3f33db15a0"
+        _tree_testcase.icon     = self.config.get_theme_icon_testcase()
         _tree_testcase.userdata = {"data":data,"type": SCR_Tree_Types.TESTCASE}
 
         parent.add_child(_tree_testcase)
@@ -186,11 +188,26 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
                 if data.is_section_variables(_section):
 
+                    _labels = [
+                                "Variables",
+                              ]
+
+                    _tree_variables = SCR_WDG_Tree_Item(
+                                                        data=_labels,
+                                                        config=self.config,
+                                                        parent=parent)
+
+                    _tree_variables.icon     = self.config.get_theme_icon_folder_variables()
+                   
+                    _tree_variables.userdata = {"data":data,"type": SCR_Tree_Types.VARIABLES}
+
+                    parent.add_child(_tree_variables)
+
                     for _variable in _section.body:
 
                         if data.is_statement_variable(_variable):
 
-                            self.load_variable(_variable,parent)
+                            self.load_variable(_variable,_tree_variables)
 
     def load_variable(self,data,parent):
 
@@ -198,21 +215,21 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                     data.name,
                   ]
 
-        _tree_testcase = SCR_WDG_Tree_Item(
+        _tree_variable = SCR_WDG_Tree_Item(
                                             data=_labels,
                                             config=self.config,
                                             parent=parent)
 
         if data.name[0] == "$":
-            _tree_testcase.icon     = "de99afcb2a785eea0974463ae9e7e063a5482b4a"
+            _tree_variable.icon     = self.config.get_theme_icon_var_scalar()
         elif data.name[0] == "@":
-            _tree_testcase.icon     = "000cc208d4e675301e21ed009db52ff361a35a9f"
+            _tree_variable.icon     = self.config.get_theme_icon_var_list()
         elif data.name[0] == "&":
-            _tree_testcase.icon     = "490daab16fc73f3decf083a5cfb04b47708c8b22"
+            _tree_variable.icon     = self.config.get_theme_icon_dict_list()
 
-        _tree_testcase.userdata = {"data":data,"type": SCR_Tree_Types.VARIABLE}
+        _tree_variable.userdata = {"data":data,"type": SCR_Tree_Types.VARIABLE}
 
-        parent.add_child(_tree_testcase)
+        parent.add_child(_tree_variable)
 
     def load_keywords(self,data,parent):
 
@@ -222,11 +239,26 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
                 if data.is_section_keywords(_section):
 
+                    _labels = [
+                                "Keywords",
+                              ]
+
+                    _tree_keywords = SCR_WDG_Tree_Item(
+                                                        data=_labels,
+                                                        config=self.config,
+                                                        parent=parent)
+
+                    _tree_keywords.icon     = self.config.get_theme_icon_folder_keywords()
+                   
+                    _tree_keywords.userdata = {"data":data,"type": SCR_Tree_Types.KEYWORDS}
+
+                    parent.add_child(_tree_keywords)
+
                     for _keyword in _section.body:
 
                         if data.is_statement_keyword(_keyword):
 
-                            self.load_keyword(_keyword,parent)
+                            self.load_keyword(_keyword,_tree_keywords)
 
     def load_keyword(self,data,parent):
 
@@ -239,7 +271,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                             config=self.config,
                                             parent=parent)
 
-        _tree_keyword.icon     = "14b802564477e8b8f64dc869c92a4b983edc1001"
+        _tree_keyword.icon     = self.config.get_theme_icon_keyword()
         _tree_keyword.userdata = {"data":data,"type": SCR_Tree_Types.KEYWORD}
 
         parent.add_child(_tree_keyword)
@@ -255,7 +287,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                             config=self.config,
                                             parent=parent)
 
-        _tree_resource.icon     = "26b41084d7c558d94b50f5e1c40cdfd362f05478"
+        _tree_resource.icon     = self.config.get_theme_icon_resource()
         _tree_resource.userdata = {"data":data,"type": SCR_Tree_Types.RESOURCE}
 
         parent.add_child(_tree_resource)
@@ -275,7 +307,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                             config=self.config,
                                             parent=parent)
 
-        _tree_library.icon     = "66a73259d66004e2b9c7180030bc347836ddcb82"
+        _tree_library.icon     = self.config.get_theme_icon_python()
         _tree_library.userdata = {"data":data,"type": SCR_Tree_Types.LIBRARY}
 
         parent.add_child(_tree_library)
@@ -289,7 +321,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 config=self.config,
                                                 parent=parent)
 
-        _tree_ext_resources.icon     = "616b77c9b4e3020bee662e34c6feb5e8ddcd2b7d"
+        _tree_ext_resources.icon     = self.config.get_theme_icon_folder()
         _tree_ext_resources.userdata = {"data":None,"type": SCR_Tree_Types.EXTRESOURCES}
 
         parent.add_child(_tree_ext_resources)
@@ -307,7 +339,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 config=self.config,
                                                 parent=parent)
 
-        _tree_ext_libraries.icon     = "66a73259d66004e2b9c7180030bc347836ddcb82"
+        _tree_ext_libraries.icon     = self.config.get_theme_icon_python()
         _tree_ext_libraries.userdata = {"data":None,"type":SCR_Tree_Types.EXTLIBRARIES}
 
         parent.add_child(_tree_ext_libraries)
