@@ -1,3 +1,13 @@
+from robot.api                        import get_tokens
+from robot.api                        import get_model
+from robot.parsing.model.blocks       import TestCaseSection
+from robot.parsing.model.blocks       import VariableSection
+from robot.parsing.model.blocks       import KeywordSection
+from robot.parsing.model.blocks       import SettingSection
+from robot.parsing.model.statements   import Variable
+from robot.parsing.model.statements   import ResourceImport
+from robot.parsing.model.statements   import LibraryImport
+from robot.parsing.model.blocks       import Keyword
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -78,3 +88,143 @@ class SCR_Base_List(object):
 
         self.objects.reverse()
 
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Model_Base_Item(object):
+
+    def __init__(self):
+
+        self.rf_model = None
+
+    @abstractmethod
+    def load_rf_model(self,rf_model):
+
+        raise NotImplementedError
+
+    def is_section_testcases(self,section):
+
+        return isinstance(section,TestCaseSection)
+
+    def is_section_variables(self,section):
+
+        return isinstance(section,VariableSection)
+
+    def is_section_keywords(self,section):
+
+        return isinstance(section,KeywordSection)        
+
+    def is_section_settings(self,statement):
+
+        return isinstance(statement,SettingSection)
+
+    def is_statement_variable(self,statement):
+
+        return isinstance(statement,Variable)
+
+    def is_statement_keyword(self,statement):
+
+        return isinstance(statement,Keyword)
+
+    def is_statement_resource_import(self,statement):
+
+        return isinstance(statement,ResourceImport)
+
+    def is_statement_library_import(self,statement):
+
+        return isinstance(statement,LibraryImport)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Model_Folder(SCR_Model_Base_Item):
+
+    def __init__(self):
+
+        SCR_Model_Base_Item.__init__(self)
+
+    def load_rf_model(self,rf_model):
+
+        self.rf_model = rf_model
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Model_TestSuite(SCR_Model_Base_Item):
+
+    def __init__(self):
+
+        SCR_Model_Base_Item.__init__(self)
+
+    def load_rf_model(self,rf_model):
+
+        self.rf_model = rf_model
+
+    def get_sections(self):
+
+        return self.rf_model.sections
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Model_Resource(SCR_Model_Base_Item):
+
+    def __init__(self):
+
+        SCR_Model_Base_Item.__init__(self)
+
+    def load_rf_model(self,rf_model):
+
+        self.rf_model = rf_model
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Model_TestCase(SCR_Model_Base_Item):
+
+    def __init__(self):
+
+        SCR_Model_Base_Item.__init__(self)
+
+    def load_rf_model(self,rf_model):
+
+        self.rf_model = rf_model
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Model_Variable(SCR_Model_Base_Item):
+
+    def __init__(self):
+
+        SCR_Model_Base_Item.__init__(self)
+
+    def load_rf_model(self,rf_model):
+
+        self.rf_model = rf_model
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Model_Keyword(SCR_Model_Base_Item):
+
+    def __init__(self):
+
+        SCR_Model_Base_Item.__init__(self)
+
+    def load_rf_model(self,rf_model):
+
+        self.rf_model = rf_model
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Model_Library(SCR_Model_Base_Item):
+
+    def __init__(self):
+
+        SCR_Model_Base_Item.__init__(self)
+
+    def load_rf_model(self,rf_model):
+
+        self.rf_model = rf_model

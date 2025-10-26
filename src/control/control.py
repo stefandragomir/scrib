@@ -1,22 +1,17 @@
 
 import os
-from model.model                      import SCR_Base_List
-from robot.api                        import get_tokens
-from robot.api                        import get_model
-from robot.parsing.model.blocks       import TestCaseSection
-from robot.parsing.model.blocks       import VariableSection
-from robot.parsing.model.blocks       import KeywordSection
-from robot.parsing.model.blocks       import SettingSection
-from robot.parsing.model.statements   import Variable
-from robot.parsing.model.statements   import ResourceImport
-from robot.parsing.model.statements   import LibraryImport
-from robot.parsing.model.blocks       import Keyword
+
 from utils.utils                      import get_all_folders
 from utils.utils                      import get_all_files
 from utils.utils                      import SCR_UtilProgress
-
-
-from time import sleep
+from model.model                      import SCR_Base_List
+from model.model                      import SCR_Model_Folder
+from model.model                      import SCR_Model_TestSuite
+from model.model                      import SCR_Model_Resource
+from model.model                      import SCR_Model_TestCase
+from model.model                      import SCR_Model_Variable
+from model.model                      import SCR_Model_Keyword
+from model.model                      import SCR_Model_Library
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -31,24 +26,36 @@ class SCR_Control():
 
     def clear(self):
 
+        #control tree, used to recurse inside the control structure
         self.testfolder  = None
+
+        #list of all items in the control. usefull for searching
+        self.testsuites  = SCR_Control_TestSuites()
         self.resources   = SCR_Control_Resources()
         self.libraries   = SCR_Control_Libraries()
+        self.variables   = SCR_Control_Variables()
+        self.keywords    = SCR_Control_Keywords()
 
     def read(self,path,observer):
 
         self.logger.debug("load test folder by path [{}]".format(path))
 
+        #create the root item of the control
+        #holds the controller for the folder loaded
         self.testfolder = SCR_Control_Folder(
                                                 parent=self,
                                                 main_ctrl=self,
                                                 path=path)
 
+        #get the number of folders and files that need to be loaded
+        #will be used in progress status
         _nr_of_items = len(get_all_files(path,None))
         _nr_of_items += len(get_all_folders(path)) - 1
 
+        #imutable progress items used by recursive calls to track progress
         _progress = SCR_UtilProgress(_nr_of_items)
 
+        #start loading folders and files
         self.testfolder.read(
                                 path=path,
                                 observer=observer,
@@ -68,38 +75,6 @@ class _SCR_Control_Base():
         self.main_ctrl = main_ctrl      
         self.model     = model
         self.ctrl_type = ctrl_type
-
-    def is_section_testcases(self,section):
-
-        return isinstance(section,TestCaseSection)
-
-    def is_section_variables(self,section):
-
-        return isinstance(section,VariableSection)
-
-    def is_section_keywords(self,section):
-
-        return isinstance(section,KeywordSection)        
-
-    def is_section_settings(self,statement):
-
-        return isinstance(statement,SettingSection)
-
-    def is_statement_variable(self,statement):
-
-        return isinstance(statement,Variable)
-
-    def is_statement_keyword(self,statement):
-
-        return isinstance(statement,Keyword)
-
-    def is_statement_resource_import(self,statement):
-
-        return isinstance(statement,ResourceImport)
-
-    def is_statement_library_import(self,statement):
-
-        return isinstance(statement,LibraryImport)
 
     def get_status_label(self):
 
@@ -134,7 +109,7 @@ class SCR_Control_Folder(_SCR_Control_Base):
                                     folder=os.path.split(path)[0],
                                     parent=parent,
                                     main_ctrl=main_ctrl,
-                                    model=None,
+                                    model=SCR_Model_Folder(),
                                     ctrl_type="Test Folder")
 
         self.testfolders = SCR_Control_Folders()
@@ -256,8 +231,13 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
                                     folder=os.path.split(path)[0],
                                     parent=parent,
                                     main_ctrl=main_ctrl,
-                                    model=None,
+                                    model=SCR_Model_TestSuite(),
                                     ctrl_type="Test Suite")
+
+        self.variables   = SCR_Control_Variables()
+        self.keywords    = SCR_Control_Keywords()
+        self.resources   = SCR_Control_Resources()
+        self.libraries   = SCR_Control_Libraries()
 
     def read(self,observer):
 
@@ -265,13 +245,21 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
 
             observer.message("reading test suite %s" % (self.name,))
 
-        self.model = get_model(source=self.path,data_only=False)
+        self.model.load_rf_model(get_model(source=self.path,data_only=False))
+
+        self.main_ctrl.testsuites.add(self)
 
         self.read_resources(observer)
 
+        self.read_libraries(observer)
+
+        self.read_variables(observer)
+
+        self.read_keywords(observer)
+
     def read_resources(self,observer):
 
-        for _section in self.model.sections:
+        for _section in self.model.rf_model.sections:
 
             if self.is_section_settings(_section):
 
@@ -293,6 +281,79 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
                             _resource.read(observer)
 
                             self.main_ctrl.resources.add(_resource)
+
+    def read_libraries(self,observer):
+
+        for _section in self.model.rf_model.sections:
+
+            if self.is_section_settings(_section):
+
+                for _item in _section.body:
+
+                    if self.is_statement_library_import(_item):
+
+                        _path = os.path.abspath(os.path.join(self.dir,_item.name))
+
+                        if os.path.exists(_path):
+
+                            _library = self.main_ctrl.libraries.find_by_attribute("path",_path)
+
+                            if _library == None:
+
+                                _library = SCR_Control_Library(
+                                                                parent=self,
+                                                                main_ctrl=self.main_ctrl,
+                                                                path=_path)
+
+                                _library.read(observer)
+
+                                self.main_ctrl.libraries.add(_library)
+
+    def read_variables(self,observer):
+
+        for _section in self.model.get_sections():
+
+            if self.model.is_section_variables(_section):
+
+                for _statement in _section.body:
+
+                    if self.model.is_statement_variable(_statement):
+
+                        _ctrl = SCR_Control_Variable(
+                                                        path=self.path,
+                                                        name=_statement.name,
+                                                        folder=os.path.split(path)[0],
+                                                        parent=self,
+                                                        main_ctrl=self.main_ctrl,
+                                                        model=SCR_Model_Variable(),
+                                                        ctrl_type="Variable")
+
+                        _ctrl.read()
+
+                        _ctrl.model.load_rf_model(_statement)
+
+    def read_keywords(self,observer):
+
+        for _section in self.model.get_sections():
+
+            if self.model.is_section_keywords(_section):
+
+                for _statement in _section.body:
+
+                    if self.model.is_section_keyword(_statement):
+
+                        _ctrl = SCR_Control_Keyword(
+                                                        path=self.path,
+                                                        name=_statement.name,
+                                                        folder=os.path.split(path)[0],
+                                                        parent=self,
+                                                        main_ctrl=self.main_ctrl,
+                                                        model=SCR_Model_Keyword(),
+                                                        ctrl_type="Keyword")
+
+                        _ctrl.read()
+
+                        _ctrl.model.load_rf_model(_statement)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -333,8 +394,13 @@ class SCR_Control_Resource(_SCR_Control_Base):
                                     folder=os.path.split(path)[0],
                                     parent=parent,
                                     main_ctrl=main_ctrl,
-                                    model=None,
+                                    model=SCR_Model_Resource(),
                                     ctrl_type="Test Resource")
+
+        self.variables   = SCR_Control_Variables()
+        self.keywords    = SCR_Control_Keywords()
+        self.resources   = SCR_Control_Resources()
+        self.libraries   = SCR_Control_Libraries()
 
         self.external = not os.path.abspath(path).startswith(os.path.abspath(main_ctrl.testfolder.path))
 
@@ -344,15 +410,19 @@ class SCR_Control_Resource(_SCR_Control_Base):
 
             observer.message("reading resource %s" % (self.name,))
 
-        self.model = get_model(source=self.path,data_only=False)
+        self.model.rf_model = get_model(source=self.path,data_only=False)
 
         self.read_resources(observer)
 
         self.read_libraries(observer)
 
+        self.read_variables(observer)
+
+        self.read_keywords(observer)
+
     def read_resources(self,observer):
 
-        for _section in self.model.sections:
+        for _section in self.model.rf_model.sections:
 
             if self.is_section_settings(_section):
 
@@ -379,7 +449,7 @@ class SCR_Control_Resource(_SCR_Control_Base):
 
     def read_libraries(self,observer):
 
-        for _section in self.model.sections:
+        for _section in self.model.rf_model.sections:
 
             if self.is_section_settings(_section):
 
@@ -403,6 +473,52 @@ class SCR_Control_Resource(_SCR_Control_Base):
                                 _library.read(observer)
 
                                 self.main_ctrl.libraries.add(_library)
+
+    def read_variables(self,observer):
+
+        for _section in self.model.get_sections():
+
+            if self.model.is_section_variables(_section):
+
+                for _statement in _section.body:
+
+                    if self.model.is_statement_variable(_statement):
+
+                        _ctrl = SCR_Control_Variable(
+                                                        path=self.path,
+                                                        name=_statement.name,
+                                                        folder=os.path.split(path)[0],
+                                                        parent=self,
+                                                        main_ctrl=self.main_ctrl,
+                                                        model=SCR_Model_Variable(),
+                                                        ctrl_type="Variable")
+
+                        _ctrl.read()
+
+                        _ctrl.model.load_rf_model(_statement)
+
+    def read_keywords(self,observer):
+
+        for _section in self.model.get_sections():
+
+            if self.model.is_section_keywords(_section):
+
+                for _statement in _section.body:
+
+                    if self.model.is_section_keyword(_statement):
+
+                        _ctrl = SCR_Control_Keyword(
+                                                        path=self.path,
+                                                        name=_statement.name,
+                                                        folder=os.path.split(path)[0],
+                                                        parent=self,
+                                                        main_ctrl=self.main_ctrl,
+                                                        model=SCR_Model_Keyword(),
+                                                        ctrl_type="Keyword")
+
+                        _ctrl.read()
+
+                        _ctrl.model.load_rf_model(_statement)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -443,7 +559,7 @@ class SCR_Control_Library(_SCR_Control_Base):
                                     folder=os.path.split(path)[0],
                                     parent=parent,
                                     main_ctrl=main_ctrl,
-                                    model=None,
+                                    model=SCR_Model_Library(),
                                     ctrl_type="Test Library")
 
         self.external = not os.path.abspath(path).startswith(os.path.abspath(main_ctrl.testfolder.path))
@@ -457,3 +573,63 @@ class SCR_Control_Library(_SCR_Control_Base):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
+class SCR_Control_Variables(SCR_Base_List):
+
+    def __init__(self):
+
+        SCR_Base_List.__init__(self)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Control_Variable(_SCR_Control_Base):
+
+    def __init__(self,parent,main_ctrl,path,name):
+
+        _SCR_Control_Base.__init__(
+                                    self,
+                                    path=path,
+                                    name=name,
+                                    folder=os.path.split(path)[0],
+                                    parent=parent,
+                                    main_ctrl=main_ctrl,
+                                    model=SCR_Model_Variable(),
+                                    ctrl_type="Variable")
+
+    def read(self,observer):
+
+        self.main_ctrl.variables.add(self)
+
+        self.parent.variables.add(self)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Control_Keywords(SCR_Base_List):
+
+    def __init__(self):
+
+        SCR_Base_List.__init__(self)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Control_Keyword(_SCR_Control_Base):
+
+    def __init__(self,parent,main_ctrl,path,name):
+
+        _SCR_Control_Base.__init__(
+                                    self,
+                                    path=path,
+                                    name=name,
+                                    folder=os.path.split(path)[0],
+                                    parent=parent,
+                                    main_ctrl=main_ctrl,
+                                    model=SCR_Model_Keyword(),
+                                    ctrl_type="Keyword")
+
+    def read(self,observer):
+
+        self.main_ctrl.keywords.add(self)
+
+        self.parent.keywords.add(self)
