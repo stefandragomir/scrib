@@ -10,9 +10,10 @@ from PyQt6.QtWidgets       import *
 *************************************************************************************************"""
 class SCR_Actions_File():
 
-    def __init__(self,scrib):
+    def __init__(self,scrib,logger):
 
-        self.scrib = scrib
+        self.scrib  = scrib
+        self.logger = logger
 
     def new(self):
 
@@ -39,23 +40,25 @@ class SCR_Actions_File():
 
     def load_testfolder_by_path(self,path):
 
+        self.logger.info("load test folder by path [{}]".format(path))
+
         if os.path.exists(path):
 
-            self.scrib.action_bar.start(withload=False,withcancel=False)
+            self.scrib.status_bar.start(withload=True,withcancel=False)
 
-            self.scrib.action_bar.msg("loading...")
+            self.scrib.status_bar.label("loading test folder")
 
-            self.scrib.ctrl.read(path,self.scrib.action_bar)
+            self.scrib.ctrl.read(path,self.scrib.status_bar)
 
             self.scrib.wdg_tree_test.wdg_tree.clear()
 
-            self.scrib.action_bar.msg("drawing test tree...")
+            self.scrib.status_bar.label("drawing test tree...")
 
             self.scrib.wdg_tree_test.wdg_tree.populate(self.scrib.ctrl,[""])
 
-            self.scrib.action_bar.stop()
+            self.scrib.status_bar.stop()
 
-            self.scrib.status_bar.message("%s" % (path,))
+            self.scrib.status_bar.label("%s" % (path,))
 
             _recents = self.scrib.preferences.get("recents")
 
@@ -77,9 +80,10 @@ class SCR_Actions_File():
 *************************************************************************************************"""
 class SCR_Actions_Appearance():
 
-    def __init__(self,scrib):
+    def __init__(self,scrib,logger):
 
-        self.scrib = scrib
+        self.scrib  = scrib
+        self.logger = logger
 
     def change_theme(self):
 
@@ -95,9 +99,10 @@ class SCR_Actions_Appearance():
 *************************************************************************************************"""
 class SCR_Actions_Help():
 
-    def __init__(self,scrib):
+    def __init__(self,scrib,logger):
 
-        self.scrib = scrib
+        self.scrib  = scrib
+        self.logger = logger
 
     def help_documentation(self):
 

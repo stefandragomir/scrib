@@ -9,7 +9,7 @@ from config.config            import SCR_Config
 from widgets.widgets          import SCR_WDG_DockWidget
 from widgets.widgets          import SCR_WDG_ToolBar
 from widgets.widgets          import SCR_WDG_ActionBar
-from widgets.widgets          import SCR_WDG_StatusBar
+from widgets.status_bar       import SCR_WDG_MainStatusBar
 from widgets.main_menu        import SCR_WDG_MainMenu
 from icons.icons              import SCR_GetIcon
 from widgets.test_tree        import SCR_WDG_TestTree_Widget
@@ -19,6 +19,8 @@ from preferences.preferences  import SCR_Preferences
 from actions.actions          import SCR_Actions_File
 from actions.actions          import SCR_Actions_Appearance
 from actions.actions          import SCR_Actions_Help
+from logger.logger            import SCR_Logger
+from utils.utils              import scr_get_logger_dir
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -30,16 +32,19 @@ class SCR_UI(QMainWindow):
         QMainWindow.__init__(self)
 
         self.config         = config
-        self.ctrl           = SCR_Control()
+        self.logger         = SCR_Logger()
+        self.ctrl           = SCR_Control(self.logger)
         self.app            = app
         self.preferences    = SCR_Preferences()
-        self.act_file       = SCR_Actions_File(self)
-        self.act_help       = SCR_Actions_Help(self)
-        self.act_appearance = SCR_Actions_Appearance(self)
+        self.act_file       = SCR_Actions_File(self,self.logger)
+        self.act_help       = SCR_Actions_Help(self,self.logger)
+        self.act_appearance = SCR_Actions_Appearance(self,self.logger)
 
         self.preferences.load()
 
         self.draw_gui() 
+
+        self.configure_logger()
 
     def draw_gui(self):
 
@@ -60,14 +65,12 @@ class SCR_UI(QMainWindow):
         self.draw_test_tree() 
         self.draw_test_tab()   
         self.draw_main_menu()
-        self.draw_action_bar()
         self.draw_status_bar()
 
         self.ly_h.addWidget(self.wdg_test_tab)
 
         self.ly.addWidget(self.wdg_toolbar)
         self.ly.addLayout(self.ly_h)
-        self.ly.addWidget(self.action_bar)
         self.ly.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         self.wdg_central.setLayout(self.ly)
@@ -126,15 +129,23 @@ class SCR_UI(QMainWindow):
 
         self.setMenuBar(self.main_menu)
 
-    def draw_action_bar(self):
-
-        self.action_bar = SCR_WDG_ActionBar(self.app,self,self.config)
-
     def draw_status_bar(self):
 
-        self.status_bar = SCR_WDG_StatusBar(self.config)
+        self.status_bar = SCR_WDG_MainStatusBar(self.app,self.config)
 
         self.setStatusBar(self.status_bar)
+
+    def configure_logger(self):
+
+        _path = scr_get_logger_dir() 
+
+        _path = os.path.join(_path,"log.txt")
+
+        self.logger.set_debug_level(True)
+
+        self.logger.set_path(_path)
+
+        self.logger.set_ui(None)
 
 """*************************************************************************************************
 ****************************************************************************************************

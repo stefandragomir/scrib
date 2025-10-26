@@ -11,14 +11,21 @@ from robot.parsing.model.statements   import Variable
 from robot.parsing.model.statements   import ResourceImport
 from robot.parsing.model.statements   import LibraryImport
 from robot.parsing.model.blocks       import Keyword
+from utils.utils                      import get_all_folders
+from utils.utils                      import get_all_files
+from utils.utils                      import SCR_UtilProgress
 
+
+from time import sleep
 
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
 class SCR_Control():
 
-    def __init__(self):
+    def __init__(self,logger):
+
+        self.logger = logger
 
         self.clear()
 
@@ -30,9 +37,19 @@ class SCR_Control():
 
     def read(self,path,observer):
 
+        self.logger.debug("load test folder by path [{}]".format(path))
+
         self.testfolder = SCR_Control_Folder(self,path)
 
-        self.testfolder.read(path,observer)
+        _nr_of_items = len(get_all_files(path,None))
+        _nr_of_items += len(get_all_folders(path)) - 1
+
+        _progress = SCR_UtilProgress(_nr_of_items)
+
+        self.testfolder.read(
+                                path=path,
+                                observer=observer,
+                                progress=_progress)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -104,19 +121,25 @@ class SCR_Control_Folder():
         self.resources   = SCR_Control_Resources()
         self.libraries   = SCR_Control_Libraries()
 
-    def read(self,path,observer):
+    def read(self,path,observer,progress):
 
         if None != observer:
 
-            observer.msg("reading test folder %s" % (self.name,))
+            observer.message("reading test folder %s" % (self.name,))
 
         for _item in os.listdir(self.path):
 
             _path = os.path.join(self.path,_item)
 
+            progress.increment()
+
+            if None != observer:
+
+                observer.progress(progress.get_progress())
+
             if os.path.isdir(_path):
 
-                self.read_testfolder(_path,observer)
+                self.read_testfolder(_path,observer,progress)
 
             else:
 
@@ -137,11 +160,11 @@ class SCR_Control_Folder():
 
                                 self.read_library(_path,observer)
 
-    def read_testfolder(self,path,observer):
+    def read_testfolder(self,path,observer,progress):
 
         _testfolder = SCR_Control_Folder(self.ctrl,path)
 
-        _testfolder.read(path,observer)
+        _testfolder.read(path,observer,progress)
 
         self.testfolders.add(_testfolder)
 
@@ -204,7 +227,7 @@ class SCR_Control_TestSuite(_SCR_Control_With_Model):
 
         if None != observer:
 
-            observer.msg("reading test suite %s" % (self.name,))
+            observer.message("reading test suite %s" % (self.name,))
 
         self.model = get_model(source=self.path,data_only=False)
 
@@ -276,7 +299,7 @@ class SCR_Control_Resource(_SCR_Control_With_Model):
 
         if None != observer:
 
-            observer.msg("reading resource %s" % (self.name,))
+            observer.message("reading resource %s" % (self.name,))
 
         self.model = get_model(source=self.path,data_only=False)
 
@@ -376,7 +399,7 @@ class SCR_Control_Library(_SCR_Control_With_Model):
 
         if None != observer:
 
-            observer.msg("reading library %s" % (self.name,))
+            observer.message("reading library %s" % (self.name,))
                        
 """*************************************************************************************************
 ****************************************************************************************************

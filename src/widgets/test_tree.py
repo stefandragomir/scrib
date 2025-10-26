@@ -225,7 +225,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
         elif data.name[0] == "@":
             _tree_variable.icon     = self.config.get_theme_icon_var_list()
         elif data.name[0] == "&":
-            _tree_variable.icon     = self.config.get_theme_icon_dict_list()
+            _tree_variable.icon     = self.config.get_theme_icon_var_dict()
 
         _tree_variable.userdata = {"data":data,"type": SCR_Tree_Types.VARIABLE}
 

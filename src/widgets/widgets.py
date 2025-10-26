@@ -13,6 +13,19 @@ from PyQt6.QtWidgets       import *
 from icons.icons           import SCR_GetIcon
 from abc                   import abstractmethod
 
+
+
+"""******************************************************************************************
+*********************************************************************************************
+******************************************************************************************"""
+class SCR_WDG_ProgressBar(QProgressBar):
+
+    def __init__(self,config):
+
+        self.config = config
+
+        QProgressBar.__init__(self)
+
 """******************************************************************************************
 *********************************************************************************************
 ******************************************************************************************"""
@@ -23,14 +36,6 @@ class SCR_WDG_StatusBar(QStatusBar):
         self.config = config
 
         QStatusBar.__init__(self)
-
-        self.lbl = QLabel()
-
-        self.addPermanentWidget(self.lbl)
-
-    def message(self,msg):
-
-        self.lbl.setText(msg)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -799,23 +804,51 @@ class SCR_WDG_ActionBar(QWidget):
     def __init__(self,app,parent,config):
 
         QWidget.__init__(self,parent)
+  
+        self.app            = app
+        self.config         = config
+        self.text_limit     = 50
+        self.text_wdg_width = 300
+        self.is_canceled    = False
+    
+        self.draw_text()
+        self.draw_progress()
+        self.draw_cancel_button()
 
-        self.app          = app
-        self.config       = config
-        self.wdg_txt      = SCR_WDG_Label(self.config,"")
-        self.wdg_progress = QProgressBar(self)
+        self.setFixedHeight(35)
+        self.setFixedHeight(35)       
+
+        self.ly  = QHBoxLayout()
+        self.ly.addWidget(self.wdg_txt) 
+        self.ly.addWidget(self.wdg_progress)
+        self.ly.addWidget(self.cancel_bt)
+        self.setLayout(self.ly)
+
+        self.setStyleSheet("border: 0px solid white; margin: 0px;")
+
+        self.stop()
+
+    def draw_text(self):
+
+        self.wdg_txt = SCR_WDG_Label(self.config,"")
+
+        _font = QFont()
+        _font.setPointSize(8)
+
+        self.wdg_txt.setFont(_font)
+        self.wdg_txt.setFixedWidth(self.text_wdg_width)
+        self.wdg_txt.setStyleSheet("border: 1px solid gray; border-radius: 4px; color: %s" % (self.config.get_theme_foreground(),))
+
+    def draw_progress(self):
+
+        self.wdg_progress   = SCR_WDG_ProgressBar(self)
+
         self.wdg_progress.setFixedHeight(8)
         self.wdg_progress.setTextVisible(False)
         self.wdg_progress.setMinimum(0)
         self.wdg_progress.setMaximum(100)
-        self.is_canceled  = False
 
-        _font = QFont()
-        _font.setPointSize(8)
-        self.wdg_txt.setFont(_font)
-
-        self.setFixedHeight(40)
-        self.setFixedHeight(40)
+    def draw_cancel_button(self):
 
         self.cancel_bt = SCR_WDG_Button(
                                             self.config,
@@ -823,22 +856,11 @@ class SCR_WDG_ActionBar(QWidget):
                                             "08fbdd84bc6f62fe1b927b9115596ab50cbca623",
                                             "Cancel",
                                             self.cancel)
-        self.cancel_bt.setFixedWidth(40)
+        self.cancel_bt.setFixedWidth(35)
 
-
-        self.ly  = QHBoxLayout()
-        self.ly.addWidget(self.wdg_txt) 
-        self.ly.addWidget(self.wdg_progress)
-        self.ly.addWidget(self.cancel_bt)
-        self.setLayout(self.ly)
         self.cancel_bt.hide()
 
-        self.setStyleSheet("border: 0px solid white; margin: 0px;")
-
-        self.wdg_txt.setStyleSheet("border: 1px solid gray; border-radius: 4px; color: %s" % (self.config.get_theme_foreground(),))
         self.wdg_progress.setStyleSheet("border: 1px solid gray; border-radius: 4px;")
-
-        self.stop()
 
     def start(self,withload=False,withcancel=False):
 
@@ -850,14 +872,18 @@ class SCR_WDG_ActionBar(QWidget):
             self.cancel_bt.hide()
 
         self.setVisible(True)
-        self.msg("")
-        self.progress(0)        
+
+        self.message("")
+
+        self.progress(0)  
+
         self.wdg_progress.setVisible(withload)
+
         self.app.processEvents()
 
     def stop(self):
 
-        self.msg("")
+        self.message("")
         self.progress(0)
         self.setVisible(False)
 
@@ -867,9 +893,15 @@ class SCR_WDG_ActionBar(QWidget):
         self.wdg_progress.update()
         self.app.processEvents()
 
-    def msg(self,msg):
+    def message(self,text):
 
-        self.wdg_txt.setText(msg)
+        print(text,len(text))
+
+        if len(text) > self.text_limit:
+
+            text = "{}...".format(text[:self.text_limit])
+
+        self.wdg_txt.setText(text)
         self.app.processEvents()
 
     def cancel(self,state):
