@@ -43,7 +43,7 @@ class SCR_WDG_TestTree_Widget(SCR_WDG_Widget):
 
         self.ly = QVBoxLayout()
 
-        self.wdg_tree = SCR_WDG_TestTree(self.config,self,lambda:self.wdg_search.show())
+        self.wdg_tree = SCR_WDG_TestTree(self.config,self.scrib,lambda:self.wdg_search.show())
 
         self.wdg_tree.setHeaderHidden(True)
 
@@ -854,6 +854,20 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
     def edit_done(self,editor):
 
         print("activated")
+
+    def selectionChanged(self,selected,deselected):
+
+        if selected.indexes():
+
+            for _item_index in selected.indexes():
+
+                _data = self.custom_model.data(_item_index,Qt.ItemDataRole.UserRole)
+
+                if _data["data"] != None:
+
+                    _status_bar_label = _data["data"].get_status_label()
+
+                    self.scrib.status_bar.label(_status_bar_label)
         
 """******************************************************************************************
 *********************************************************************************************

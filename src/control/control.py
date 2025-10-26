@@ -39,7 +39,10 @@ class SCR_Control():
 
         self.logger.debug("load test folder by path [{}]".format(path))
 
-        self.testfolder = SCR_Control_Folder(self,path)
+        self.testfolder = SCR_Control_Folder(
+                                                parent=self,
+                                                main_ctrl=self,
+                                                path=path)
 
         _nr_of_items = len(get_all_files(path,None))
         _nr_of_items += len(get_all_folders(path)) - 1
@@ -54,11 +57,17 @@ class SCR_Control():
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class _SCR_Control_With_Model():
+class _SCR_Control_Base():
 
-    def __init__(self):
+    def __init__(self,path,name,folder,parent,main_ctrl,model,ctrl_type):
 
-        self.model = None
+        self.path      = path
+        self.name      = name
+        self.dir       = folder
+        self.ctrl      = parent  
+        self.main_ctrl = main_ctrl      
+        self.model     = model
+        self.ctrl_type = ctrl_type
 
     def is_section_testcases(self,section):
 
@@ -92,6 +101,12 @@ class _SCR_Control_With_Model():
 
         return isinstance(statement,LibraryImport)
 
+    def get_status_label(self):
+
+        _text = "[{}]   [{}]".format(self.ctrl_type,self.path)
+
+        return _text
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -108,14 +123,20 @@ class SCR_Control_Folders(SCR_Base_List):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Control_Folder():
+class SCR_Control_Folder(_SCR_Control_Base):
 
-    def __init__(self,ctrl,path):
+    def __init__(self,parent,main_ctrl,path):
 
-        self.path        = path
-        self.name        = os.path.split(path)[1]
-        self.dir         = os.path.split(path)[0]
-        self.ctrl        = ctrl
+        _SCR_Control_Base.__init__(
+                                    self,
+                                    path=path,
+                                    name=os.path.split(path)[1],
+                                    folder=os.path.split(path)[0],
+                                    parent=parent,
+                                    main_ctrl=main_ctrl,
+                                    model=None,
+                                    ctrl_type="Test Folder")
+
         self.testfolders = SCR_Control_Folders()
         self.testsuites  = SCR_Control_TestSuites()
         self.resources   = SCR_Control_Resources()
@@ -162,7 +183,10 @@ class SCR_Control_Folder():
 
     def read_testfolder(self,path,observer,progress):
 
-        _testfolder = SCR_Control_Folder(self.ctrl,path)
+        _testfolder = SCR_Control_Folder(
+                                            parent=self,
+                                            main_ctrl=self.main_ctrl,
+                                            path=path)
 
         _testfolder.read(path,observer,progress)
 
@@ -170,7 +194,10 @@ class SCR_Control_Folder():
 
     def read_testsuite(self,path,observer):
 
-        _testsuite = SCR_Control_TestSuite(self.ctrl,path)
+        _testsuite = SCR_Control_TestSuite(
+                                            parent=self,
+                                            main_ctrl=self.main_ctrl,
+                                            path=path)
 
         _testsuite.read(observer)
 
@@ -178,21 +205,27 @@ class SCR_Control_Folder():
 
     def read_resource(self,path,observer):
 
-        _resource = SCR_Control_Resource(self.ctrl,path)
+        _resource = SCR_Control_Resource(   
+                                            parent=self,
+                                            main_ctrl=self.main_ctrl,
+                                            path=path)
 
         _resource.read(observer)
 
-        self.ctrl.resources.add(_resource)
+        self.main_ctrl.resources.add(_resource)
 
         self.resources.add(_resource)
 
     def read_library(self,path,observer):
 
-        _library = SCR_Control_Library(self.ctrl,path)
+        _library = SCR_Control_Library(
+                                        parent=self,
+                                        main_ctrl=main_ctrl,
+                                        path=path)
 
         _library.read(observer)
 
-        self.ctrl.libraries.add(_library)
+        self.main_ctrl.libraries.add(_library)
 
         self.libraries.add(_library)
 
@@ -212,16 +245,19 @@ class SCR_Control_TestSuites(SCR_Base_List):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Control_TestSuite(_SCR_Control_With_Model):
+class SCR_Control_TestSuite(_SCR_Control_Base):
 
-    def __init__(self,ctrl,path):
+    def __init__(self,parent,main_ctrl,path):
 
-        _SCR_Control_With_Model.__init__(self)
-
-        self.path      = path
-        self.name      = os.path.splitext(os.path.split(path)[1])[0]
-        self.dir       = os.path.split(path)[0]
-        self.ctrl      = ctrl
+        _SCR_Control_Base.__init__(
+                                    self,
+                                    path=path,
+                                    name=os.path.splitext(os.path.split(path)[1])[0],
+                                    folder=os.path.split(path)[0],
+                                    parent=parent,
+                                    main_ctrl=main_ctrl,
+                                    model=None,
+                                    ctrl_type="Test Suite")
 
     def read(self,observer):
 
@@ -245,15 +281,18 @@ class SCR_Control_TestSuite(_SCR_Control_With_Model):
 
                         _path = os.path.abspath(os.path.join(self.dir,_item.name))
 
-                        _resource = self.ctrl.resources.find_by_attribute("path",_path)
+                        _resource = self.main_ctrl.resources.find_by_attribute("path",_path)
 
                         if _resource == None:
 
-                            _resource = SCR_Control_Resource(self.ctrl,_path)
+                            _resource = SCR_Control_Resource(
+                                                                parent=self,
+                                                                main_ctrl=self.main_ctrl,
+                                                                path=_path)
 
                             _resource.read(observer)
 
-                            self.ctrl.resources.add(_resource)
+                            self.main_ctrl.resources.add(_resource)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -283,17 +322,21 @@ class SCR_Control_Resources(SCR_Base_List):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Control_Resource(_SCR_Control_With_Model):
+class SCR_Control_Resource(_SCR_Control_Base):
 
-    def __init__(self,ctrl,path):
+    def __init__(self,parent,main_ctrl,path):
 
-        _SCR_Control_With_Model.__init__(self)
+        _SCR_Control_Base.__init__(
+                                    self,
+                                    path=path,
+                                    name=os.path.splitext(os.path.split(path)[1])[0],
+                                    folder=os.path.split(path)[0],
+                                    parent=parent,
+                                    main_ctrl=main_ctrl,
+                                    model=None,
+                                    ctrl_type="Test Resource")
 
-        self.path     = path
-        self.name     = os.path.splitext(os.path.split(path)[1])[0]
-        self.dir      = os.path.split(path)[0]
-        self.ctrl     = ctrl
-        self.external = not os.path.abspath(path).startswith(os.path.abspath(ctrl.testfolder.path))
+        self.external = not os.path.abspath(path).startswith(os.path.abspath(main_ctrl.testfolder.path))
 
     def read(self,observer):
 
@@ -321,15 +364,18 @@ class SCR_Control_Resource(_SCR_Control_With_Model):
 
                         if os.path.exists(_path):
 
-                            _resource = self.ctrl.resources.find_by_attribute("path",_path)
+                            _resource = self.main_ctrl.resources.find_by_attribute("path",_path)
 
                             if _resource == None:
 
-                                _resource = SCR_Control_Resource(self.ctrl,_path)
+                                _resource = SCR_Control_Resource(
+                                                                    parent=self,
+                                                                    main_ctrl=self.main_ctrl,
+                                                                    path=_path)
 
                                 _resource.read(observer)
 
-                                self.ctrl.resources.add(_resource)
+                                self.main_ctrl.resources.add(_resource)
 
     def read_libraries(self,observer):
 
@@ -345,15 +391,18 @@ class SCR_Control_Resource(_SCR_Control_With_Model):
 
                         if os.path.exists(_path):
 
-                            _library = self.ctrl.libraries.find_by_attribute("path",_path)
+                            _library = self.main_ctrl.libraries.find_by_attribute("path",_path)
 
                             if _library == None:
 
-                                _library = SCR_Control_Library(self.ctrl,_path)
+                                _library = SCR_Control_Library(
+                                                                parent=self,
+                                                                main_ctrl=self.main_ctrl,
+                                                                path=_path)
 
                                 _library.read(observer)
 
-                                self.ctrl.libraries.add(_library)
+                                self.main_ctrl.libraries.add(_library)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -383,17 +432,21 @@ class SCR_Control_Libraries(SCR_Base_List):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Control_Library(_SCR_Control_With_Model):
+class SCR_Control_Library(_SCR_Control_Base):
 
-    def __init__(self,ctrl,path):
+    def __init__(self,parent,main_ctrl,path):
 
-        _SCR_Control_With_Model.__init__(self)
+        _SCR_Control_Base.__init__(
+                                    self,
+                                    path=path,
+                                    name=os.path.splitext(os.path.split(path)[1])[0],
+                                    folder=os.path.split(path)[0],
+                                    parent=parent,
+                                    main_ctrl=main_ctrl,
+                                    model=None,
+                                    ctrl_type="Test Library")
 
-        self.path     = path
-        self.name     = os.path.splitext(os.path.split(path)[1])[0]
-        self.dir      = os.path.split(path)[0]
-        self.ctrl     = ctrl
-        self.external = not os.path.abspath(path).startswith(os.path.abspath(ctrl.testfolder.path))
+        self.external = not os.path.abspath(path).startswith(os.path.abspath(main_ctrl.testfolder.path))
 
     def read(self,observer):
 

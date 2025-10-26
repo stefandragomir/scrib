@@ -593,8 +593,8 @@ class SCR_WDG_Tree(QTreeView):
         _css  = ""
         _css += "background-color: {};".format(self.config.get_theme_background(),)
         _css += "color: {};".format(self.config.get_theme_foreground(),)  
-        _css += "selection-color: #000000;"
-        _css += "selection-background-color: #c2d2ed;"
+        _css += "selection-color: {};".format(self.config.get_theme_sel_foreground(),) 
+        _css += "selection-background-color: {};".format(self.config.get_theme_sel_background(),) 
         _css += "font-family: Arial;"
         _css += "font-size: 9pt;"
         _css += "border: 1px solid #707070;"
@@ -894,8 +894,6 @@ class SCR_WDG_ActionBar(QWidget):
         self.app.processEvents()
 
     def message(self,text):
-
-        print(text,len(text))
 
         if len(text) > self.text_limit:
 
