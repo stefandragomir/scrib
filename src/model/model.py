@@ -158,13 +158,13 @@ class SCR_Model_TestSuite(SCR_Model_Base_Item):
 
         SCR_Model_Base_Item.__init__(self)
 
-    def load_rf_model(self,path):
-        """
-        For Test Suites the model is not given, instead the path to the suite file is given
-        and the RF API for reading the file is used
-        """
+    def read_rf_model(self,path):
 
         self.rf_model = get_model(source=path,data_only=False)
+
+    def load_rf_model(self,rf_model):
+
+        self.rf_model = rf_model
 
     def get_resources_rf_models(self):
 
@@ -226,7 +226,7 @@ class SCR_Model_TestSuite(SCR_Model_Base_Item):
 
                     if self.is_statement_keyword(_item):
 
-                        _models.append([_item.name,item])
+                        _models.append([_item.name,_item])
 
         return _models
 
@@ -240,7 +240,7 @@ class SCR_Model_TestSuite(SCR_Model_Base_Item):
 
                 for _item in _section.body:
 
-                    _models.append([_item.name,item])
+                    _models.append([_item.name,_item])
 
         return _models
 
@@ -253,13 +253,13 @@ class SCR_Model_Resource(SCR_Model_Base_Item):
 
         SCR_Model_Base_Item.__init__(self)
 
-    def load_rf_model(self,path):
-        """
-        For Resource the model is not given, instead the path to the resource file is given
-        and the RF API for reading the file is used
-        """
+    def read_rf_model(self,path):
 
         self.rf_model = get_model(source=path,data_only=False)
+
+    def load_rf_model(self,rf_model):
+
+        self.rf_model = rf_model
 
     def get_resources_rf_models(self):
 
@@ -321,7 +321,7 @@ class SCR_Model_Resource(SCR_Model_Base_Item):
 
                     if self.is_statement_keyword(_item):
 
-                        _models.append([_item.name,item])
+                        _models.append([_item.name,_item])
 
         return _models
 
@@ -335,10 +335,10 @@ class SCR_Model_Resource(SCR_Model_Base_Item):
 
                 for _item in _section.body:
 
-                    _models.append([_item.name,item])
+                    _models.append([_item.name,_item])
 
         return _models
-        
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""

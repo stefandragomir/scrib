@@ -243,23 +243,31 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
 
     def read(self,observer):
 
+        _status = False
+
         if None != observer:
 
             observer.message("reading test suite %s" % (self.name,))
 
-        self.model.load_rf_model(self.path)
+        if os.path.exists(self.path):
 
-        self.main_ctrl.testsuites.add(self)
+            self.model.read_rf_model(self.path)
 
-        self.read_resources(observer)
+            self.main_ctrl.testsuites.add(self)
 
-        self.read_libraries(observer)
+            self.read_resources(observer)
 
-        self.read_variables(observer)
+            self.read_libraries(observer)
 
-        self.read_keywords(observer)
+            self.read_variables(observer)
 
-        self.read_testcases(observer)
+            self.read_keywords(observer)
+
+            self.read_testcases(observer)
+
+            _status = True
+
+        return _status
 
     def read_resources(self,observer):
 
@@ -394,19 +402,27 @@ class SCR_Control_Resource(_SCR_Control_Base):
 
     def read(self,observer):
 
+        _status = False
+
         if None != observer:
 
             observer.message("reading resource %s" % (self.name,))
 
-        self.model.load_rf_model(self.path)
+        if os.path.exists(self.path):
 
-        self.read_resources(observer)
+            self.model.read_rf_model(self.path)
 
-        self.read_libraries(observer)
+            self.read_resources(observer)
 
-        self.read_variables(observer)
+            self.read_libraries(observer)
 
-        self.read_keywords(observer)
+            self.read_variables(observer)
+
+            self.read_keywords(observer)
+
+            _status = True
+
+        return _status
 
     def read_resources(self,observer):
 
