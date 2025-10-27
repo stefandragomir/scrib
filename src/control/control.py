@@ -71,8 +71,8 @@ class _SCR_Control_Base():
 
         self.path      = path
         self.name      = name
-        self.dir       = folder
-        self.ctrl      = parent  
+        self.folder    = folder
+        self.parent    = parent  
         self.main_ctrl = main_ctrl      
         self.model     = model
         self.ctrl_type = ctrl_type
@@ -241,14 +241,13 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
         self.libraries   = SCR_Control_Libraries()
         self.testcases   = SCR_Control_TestCases()
 
-
     def read(self,observer):
 
         if None != observer:
 
             observer.message("reading test suite %s" % (self.name,))
 
-        self.model.load_rf_model(get_model(source=self.path,data_only=False))
+        self.model.load_rf_model(self.path)
 
         self.main_ctrl.testsuites.add(self)
 
@@ -266,13 +265,13 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
 
         for _name,_model in self.model.get_resources_rf_models():
 
-            _path = os.path.abspath(os.path.join(self.dir,_name))
+            _path = os.path.abspath(os.path.join(self.folder,_name))
 
             _resource = self.main_ctrl.resources.find_by_attribute("path",_path)
 
             if _resource == None:
 
-                _resource = SCR_Control_Resources(
+                _resource = SCR_Control_Resource(
                                                     parent=self,
                                                     main_ctrl=self.main_ctrl,
                                                     path=_path)
@@ -285,7 +284,7 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
 
         for _name,_model in self.model.get_libraries_rf_models():
 
-            _path = os.path.abspath(os.path.join(self.dir,_name))
+            _path = os.path.abspath(os.path.join(self.folder,_name))
 
             if os.path.exists(_path):
 
@@ -307,15 +306,12 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
         for _name,_model in self.model.get_variables_rf_models():
 
             _ctrl = SCR_Control_Variable(
-                                            path=self.path,
-                                            name=_name,
-                                            folder=os.path.split(path)[0],
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
-                                            model=SCR_Model_Variable(),
-                                            ctrl_type="Variable")
+                                            path=self.path,
+                                            name=_name)
 
-            _ctrl.read()
+            _ctrl.read(observer)
 
             _ctrl.model.load_rf_model(_model)
 
@@ -324,15 +320,12 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
         for _name,_model in self.model.get_keywords_rf_models():
 
             _ctrl = SCR_Control_Keyword(
-                                            path=self.path,
-                                            name=_name,
-                                            folder=os.path.split(path)[0],
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
-                                            model=SCR_Model_Keyword(),
-                                            ctrl_type="Keyword")
+                                            path=self.path,
+                                            name=_name)
 
-            _ctrl.read()
+            _ctrl.read(observer)
 
             _ctrl.model.load_rf_model(_model)
 
@@ -341,15 +334,12 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
         for _name,_model in self.model.get_testcases_rf_models():
 
             _ctrl = SCR_Control_TestCase(
-                                            path=self.path,
-                                            name=_name,
-                                            folder=os.path.split(path)[0],
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
-                                            model=SCR_Model_Keyword(),
-                                            ctrl_type="TestCase")
+                                            path=self.path,
+                                            name=_name)
 
-            _ctrl.read()
+            _ctrl.read(observer)
 
             _ctrl.model.load_rf_model(_model)
 
@@ -408,7 +398,7 @@ class SCR_Control_Resource(_SCR_Control_Base):
 
             observer.message("reading resource %s" % (self.name,))
 
-        self.model.rf_model = get_model(source=self.path,data_only=False)
+        self.model.load_rf_model(self.path)
 
         self.read_resources(observer)
 
@@ -422,13 +412,13 @@ class SCR_Control_Resource(_SCR_Control_Base):
 
         for _name,_model in self.model.get_resources_rf_models():
 
-            _path = os.path.abspath(os.path.join(self.dir,_name))
+            _path = os.path.abspath(os.path.join(self.folder,_name))
 
             _resource = self.main_ctrl.resources.find_by_attribute("path",_path)
 
             if _resource == None:
 
-                _resource = SCR_Control_Resources(
+                _resource = SCR_Control_Resource(
                                                     parent=self,
                                                     main_ctrl=self.main_ctrl,
                                                     path=_path)
@@ -441,7 +431,7 @@ class SCR_Control_Resource(_SCR_Control_Base):
 
         for _name,_model in self.model.get_libraries_rf_models():
 
-            _path = os.path.abspath(os.path.join(self.dir,_name))
+            _path = os.path.abspath(os.path.join(self.folder,_name))
 
             if os.path.exists(_path):
 
@@ -463,15 +453,12 @@ class SCR_Control_Resource(_SCR_Control_Base):
         for _name,_model in self.model.get_variables_rf_models():
 
             _ctrl = SCR_Control_Variable(
-                                            path=self.path,
-                                            name=_name,
-                                            folder=os.path.split(path)[0],
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
-                                            model=SCR_Model_Variable(),
-                                            ctrl_type="Variable")
+                                            path=self.path,
+                                            name=_name)
 
-            _ctrl.read()
+            _ctrl.read(observer)
 
             _ctrl.model.load_rf_model(_model)
 
@@ -480,15 +467,12 @@ class SCR_Control_Resource(_SCR_Control_Base):
         for _name,_model in self.model.get_keywords_rf_models():
 
             _ctrl = SCR_Control_Keyword(
-                                            path=self.path,
-                                            name=_name,
-                                            folder=os.path.split(path)[0],
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
-                                            model=SCR_Model_Keyword(),
-                                            ctrl_type="Keyword")
+                                            path=self.path,
+                                            name=_name)
 
-            _ctrl.read()
+            _ctrl.read(observer)
 
             _ctrl.model.load_rf_model(_model)
 
