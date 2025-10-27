@@ -666,7 +666,7 @@ class SCR_WDG_Tree(QTreeView):
 
     def keyPressEvent(self, event):
 
-        _find_shortcut = (event.modifiers() == Qt.KeyboardModifier.ControlModifier and event.key() == Qt.Key_F)  
+        _find_shortcut = (event.modifiers() == Qt.KeyboardModifier.ControlModifier and event.key() == Qt.Key.Key_F)  
 
         if _find_shortcut:
 
@@ -986,7 +986,7 @@ class SCR_WDG_Tab(QTabWidget):
 
     def add_tab(self,label):
 
-        _widget = QWidget()
+        _widget = SCR_WDG_Widget()
 
         self.addTab(_widget,label)
 

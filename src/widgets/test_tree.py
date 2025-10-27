@@ -352,8 +352,8 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
         _finds      = []
         _index      = self.index(row, 0, parent)
-        _name       = _index.data(Qt.DisplayRole)
-        _user_data  = _index.data(Qt.UserRole)  
+        _name       = _index.data(Qt.ItemDataRole.DisplayRole)
+        _user_data  = _index.data(Qt.ItemDataRole.UserRole)  
 
         if text.lower() in _name.lower():
 
@@ -880,21 +880,21 @@ class SCR_WDG_TestTree_Find(SCR_WDG_Widget):
         #find previous button
         self._find_prev_button = SCR_WDG_ToolButton(self.config)
         self._find_prev_button.setStyleSheet("background: transparent; border-radius: 0px")
-        self._find_prev_button.setIcon(SCR_GetIcon('85905e29412dc4ee1bca3b78beeca05a0ea1d14b'))
+        self._find_prev_button.setIcon(SCR_GetIcon(self.config.get_theme_icon_previous()))
         self._find_prev_button.setToolTip("Find Previous Item")
         self._find_prev_button.clicked.connect(self._find_prev)                 
 
         #find next button
         self._find_next_button = SCR_WDG_ToolButton(self.config)
         self._find_next_button.setStyleSheet("background: transparent; border-radius: 0px")
-        self._find_next_button.setIcon(SCR_GetIcon('47d97a19678ecbc93257bfc890b71cc62f4ae908'))
+        self._find_next_button.setIcon(SCR_GetIcon(self.config.get_theme_icon_next()))
         self._find_prev_button.setToolTip("Find Next Item")
         self._find_next_button.clicked.connect(self._find_next)           
 
         #close button
         self._close_button = SCR_WDG_ToolButton(self.config)
         self._close_button.setStyleSheet("background: transparent; border-radius: 0px")
-        self._close_button.setIcon(SCR_GetIcon('779d79bcda4833c45d97b063d0041af2e47265e4'))
+        self._close_button.setIcon(SCR_GetIcon(self.config.get_theme_icon_close()))
         self._find_prev_button.setToolTip("Close Test Tree Search Bar")
         self._close_button.clicked.connect(self.hide)
 

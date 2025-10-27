@@ -82,19 +82,19 @@ class SCR_UI(QMainWindow):
 
         self.wdg_toolbar = SCR_WDG_ToolBar(self.config)
 
-        self.wdg_toolbar.add_button(
-                                        "load testfolder",
-                                        self.config.get_theme_icon_folder(),
-                                        self.config.get_theme_icon_folder(),
-                                        "Load Tests Folder",
-                                        self.act_file.load_testfolder)
+        # self.wdg_toolbar.add_button(
+        #                                 "load testfolder",
+        #                                 self.config.get_theme_icon_folder(),
+        #                                 self.config.get_theme_icon_folder(),
+        #                                 "Load Tests Folder",
+        #                                 self.act_file.load_testfolder)
         
-        self.wdg_toolbar.add_button(
-                                        "save",
-                                        self.config.get_theme_icon_save(),
-                                        self.config.get_theme_icon_save(),
-                                        "Save",
-                                        self.act_file.save)
+        # self.wdg_toolbar.add_button(
+        #                                 "save",
+        #                                 self.config.get_theme_icon_save(),
+        #                                 self.config.get_theme_icon_save(),
+        #                                 "Save",
+        #                                 self.act_file.save)
         self.wdg_toolbar.draw()
 
     def draw_test_tree(self):

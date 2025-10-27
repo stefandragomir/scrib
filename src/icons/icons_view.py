@@ -85,7 +85,7 @@ class SCR_IconsMainApp(QMainWindow):
                 errorText = 'Images : ' + ','.join(imagesNOk) +' are not in the expected format! Image height and width should be equal and image dimension should be at least 50x50 pixels!'
             else:
                 errorText = 'Image : ' + str(imagesNOk[0]) +' is not in the expected format! Image height and width should be equal and image dimension should be at least 50x50 pixels!'
-            self.internalPopUp = SCR_Info(self,"Error",errorText,QMessageBox.Critical)
+            self.internalPopUp = SCR_Info(self,"Error",errorText,QMessageBox.Icon.Critical)
 
         if len(imagesOk):
             self.iconInserterWindow = SCR_IconInserter(self.centralWidget.databaseConnection,imagesOk)
@@ -604,7 +604,7 @@ class SCR_Info(QMessageBox):
     def __init__(self,parent,title,text,boxType = QMessageBox.critical):
 
         self.boxType   = boxType
-        QInputDialog.__init__(self,self.boxType,title,text,QMessageBox.Ok)
+        QInputDialog.__init__(self,self.boxType,title,text,QMessageBox.StandardButton.Ok)
         self.parent = parent
         self.setStyleSheet(CSS)
         self.setModal(True)

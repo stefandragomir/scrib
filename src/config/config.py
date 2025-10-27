@@ -37,6 +37,9 @@ class SCR_Config(object):
                                     "icon_testcase"         : "ca211c47afa3b991350a6c183d8aaf3f33db15a0",
                                     "icon_folder_variables" : "949033dd2b69acfd3791881e24078e0c1a1d3d2f",
                                     "icon_folder_keywords"  : "f072f0504b91bc3ac90d7ea0f0f4cb0f0ba2bab1",
+                                    "icon_close"            : "c4c80912bacc504d1b0259c9f2fe36c548b5aca0",
+                                    "icon_next"             : "6b86610e1a71d541a418c3aeb3bc9561cc75ef46",
+                                    "icon_previous"         : "0aed51b9ddeed91efe378a353a15cefcd16d3acc"            
                                    },
                                   
                         "dark" : {
@@ -61,6 +64,9 @@ class SCR_Config(object):
                                     "icon_testcase"         : "ca211c47afa3b991350a6c183d8aaf3f33db15a0",
                                     "icon_folder_variables" : "9d5fffb1c55c6ec2ae1d191b4a8da81bb52f3988",
                                     "icon_folder_keywords"  : "a192dd0bd33d992c21fb05a4b32e1d55084334ab",
+                                    "icon_close"            : "4d7ceae0b6dd5d6f513fe835c953da883f6679b8",
+                                    "icon_next"             : "1544b76bb3a7d83cc0f5c7757a48e6bcd1c19ba1",
+                                    "icon_previous"         : "ad904921c967fef713cce3f04558c33c40581de8"  
                                  },
                       }
 
@@ -147,6 +153,18 @@ class SCR_Config(object):
     def get_theme_icon_folder_keywords(self):
 
         return self.themes[self.theme]["icon_folder_keywords"]
+
+    def get_theme_icon_close(self):
+
+        return self.themes[self.theme]["icon_close"]
+
+    def get_theme_icon_next(self):
+
+        return self.themes[self.theme]["icon_next"]
+
+    def get_theme_icon_previous(self):
+
+        return self.themes[self.theme]["icon_previous"]
 
 """*************************************************************************************************
 ****************************************************************************************************

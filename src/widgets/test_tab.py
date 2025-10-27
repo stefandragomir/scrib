@@ -18,3 +18,9 @@ class SCR_WDG_Test_Tab(SCR_WDG_Tab):
 		self.config = config
 
 		SCR_WDG_Tab.__init__(self,config)
+
+		self.draw_gui()
+
+	def draw_gui(self):
+
+		_editor = self.add_tab("Edit")
