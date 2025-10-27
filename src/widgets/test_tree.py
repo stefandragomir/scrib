@@ -154,15 +154,11 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
     def load_testcases(self,data,parent):
 
-        if data.model != None:
+        if data != None:
 
-            for _section in data.model.sections:
+            for _testcase in data.testcases:
 
-                if data.is_section_testcases(_section):
-
-                    for _testcase in _section.body:
-
-                        self.load_testcase(_testcase,parent)
+                self.load_testcase(_testcase,parent)
 
     def load_testcase(self,data,parent):
 
@@ -182,32 +178,26 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
     def load_variables(self,data,parent):
 
-        if data.model != None:
+        if data != None:
 
-            for _section in data.model.sections:
+            _labels = [
+                        "Variables",
+                      ]
 
-                if data.is_section_variables(_section):
+            _tree_variables = SCR_WDG_Tree_Item(
+                                                data=_labels,
+                                                config=self.config,
+                                                parent=parent)
 
-                    _labels = [
-                                "Variables",
-                              ]
+            _tree_variables.icon     = self.config.get_theme_icon_folder_variables()
+           
+            _tree_variables.userdata = {"data":data,"type": SCR_Tree_Types.VARIABLES}
 
-                    _tree_variables = SCR_WDG_Tree_Item(
-                                                        data=_labels,
-                                                        config=self.config,
-                                                        parent=parent)
+            parent.add_child(_tree_variables)
 
-                    _tree_variables.icon     = self.config.get_theme_icon_folder_variables()
-                   
-                    _tree_variables.userdata = {"data":data,"type": SCR_Tree_Types.VARIABLES}
+            for _variable in data.variables:
 
-                    parent.add_child(_tree_variables)
-
-                    for _variable in _section.body:
-
-                        if data.is_statement_variable(_variable):
-
-                            self.load_variable(_variable,_tree_variables)
+                self.load_variable(_variable,_tree_variables)
 
     def load_variable(self,data,parent):
 
@@ -233,32 +223,26 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
 
     def load_keywords(self,data,parent):
 
-        if data.model != None:
+        if data != None:
 
-            for _section in data.model.sections:
+            _labels = [
+                        "Keywords",
+                      ]
 
-                if data.is_section_keywords(_section):
+            _tree_keywords = SCR_WDG_Tree_Item(
+                                                data=_labels,
+                                                config=self.config,
+                                                parent=parent)
 
-                    _labels = [
-                                "Keywords",
-                              ]
+            _tree_keywords.icon     = self.config.get_theme_icon_folder_keywords()
+           
+            _tree_keywords.userdata = {"data":data,"type": SCR_Tree_Types.KEYWORDS}
 
-                    _tree_keywords = SCR_WDG_Tree_Item(
-                                                        data=_labels,
-                                                        config=self.config,
-                                                        parent=parent)
+            parent.add_child(_tree_keywords)
 
-                    _tree_keywords.icon     = self.config.get_theme_icon_folder_keywords()
-                   
-                    _tree_keywords.userdata = {"data":data,"type": SCR_Tree_Types.KEYWORDS}
+            for _keyword in data.keywords:
 
-                    parent.add_child(_tree_keywords)
-
-                    for _keyword in _section.body:
-
-                        if data.is_statement_keyword(_keyword):
-
-                            self.load_keyword(_keyword,_tree_keywords)
+                self.load_keyword(_keyword,_tree_keywords)
 
     def load_keyword(self,data,parent):
 
