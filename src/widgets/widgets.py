@@ -700,15 +700,18 @@ class SCR_WDG_Selection(QComboBox):
                      border-radius: 3px;
                      font-size: 9pt;
                      font-family: Arial;
+                     border-color: %s;
 
-                     """ % (self.config.get_theme_background(), self.config.get_theme_foreground())
+                     """ % (
+                                self.config.get_theme_background(), 
+                                self.config.get_theme_foreground(),
+                                self.config.get_theme_foreground(),)
 
         self.setStyleSheet(_css)
         self.editTextChanged.connect(self.textChangedHandler)
         self.setEditable(True)
         self.data = []
         self._model_items = []
-
 
     def __create_completer(self):
 
@@ -768,12 +771,7 @@ class SCR_WDG_Selection(QComboBox):
 
     def textChangedHandler(self, text):
 
-        if self._model_items:
-
-            if str(text) in self._model_items or not len(text):
-                self.setStyleSheet("background-color: %s; color: %s;  " % (self.config.get_theme_background(),self.config.get_theme_foreground()))
-            else: 
-                self.setStyleSheet("background-color: #ffcccc; color: %s;  " % (self.config.get_theme_foreground(),))
+        pass
 
 """*************************************************************************************************
 ****************************************************************************************************

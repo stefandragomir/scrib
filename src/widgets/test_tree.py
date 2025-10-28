@@ -107,7 +107,7 @@ class SCR_WDG_TestTree_Model(SCR_WDG_Tree_Model):
                                                 config=self.config,
                                                 parent=parent)
 
-        _tree_testsuite.icon     = "8e205a227046baee2a67b75fb12c95813784c484"
+        _tree_testsuite.icon     = self.config.get_theme_icon_testsuite()
         _tree_testsuite.userdata = {"data":data,"type": SCR_Tree_Types.TESTSUITE}
 
         parent.add_child(_tree_testsuite)
@@ -874,7 +874,7 @@ class SCR_WDG_TestTree_Find(SCR_WDG_Widget):
         self.line = SCR_WDG_LineEdit(self.config)
         self.line.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)    
         self.line.setStyleSheet('border: 1px solid gray;')
-        self.line.returnPressed.connect(self._find_next) 
+        self.line.returnPressed.connect(self._find_next)
         self.line.textEdited.connect(self._textedited)
 
         #find previous button
@@ -900,7 +900,7 @@ class SCR_WDG_TestTree_Find(SCR_WDG_Widget):
 
         #type selection
         self._selection = SCR_WDG_Selection(self.config)
-        self._selection.setFixedWidth(80)
+        self._selection.setFixedWidth(90)
         self._selection.setStyleSheet('border: 1px solid gray;')
         self._selection.currentIndexChanged.connect(self.selection_change)
 
@@ -917,15 +917,20 @@ class SCR_WDG_TestTree_Find(SCR_WDG_Widget):
 
         self._selection.populate(_data)
 
-        box = QHBoxLayout(self)
-        box.addWidget(self.line)
-        box.addWidget(self._selection)
-        box.addWidget(self._find_next_button)
-        box.addWidget(self._find_prev_button)        
-        box.addWidget(self._close_button)
-        box.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
-        box.setContentsMargins(8, 8, 5, 5)
-        self.setLayout(box)
+        _vly = QVBoxLayout(self)
+
+        _hly = QHBoxLayout()
+        _hly.addWidget(self._selection)
+        _hly.addWidget(self._find_next_button)
+        _hly.addWidget(self._find_prev_button)        
+        _hly.addWidget(self._close_button)
+        _hly.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
+        _hly.setContentsMargins(8, 8, 5, 5)
+        
+        _vly.addWidget(self.line)
+        _vly.addLayout(_hly)
+
+        self.setLayout(_vly)
 
     def selection_change(self):
 
