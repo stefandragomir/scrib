@@ -4,6 +4,7 @@ import os
 from PyQt6.QtCore          import *
 from PyQt6.QtGui           import *
 from PyQt6.QtWidgets       import *
+from widgets.widgets       import SCR_WDG_PopUp
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -85,14 +86,35 @@ class SCR_Actions_Appearance():
         self.scrib  = scrib
         self.logger = logger
 
-    def change_theme(self):
+    def set_theme_light(self):
 
-        if self.scrib.preferences.get("theme") == "light":
-            self.scrib.preferences.set("theme","dark")
-            self.scrib.preferences.save()
-        else:
-            self.scrib.preferences.set("theme","light")
-            self.scrib.preferences.save()
+        self.scrib.preferences.set("theme","light")
+        self.scrib.preferences.save()
+
+        SCR_WDG_PopUp(
+                        self.scrib.config,
+                        "Apply Theme Light",
+                        "Theme will be applied after Scrib is restarted")
+
+    def set_theme_dark(self):
+
+        self.scrib.preferences.set("theme","dark")
+        self.scrib.preferences.save()
+
+        SCR_WDG_PopUp(
+                        self.scrib.config,
+                        "Apply Theme Dark",
+                        "Theme will be applied after Scrib is restarted")
+
+    def set_theme_normal(self):
+
+        self.scrib.preferences.set("theme","normal")
+        self.scrib.preferences.save()
+
+        SCR_WDG_PopUp(
+                        self.scrib.config,
+                        "Apply Theme Normal",
+                        "Theme will be applied after Scrib is restarted")
 
 """*************************************************************************************************
 ****************************************************************************************************

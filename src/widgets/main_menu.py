@@ -96,19 +96,26 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
 
         _menu_appearance = self.add_menu(self,"&Appearance")
 
-        _title = ""
-
-        if self.scrib.preferences.get("theme") == "light":
-            _title = "Theme Dark"
-        else:
-            _title = "Theme Light"
+        self.add_action(
+                        _menu_appearance, 
+                        "Theme Light",              
+                        self.config.get_theme_icon_theme_light(),
+                        None, 
+                        self.scrib.act_appearance.set_theme_light)
 
         self.add_action(
                         _menu_appearance, 
-                        _title,              
-                        self.config.get_theme_icon_theme(),
+                        "Theme Dark",              
+                        self.config.get_theme_icon_theme_dark(),
                         None, 
-                        self.scrib.act_appearance.change_theme)
+                        self.scrib.act_appearance.set_theme_dark)
+
+        self.add_action(
+                        _menu_appearance, 
+                        "Theme Normal",              
+                        self.config.get_theme_icon_theme_normal(),
+                        None, 
+                        self.scrib.act_appearance.set_theme_normal)
 
     def populate_plugins(self):
 

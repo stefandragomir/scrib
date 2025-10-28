@@ -1,3 +1,4 @@
+from functools import partial
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -40,7 +41,10 @@ class SCR_Config(object):
                                     "icon_folder_keywords"  : "f072f0504b91bc3ac90d7ea0f0f4cb0f0ba2bab1",
                                     "icon_close"            : "c4c80912bacc504d1b0259c9f2fe36c548b5aca0",
                                     "icon_next"             : "6b86610e1a71d541a418c3aeb3bc9561cc75ef46",
-                                    "icon_previous"         : "0aed51b9ddeed91efe378a353a15cefcd16d3acc"            
+                                    "icon_previous"         : "0aed51b9ddeed91efe378a353a15cefcd16d3acc",
+                                    "icon_theme_dark"       : "e992b70da97cb861738b83261468fdd9abaf51f5",
+                                    "icon_theme_light"      : "37b4cae8645a18d8aa05903e3097fb3d6832ef9c",
+                                    "icon_theme_normal"     : "15b3ae5a17b0af25c1a7aa2b59fc07455e8ea66c",        
                                    },
                                   
                         "dark" : {
@@ -68,7 +72,11 @@ class SCR_Config(object):
                                     "icon_folder_keywords"  : "a192dd0bd33d992c21fb05a4b32e1d55084334ab",
                                     "icon_close"            : "4d7ceae0b6dd5d6f513fe835c953da883f6679b8",
                                     "icon_next"             : "1544b76bb3a7d83cc0f5c7757a48e6bcd1c19ba1",
-                                    "icon_previous"         : "ad904921c967fef713cce3f04558c33c40581de8"  
+                                    "icon_previous"         : "ad904921c967fef713cce3f04558c33c40581de8",
+                                    "icon_theme_dark"       : "ee91c7281c28538a48e73d90c94cf7774991b52d",
+                                    "icon_theme_light"      : "b29b41abd03de5c5cd4b97362b7fc94103ed813f",
+                                    "icon_theme_normal"     : "582ba94f4219878c21f8e6720b9fae8bdb35cd6c", 
+
                                  },
 
                         "normal"  : {
@@ -96,110 +104,22 @@ class SCR_Config(object):
                                     "icon_folder_keywords"  : "f072f0504b91bc3ac90d7ea0f0f4cb0f0ba2bab1",
                                     "icon_close"            : "c4c80912bacc504d1b0259c9f2fe36c548b5aca0",
                                     "icon_next"             : "6b86610e1a71d541a418c3aeb3bc9561cc75ef46",
-                                    "icon_previous"         : "0aed51b9ddeed91efe378a353a15cefcd16d3acc"            
+                                    "icon_previous"         : "0aed51b9ddeed91efe378a353a15cefcd16d3acc",
+                                    "icon_theme_dark"       : "e992b70da97cb861738b83261468fdd9abaf51f5",
+                                    "icon_theme_light"      : "37b4cae8645a18d8aa05903e3097fb3d6832ef9c",
+                                    "icon_theme_normal"     : "15b3ae5a17b0af25c1a7aa2b59fc07455e8ea66c",        
                                    },
-
                       }
 
-    def get_theme_background(self):
+        _index = list(self.themes.keys())[0]
 
-        return self.themes[self.theme]["background"]
+        for _item in list(self.themes[_index].keys()):
 
-    def get_theme_foreground(self):
+            self.__dict__.update({"get_theme_{}".format(_item): partial(self.get_item,_item)})
 
-        return self.themes[self.theme]["foreground"]
+    def get_item(self,item_name):
 
-    def get_theme_sel_background(self):
-
-        return self.themes[self.theme]["selection_background"]
-
-    def get_theme_sel_foreground(self):
-
-        return self.themes[self.theme]["selection_foreground"]
-
-    def get_theme_icon_new(self):
-
-        return self.themes[self.theme]["icon_new"]
-
-    def get_theme_icon_folder(self):
-
-        return self.themes[self.theme]["icon_folder"]
-
-    def get_theme_icon_save(self):
-
-        return self.themes[self.theme]["icon_save"]
-
-    def get_theme_icon_exit(self):
-
-        return self.themes[self.theme]["icon_exit"]
-
-    def get_theme_icon_theme(self):
-
-        return self.themes[self.theme]["icon_theme"]
-
-    def get_theme_icon_bug(self):
-
-        return self.themes[self.theme]["icon_bug"]
-
-    def get_theme_icon_info(self):
-
-        return self.themes[self.theme]["icon_info"]
-
-    def get_theme_icon_doc(self):
-
-        return self.themes[self.theme]["icon_doc"]
-
-    def get_theme_icon_var_scalar(self):
-
-        return self.themes[self.theme]["icon_var_scalar"]
-
-    def get_theme_icon_var_list(self):
-
-        return self.themes[self.theme]["icon_var_list"]
-
-    def get_theme_icon_var_dict(self):
-
-        return self.themes[self.theme]["icon_var_dict"]
-
-    def get_theme_icon_keyword(self):
-
-        return self.themes[self.theme]["icon_keyword"]
-
-    def get_theme_icon_python(self):
-
-        return self.themes[self.theme]["icon_python"]
-
-    def get_theme_icon_resource(self):
-
-        return self.themes[self.theme]["icon_resource"]
-
-    def get_theme_icon_testcase(self):
-
-        return self.themes[self.theme]["icon_testcase"]
-
-    def get_theme_icon_testsuite(self):
-
-        return self.themes[self.theme]["icon_testsuite"]
-
-    def get_theme_icon_folder_variables(self):
-
-        return self.themes[self.theme]["icon_folder_variables"]
-
-    def get_theme_icon_folder_keywords(self):
-
-        return self.themes[self.theme]["icon_folder_keywords"]
-
-    def get_theme_icon_close(self):
-
-        return self.themes[self.theme]["icon_close"]
-
-    def get_theme_icon_next(self):
-
-        return self.themes[self.theme]["icon_next"]
-
-    def get_theme_icon_previous(self):
-
-        return self.themes[self.theme]["icon_previous"]
+        return self.themes[self.theme][item_name]
 
 """*************************************************************************************************
 ****************************************************************************************************
