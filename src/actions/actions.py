@@ -79,6 +79,30 @@ class SCR_Actions_File():
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
+class SCR_Actions_Tools():
+
+    def __init__(self,scrib,logger):
+
+        self.scrib  = scrib
+        self.logger = logger
+
+    def console_visibility(self):
+
+        if self.scrib.console_visible:
+            
+            self.scrib.console_visible = False 
+            self.scrib.dock_console.hide()
+            self.scrib.main_menu.change_console_tile(False)
+        else:
+
+            self.scrib.console_visible = True
+            self.scrib.dock_console.show()
+            self.scrib.main_menu.change_console_tile(True)
+
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
 class SCR_Actions_Appearance():
 
     def __init__(self,scrib,logger):

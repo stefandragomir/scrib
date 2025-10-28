@@ -17,10 +17,12 @@ from widgets.test_tab         import SCR_WDG_Test_Tab
 from control.control          import SCR_Control
 from preferences.preferences  import SCR_Preferences
 from actions.actions          import SCR_Actions_File
+from actions.actions          import SCR_Actions_Tools
 from actions.actions          import SCR_Actions_Appearance
 from actions.actions          import SCR_Actions_Help
 from logger.logger            import SCR_Logger
 from utils.utils              import scr_get_logger_dir
+from widgets.console          import SCR_WDG_Console
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -31,14 +33,16 @@ class SCR_UI(QMainWindow):
 
         QMainWindow.__init__(self)
 
-        self.config         = config
-        self.logger         = SCR_Logger()
-        self.ctrl           = SCR_Control(self.logger)
-        self.app            = app
-        self.preferences    = SCR_Preferences()
-        self.act_file       = SCR_Actions_File(self,self.logger)
-        self.act_help       = SCR_Actions_Help(self,self.logger)
-        self.act_appearance = SCR_Actions_Appearance(self,self.logger)
+        self.config          = config
+        self.logger          = SCR_Logger()
+        self.ctrl            = SCR_Control(self.logger)
+        self.app             = app
+        self.preferences     = SCR_Preferences()
+        self.act_file        = SCR_Actions_File(self,self.logger)
+        self.act_tools       = SCR_Actions_Tools(self,self.logger)
+        self.act_help        = SCR_Actions_Help(self,self.logger)
+        self.act_appearance  = SCR_Actions_Appearance(self,self.logger)
+        self.console_visible = False
 
         self.preferences.load()
 
@@ -63,9 +67,11 @@ class SCR_UI(QMainWindow):
 
         self.draw_toolbar()
         self.draw_test_tree() 
+        self.draw_console()
         self.draw_test_tab()   
         self.draw_main_menu()
         self.draw_status_bar()
+        
 
         self.ly_h.addWidget(self.wdg_test_tab)
 
@@ -135,6 +141,22 @@ class SCR_UI(QMainWindow):
 
         self.setStatusBar(self.status_bar)
 
+    def draw_console(self):
+
+        self.wdg_console = SCR_WDG_Console(self.config)
+
+        self.dock_console = SCR_WDG_DockWidget(self.config)
+
+        self.dock_console.setWidget(self.wdg_console)
+
+        self.dock_console.setFeatures(
+                                        QDockWidget.DockWidgetFeature.DockWidgetMovable | 
+                                        QDockWidget.DockWidgetFeature.DockWidgetFloatable)
+
+        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea,self.dock_console)
+
+        self.dock_console.hide()
+
     def configure_logger(self):
 
         _path = scr_get_logger_dir() 
@@ -145,7 +167,7 @@ class SCR_UI(QMainWindow):
 
         self.logger.set_path(_path)
 
-        self.logger.set_ui(None)
+        self.logger.set_ui(self.wdg_console)
 
 """*************************************************************************************************
 ****************************************************************************************************

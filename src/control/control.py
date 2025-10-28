@@ -46,7 +46,8 @@ class SCR_Control():
         self.testfolder = SCR_Control_Folder(
                                                 parent=self,
                                                 main_ctrl=self,
-                                                path=path)
+                                                path=path,
+                                                logger=self.logger)
 
         #get the number of folders and files that need to be loaded
         #will be used in progress status
@@ -67,7 +68,7 @@ class SCR_Control():
 *************************************************************************************************"""
 class _SCR_Control_Base():
 
-    def __init__(self,path,name,folder,parent,main_ctrl,model,ctrl_type):
+    def __init__(self,path,name,folder,parent,main_ctrl,model,ctrl_type,logger):
 
         self.path      = path
         self.name      = name
@@ -76,6 +77,7 @@ class _SCR_Control_Base():
         self.main_ctrl = main_ctrl      
         self.model     = model
         self.ctrl_type = ctrl_type
+        self.logger    = logger
 
     def get_status_label(self):
 
@@ -101,7 +103,7 @@ class SCR_Control_Folders(SCR_Base_List):
 *************************************************************************************************"""
 class SCR_Control_Folder(_SCR_Control_Base):
 
-    def __init__(self,parent,main_ctrl,path):
+    def __init__(self,parent,main_ctrl,path,logger):
 
         _SCR_Control_Base.__init__(
                                     self,
@@ -111,7 +113,8 @@ class SCR_Control_Folder(_SCR_Control_Base):
                                     parent=parent,
                                     main_ctrl=main_ctrl,
                                     model=SCR_Model_Folder(),
-                                    ctrl_type="Test Folder")
+                                    ctrl_type="Test Folder",
+                                    logger=logger)
 
         self.testfolders = SCR_Control_Folders()
         self.testsuites  = SCR_Control_TestSuites()
@@ -120,9 +123,11 @@ class SCR_Control_Folder(_SCR_Control_Base):
 
     def read(self,path,observer,progress):
 
+        self.logger.debug("reading test folder [{}]".format(path))
+
         if None != observer:
 
-            observer.message("reading test folder %s" % (self.name,))
+            observer.message("reading test folder {}".format(self.name,))
 
         for _item in os.listdir(self.path):
 
@@ -162,7 +167,8 @@ class SCR_Control_Folder(_SCR_Control_Base):
         _testfolder = SCR_Control_Folder(
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
-                                            path=path)
+                                            path=path,
+                                            logger=self.logger)
 
         _testfolder.read(path,observer,progress)
 
@@ -173,7 +179,8 @@ class SCR_Control_Folder(_SCR_Control_Base):
         _testsuite = SCR_Control_TestSuite(
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
-                                            path=path)
+                                            path=path,
+                                            logger=self.logger)
 
         _testsuite.read(observer)
 
@@ -184,7 +191,8 @@ class SCR_Control_Folder(_SCR_Control_Base):
         _resource = SCR_Control_Resource(   
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
-                                            path=path)
+                                            path=path,
+                                            logger=self.logger)
 
         _resource.read(observer)
 
@@ -197,7 +205,8 @@ class SCR_Control_Folder(_SCR_Control_Base):
         _library = SCR_Control_Library(
                                         parent=self,
                                         main_ctrl=main_ctrl,
-                                        path=path)
+                                        path=path,
+                                        logger=self.logger)
 
         _library.read(observer)
 
@@ -223,7 +232,7 @@ class SCR_Control_TestSuites(SCR_Base_List):
 *************************************************************************************************"""
 class SCR_Control_TestSuite(_SCR_Control_Base):
 
-    def __init__(self,parent,main_ctrl,path):
+    def __init__(self,parent,main_ctrl,path,logger):
 
         _SCR_Control_Base.__init__(
                                     self,
@@ -233,7 +242,8 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
                                     parent=parent,
                                     main_ctrl=main_ctrl,
                                     model=SCR_Model_TestSuite(),
-                                    ctrl_type="Test Suite")
+                                    ctrl_type="Test Suite",
+                                    logger=logger)
 
         self.variables   = SCR_Control_Variables()
         self.keywords    = SCR_Control_Keywords()
@@ -243,11 +253,13 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
 
     def read(self,observer):
 
+        self.logger.debug("reading test suite [{}]".format(self.path))
+
         _status = False
 
         if None != observer:
 
-            observer.message("reading test suite %s" % (self.name,))
+            observer.message("reading test suite {}".format(self.name,))
 
         if os.path.exists(self.path):
 
@@ -266,6 +278,8 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
             self.read_testcases(observer)
 
             _status = True
+        else:
+            self.logger.error("test suite path does not exist [{}]".format(self.path))
 
         return _status
 
@@ -282,7 +296,8 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
                 _resource = SCR_Control_Resource(
                                                     parent=self,
                                                     main_ctrl=self.main_ctrl,
-                                                    path=_path)
+                                                    path=_path,
+                                                    logger=self.logger)
 
                 _resource.read(observer)
 
@@ -303,11 +318,14 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
                     _library = SCR_Control_Library(
                                                     parent=self,
                                                     main_ctrl=self.main_ctrl,
-                                                    path=_path)
+                                                    path=_path,
+                                                    logger=self.logger)
 
                     _library.read(observer)
 
                     self.main_ctrl.libraries.add(_library)
+            else:
+                self.logger.error("libraries path does not exist [{}]".format(_path))
 
     def read_variables(self,observer):
 
@@ -317,7 +335,8 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
                                             path=self.path,
-                                            name=_name)
+                                            name=_name,
+                                            logger=self.logger)
 
             _ctrl.read(observer)
 
@@ -331,7 +350,8 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
                                             path=self.path,
-                                            name=_name)
+                                            name=_name,
+                                            logger=self.logger)
 
             _ctrl.read(observer)
 
@@ -345,7 +365,8 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
                                             path=self.path,
-                                            name=_name)
+                                            name=_name,
+                                            logger=self.logger)
 
             _ctrl.read(observer)
 
@@ -381,7 +402,7 @@ class SCR_Control_Resources(SCR_Base_List):
 *************************************************************************************************"""
 class SCR_Control_Resource(_SCR_Control_Base):
 
-    def __init__(self,parent,main_ctrl,path):
+    def __init__(self,parent,main_ctrl,path,logger):
 
         _SCR_Control_Base.__init__(
                                     self,
@@ -391,7 +412,8 @@ class SCR_Control_Resource(_SCR_Control_Base):
                                     parent=parent,
                                     main_ctrl=main_ctrl,
                                     model=SCR_Model_Resource(),
-                                    ctrl_type="Test Resource")
+                                    ctrl_type="Test Resource",
+                                    logger=logger)
 
         self.variables   = SCR_Control_Variables()
         self.keywords    = SCR_Control_Keywords()
@@ -402,11 +424,13 @@ class SCR_Control_Resource(_SCR_Control_Base):
 
     def read(self,observer):
 
+        self.logger.debug("reading resource [{}]".format(self.path))
+
         _status = False
 
         if None != observer:
 
-            observer.message("reading resource %s" % (self.name,))
+            observer.message("reading resource {}".format(self.name,))
 
         if os.path.exists(self.path):
 
@@ -421,6 +445,8 @@ class SCR_Control_Resource(_SCR_Control_Base):
             self.read_keywords(observer)
 
             _status = True
+        else:
+            self.logger.error("resource path does not exist [{}]".format(self.path))
 
         return _status
 
@@ -437,7 +463,8 @@ class SCR_Control_Resource(_SCR_Control_Base):
                 _resource = SCR_Control_Resource(
                                                     parent=self,
                                                     main_ctrl=self.main_ctrl,
-                                                    path=_path)
+                                                    path=_path,
+                                                    logger=self.logger)
 
                 _resource.read(observer)
 
@@ -458,11 +485,14 @@ class SCR_Control_Resource(_SCR_Control_Base):
                     _library = SCR_Control_Library(
                                                     parent=self,
                                                     main_ctrl=self.main_ctrl,
-                                                    path=_path)
+                                                    path=_path,
+                                                    logger=self.logger)
 
                     _library.read(observer)
 
                     self.main_ctrl.libraries.add(_library)
+            else:
+                self.logger.error("libraries path does not exist [{}]".format(_path))
 
     def read_variables(self,observer):
 
@@ -472,7 +502,8 @@ class SCR_Control_Resource(_SCR_Control_Base):
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
                                             path=self.path,
-                                            name=_name)
+                                            name=_name,
+                                            logger=self.logger)
 
             _ctrl.read(observer)
 
@@ -486,7 +517,8 @@ class SCR_Control_Resource(_SCR_Control_Base):
                                             parent=self,
                                             main_ctrl=self.main_ctrl,
                                             path=self.path,
-                                            name=_name)
+                                            name=_name,
+                                            logger=self.logger)
 
             _ctrl.read(observer)
 
@@ -522,7 +554,7 @@ class SCR_Control_Libraries(SCR_Base_List):
 *************************************************************************************************"""
 class SCR_Control_Library(_SCR_Control_Base):
 
-    def __init__(self,parent,main_ctrl,path):
+    def __init__(self,parent,main_ctrl,path,logger):
 
         _SCR_Control_Base.__init__(
                                     self,
@@ -532,15 +564,18 @@ class SCR_Control_Library(_SCR_Control_Base):
                                     parent=parent,
                                     main_ctrl=main_ctrl,
                                     model=SCR_Model_Library(),
-                                    ctrl_type="Test Library")
+                                    ctrl_type="Test Library",
+                                    logger=logger)
 
         self.external = not os.path.abspath(path).startswith(os.path.abspath(main_ctrl.testfolder.path))
 
     def read(self,observer):
 
+        self.logger.debug("reading library [{}]".format(self.path))
+
         if None != observer:
 
-            observer.message("reading library %s" % (self.name,))
+            observer.message("reading library {}".format(self.name,))
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -556,7 +591,7 @@ class SCR_Control_TestCases(SCR_Base_List):
 *************************************************************************************************"""
 class SCR_Control_TestCase(_SCR_Control_Base):
 
-    def __init__(self,parent,main_ctrl,path,name):
+    def __init__(self,parent,main_ctrl,path,name,logger):
 
         _SCR_Control_Base.__init__(
                                     self,
@@ -566,7 +601,8 @@ class SCR_Control_TestCase(_SCR_Control_Base):
                                     parent=parent,
                                     main_ctrl=main_ctrl,
                                     model=SCR_Model_Keyword(),
-                                    ctrl_type="TestCase")
+                                    ctrl_type="TestCase",
+                                    logger=logger)
 
     def read(self,observer):
 
@@ -588,7 +624,7 @@ class SCR_Control_Variables(SCR_Base_List):
 *************************************************************************************************"""
 class SCR_Control_Variable(_SCR_Control_Base):
 
-    def __init__(self,parent,main_ctrl,path,name):
+    def __init__(self,parent,main_ctrl,path,name,logger):
 
         _SCR_Control_Base.__init__(
                                     self,
@@ -598,7 +634,8 @@ class SCR_Control_Variable(_SCR_Control_Base):
                                     parent=parent,
                                     main_ctrl=main_ctrl,
                                     model=SCR_Model_Variable(),
-                                    ctrl_type="Variable")
+                                    ctrl_type="Variable",
+                                    logger=logger)
 
     def read(self,observer):
 
@@ -620,7 +657,7 @@ class SCR_Control_Keywords(SCR_Base_List):
 *************************************************************************************************"""
 class SCR_Control_Keyword(_SCR_Control_Base):
 
-    def __init__(self,parent,main_ctrl,path,name):
+    def __init__(self,parent,main_ctrl,path,name,logger):
 
         _SCR_Control_Base.__init__(
                                     self,
@@ -630,7 +667,8 @@ class SCR_Control_Keyword(_SCR_Control_Base):
                                     parent=parent,
                                     main_ctrl=main_ctrl,
                                     model=SCR_Model_Keyword(),
-                                    ctrl_type="Keyword")
+                                    ctrl_type="Keyword",
+                                    logger=logger)
 
     def read(self,observer):
 

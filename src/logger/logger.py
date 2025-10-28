@@ -69,7 +69,7 @@ class SCR_Logger(object):
 
         self.__log_to_file(_log_txt + "\n")
 
-        self.__log_to_ui(_log_txt + "\n")
+        self.__log_to_ui(_log_txt)
 
     def __is_log_to_big(self):
 

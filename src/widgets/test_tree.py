@@ -32,7 +32,7 @@ class SCR_WDG_TestTree_Widget(SCR_WDG_Widget):
 
     def __init__(self,config, scrib):
 
-        SCR_WDG_Widget.__init__(self)
+        SCR_WDG_Widget.__init__(self,config)
 
         self.scrib  = scrib 
         self.config = config
@@ -860,7 +860,7 @@ class SCR_WDG_TestTree_Find(SCR_WDG_Widget):
 
     def __init__(self,config,tree):
 
-        SCR_WDG_Widget.__init__(self,tree)
+        SCR_WDG_Widget.__init__(self,config,tree)
 
         self.config = config
 

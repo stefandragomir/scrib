@@ -21,6 +21,7 @@ class SCR_Config(object):
                                     "foreground"            : "#000000",
                                     "sel_background"        : "#A7AABA",
                                     "sel_foreground"        : "#FFFFFF",
+                                    "border_color"          : "#707070",
                                     "icon_new"              : "cce0eae9f8616e09065e8ca2f7f2e768fa70c5b2",
                                     "icon_folder"           : "15446caa0c97fc7e6f21c74e2f2eb6c05823297e",
                                     "icon_save"             : "76898ed4d16e54864c213e6a1ad878d1c3abf031",
@@ -44,7 +45,8 @@ class SCR_Config(object):
                                     "icon_previous"         : "0aed51b9ddeed91efe378a353a15cefcd16d3acc",
                                     "icon_theme_dark"       : "e992b70da97cb861738b83261468fdd9abaf51f5",
                                     "icon_theme_light"      : "37b4cae8645a18d8aa05903e3097fb3d6832ef9c",
-                                    "icon_theme_normal"     : "15b3ae5a17b0af25c1a7aa2b59fc07455e8ea66c",        
+                                    "icon_theme_normal"     : "15b3ae5a17b0af25c1a7aa2b59fc07455e8ea66c",   
+                                    "icon_console"          : "a63132e94239950282ed64a8fd45989360a2d48a",     
                                    },
                                   
                         "dark" : {
@@ -52,6 +54,7 @@ class SCR_Config(object):
                                     "foreground"            : "#FFFFFF", 
                                     "sel_background"        : "#34363E",
                                     "sel_foreground"        : "#FFFFFF",
+                                    "border_color"          : "#707070",
                                     "icon_new"              : "e91a19ef57b475414003d55e49180b1f26d95397",
                                     "icon_folder"           : "9137835f5ba5460ba8f1413bde7c592895c08018",
                                     "icon_save"             : "23fb7d17e04d0a5a799f082a44938632abbdc3dc",
@@ -76,6 +79,7 @@ class SCR_Config(object):
                                     "icon_theme_dark"       : "ee91c7281c28538a48e73d90c94cf7774991b52d",
                                     "icon_theme_light"      : "b29b41abd03de5c5cd4b97362b7fc94103ed813f",
                                     "icon_theme_normal"     : "582ba94f4219878c21f8e6720b9fae8bdb35cd6c", 
+                                    "icon_console"          : "3ced25fab70d17a862ccf95412caae4b97c01239",
 
                                  },
 
@@ -84,6 +88,7 @@ class SCR_Config(object):
                                     "foreground"            : "#000000",
                                     "sel_background"        : "#A7AABA",
                                     "sel_foreground"        : "#FFFFFF",
+                                    "border_color"          : "#707070",
                                     "icon_new"              : "cce0eae9f8616e09065e8ca2f7f2e768fa70c5b2",
                                     "icon_folder"           : "15446caa0c97fc7e6f21c74e2f2eb6c05823297e",
                                     "icon_save"             : "76898ed4d16e54864c213e6a1ad878d1c3abf031",
@@ -107,7 +112,8 @@ class SCR_Config(object):
                                     "icon_previous"         : "0aed51b9ddeed91efe378a353a15cefcd16d3acc",
                                     "icon_theme_dark"       : "e992b70da97cb861738b83261468fdd9abaf51f5",
                                     "icon_theme_light"      : "37b4cae8645a18d8aa05903e3097fb3d6832ef9c",
-                                    "icon_theme_normal"     : "15b3ae5a17b0af25c1a7aa2b59fc07455e8ea66c",        
+                                    "icon_theme_normal"     : "15b3ae5a17b0af25c1a7aa2b59fc07455e8ea66c",    
+                                    "icon_console"          : "a63132e94239950282ed64a8fd45989360a2d48a",    
                                    },
                       }
 

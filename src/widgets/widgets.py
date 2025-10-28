@@ -163,9 +163,11 @@ class SCR_WDG_LineEdit(QLineEdit):
 *************************************************************************************************"""
 class SCR_WDG_Widget(QWidget):
 
-    def __init__(self,*args):
+    def __init__(self,config,*args):
 
         QWidget.__init__(self,*args)
+
+        self.config = config
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -229,11 +231,11 @@ class SCR_WDG_Button(QPushButton):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_WDG_ToolBar(QWidget):
+class SCR_WDG_ToolBar(SCR_WDG_Widget):
 
     def __init__(self,config):
 
-        QWidget.__init__(self)
+        SCR_WDG_Widget.__init__(self,config)
 
         self.wdgs   = {}
         self.config = config
@@ -261,9 +263,11 @@ class SCR_WDG_ToolBar(QWidget):
 *************************************************************************************************"""
 class SCR_WDG_PlainTextEdit(QPlainTextEdit):
 
-    def __init__(self):
+    def __init__(self,config):
 
         QPlainTextEdit.__init__(self)
+
+        self.config = config
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -588,7 +592,7 @@ class SCR_WDG_Tree(QTreeView):
         _css += "selection-background-color: {};".format(self.config.get_theme_sel_background(),) 
         _css += "font-family: Arial;"
         _css += "font-size: 9pt;"
-        _css += "border: 1px solid #707070;"
+        _css += "border: 1px solid {};".format(self.config.get_theme_border_color())
 
         self.setStyleSheet(_css)
 
@@ -665,7 +669,7 @@ class SCR_WDG_Tree(QTreeView):
 
                 self.search_clbk()
 
-        QWidget.keyPressEvent(self,event) 
+        SCR_WDG_Widget.keyPressEvent(self,event) 
  
     def find_items(self,text,column):
 
@@ -788,11 +792,11 @@ class SCR_WDG_Label(QLabel):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_WDG_ActionBar(QWidget):
+class SCR_WDG_ActionBar(SCR_WDG_Widget):
 
     def __init__(self,app,parent,config):
 
-        QWidget.__init__(self,parent)
+        SCR_WDG_Widget.__init__(self,config,parent)
   
         self.app            = app
         self.config         = config
@@ -941,12 +945,12 @@ class SCR_WDG_Tab(QTabWidget):
 
         _css  = """
         QTabWidget::pane { 
-                            border: 1px solid #707070;
+                            border: 1px solid %s;
                             border-radius: 3px;
                          }
 
         QTabBar::tab {
-                    border: 1px solid #707070;
+                    border: 1px solid %s;
                     border-bottom-color: #bfc0c1;
                     min-width: 55ex;
                     font-family: Arial;
@@ -957,7 +961,7 @@ class SCR_WDG_Tab(QTabWidget):
 
         QTabBar::tab:selected {
             border-color: gray;
-            border-bottom-color: #707070; 
+            border-bottom-color: %s; 
             background-color: #c1c1c1;
             border-radius: 3px;
             color:%s
@@ -969,13 +973,18 @@ class SCR_WDG_Tab(QTabWidget):
             color:%s
         }
 
-        """ % (self.config.get_theme_foreground(),self.config.get_theme_foreground())
+        """ % (
+                self.config.get_theme_border_color(),
+                self.config.get_theme_border_color(),
+                self.config.get_theme_border_color(),
+                self.config.get_theme_foreground(),
+                self.config.get_theme_foreground())
 
         self.setStyleSheet(_css)
 
     def add_tab(self,label):
 
-        _widget = SCR_WDG_Widget()
+        _widget = SCR_WDG_Widget(self.config)
 
         self.addTab(_widget,label)
 

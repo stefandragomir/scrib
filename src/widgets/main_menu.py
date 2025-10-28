@@ -90,11 +90,23 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
 
     def populate_tools(self):
 
-        _menu_search = self.add_menu(self,"&Tools")
+        _menu_tools = self.add_menu(self,"Tools")
+
+        if self.scrib.console_visible:
+            _title = "Hide Console"
+        else:
+            _title = "Show Console"
+
+        self.add_action(
+                        _menu_tools, 
+                        _title,              
+                        self.config.get_theme_icon_console(),
+                        None, 
+                        self.scrib.act_tools.console_visibility)
 
     def populate_appearance(self):
 
-        _menu_appearance = self.add_menu(self,"&Appearance")
+        _menu_appearance = self.add_menu(self,"Appearance")
 
         self.add_action(
                         _menu_appearance, 
@@ -119,11 +131,11 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
 
     def populate_plugins(self):
 
-        _menu_plugins = self.add_menu(self,"&Plugins")
+        _menu_plugins = self.add_menu(self,"Plugins")
 
     def populate_help(self):
 
-        _menu_help = self.add_menu(self,"&Help")
+        _menu_help = self.add_menu(self,"Help")
 
         self.add_action(
                         _menu_help, 
@@ -149,4 +161,24 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
 
 
 
+
+
+
+    def change_console_tile(self,visible):
+
+        for _action_1 in self.actions():
+
+            if _action_1.menu() and _action_1.text() == "Tools":
+
+                for _action_2 in _action_1.menu().actions():
+
+                    if visible:
+
+                        if _action_2.text() == "Show Console":
+
+                            _action_2.setText("Hide Console")
+                    else:
+                        if _action_2.text() == "Hide Console":
+
+                            _action_2.setText("Show Console")
 
