@@ -102,7 +102,19 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
                         _title,              
                         self.config.get_theme_icon_console(),
                         None, 
-                        self.scrib.act_tools.console_visibility)
+                        self.scrib.act_tools.toogle_console_visibility)
+
+        if self.scrib.preferences.get("debug_logging"):
+            _title = "Disable Debug Logging"
+        else:
+            _title = "Enable Debug Logging"
+
+        self.add_action(
+                        _menu_tools, 
+                        _title,              
+                        self.config.get_theme_icon_debug_logging(),
+                        None, 
+                        self.scrib.act_tools.toogle_debug_logging)
 
     def populate_appearance(self):
 
@@ -158,12 +170,6 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
                         None, 
                         self.scrib.act_help.help_about)
 
-
-
-
-
-
-
     def change_console_tile(self,visible):
 
         for _action_1 in self.actions():
@@ -182,3 +188,20 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
 
                             _action_2.setText("Show Console")
 
+    def change_debug_logging_tile(self,state):
+
+        for _action_1 in self.actions():
+
+            if _action_1.menu() and _action_1.text() == "Tools":
+
+                for _action_2 in _action_1.menu().actions():
+
+                    if state:
+
+                        if _action_2.text() == "Enable Debug Logging":
+
+                            _action_2.setText("Disable Debug Logging")
+                    else:
+                        if _action_2.text() == "Disable Debug Logging":
+
+                            _action_2.setText("Enable Debug Logging")

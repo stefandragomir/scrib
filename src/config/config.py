@@ -46,7 +46,8 @@ class SCR_Config(object):
                                     "icon_theme_dark"       : "e992b70da97cb861738b83261468fdd9abaf51f5",
                                     "icon_theme_light"      : "37b4cae8645a18d8aa05903e3097fb3d6832ef9c",
                                     "icon_theme_normal"     : "15b3ae5a17b0af25c1a7aa2b59fc07455e8ea66c",   
-                                    "icon_console"          : "a63132e94239950282ed64a8fd45989360a2d48a",     
+                                    "icon_console"          : "a63132e94239950282ed64a8fd45989360a2d48a",  
+                                    "icon_debug_logging"    : "07c4bd74a9514a3805a37c5929c3805194b5f7de",   
                                    },
                                   
                         "dark" : {
@@ -80,6 +81,7 @@ class SCR_Config(object):
                                     "icon_theme_light"      : "b29b41abd03de5c5cd4b97362b7fc94103ed813f",
                                     "icon_theme_normal"     : "582ba94f4219878c21f8e6720b9fae8bdb35cd6c", 
                                     "icon_console"          : "3ced25fab70d17a862ccf95412caae4b97c01239",
+                                    "icon_debug_logging"    : "8a0ce8571e8bfb8fd931e08421719dbdd3f1f2eb",
 
                                  },
 
@@ -113,7 +115,8 @@ class SCR_Config(object):
                                     "icon_theme_dark"       : "e992b70da97cb861738b83261468fdd9abaf51f5",
                                     "icon_theme_light"      : "37b4cae8645a18d8aa05903e3097fb3d6832ef9c",
                                     "icon_theme_normal"     : "15b3ae5a17b0af25c1a7aa2b59fc07455e8ea66c",    
-                                    "icon_console"          : "a63132e94239950282ed64a8fd45989360a2d48a",    
+                                    "icon_console"          : "a63132e94239950282ed64a8fd45989360a2d48a",  
+                                    "icon_debug_logging"    : "07c4bd74a9514a3805a37c5929c3805194b5f7de",  
                                    },
                       }
 

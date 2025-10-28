@@ -163,7 +163,7 @@ class SCR_UI(QMainWindow):
 
         _path = os.path.join(_path,"log.txt")
 
-        self.logger.set_debug_level(True)
+        self.logger.set_debug_level(self.preferences.get("debug_logging"))
 
         self.logger.set_path(_path)
 

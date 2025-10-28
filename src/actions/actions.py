@@ -86,7 +86,7 @@ class SCR_Actions_Tools():
         self.scrib  = scrib
         self.logger = logger
 
-    def console_visibility(self):
+    def toogle_console_visibility(self):
 
         if self.scrib.console_visible:
             
@@ -99,6 +99,20 @@ class SCR_Actions_Tools():
             self.scrib.dock_console.show()
             self.scrib.main_menu.change_console_tile(True)
 
+    def toogle_debug_logging(self):
+
+        if self.scrib.preferences.get("debug_logging"):
+            
+            self.scrib.preferences.set("debug_logging",False)
+            self.scrib.preferences.save()
+            self.scrib.main_menu.change_debug_logging_tile(False)
+            self.logger.set_debug_level(False)
+        else:
+
+            self.scrib.preferences.set("debug_logging",True)
+            self.scrib.preferences.save()
+            self.scrib.main_menu.change_debug_logging_tile(True)
+            self.logger.set_debug_level(True)
 
 """*************************************************************************************************
 ****************************************************************************************************

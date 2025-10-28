@@ -16,9 +16,10 @@ class SCR_Preferences():
 	def __init__(self):
 
 		self.default = {
-								"recents": [],
-								"cwd"    : "",
-								"theme"  : "light",
+								"recents"      : [],
+								"cwd"          : "",
+								"theme"        : "light",
+								"debug_logging": False
 							}
 
 		self.preferences = self.default
