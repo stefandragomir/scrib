@@ -48,6 +48,13 @@ class SCR_Config(object):
                                     "icon_theme_normal"     : "15b3ae5a17b0af25c1a7aa2b59fc07455e8ea66c",   
                                     "icon_console"          : "a63132e94239950282ed64a8fd45989360a2d48a",  
                                     "icon_debug_logging"    : "07c4bd74a9514a3805a37c5929c3805194b5f7de",   
+                                    "icon_rename"           : "e7cec978fe0a220b390f534bc8060904b5a09293",
+                                    "icon_delete"           : "cb8851a8e47ec29dddb5dce4cc450d817a586d6d",
+                                    "icon_search"           : "be58b732a543353a7d6aef85c61afdffcc9c9c44",
+                                    "icon_expand"           : "2fb192c0d475088e4ad9a2d464087a2d30d05dfd",
+                                    "icon_collapse"         : "9070b91169189052e08b2a0a8730ab285bb9d57d",
+                                    "icon_select_all"       : "0df661bf0206ccea0d5ef89cf9cbad7b61b8055b",
+                                    "icon_deselect_all"     : "b49bc191b2a8c689d3d25431dde459e769349b8f",
                                    },
                                   
                         "dark" : {
@@ -82,6 +89,13 @@ class SCR_Config(object):
                                     "icon_theme_normal"     : "582ba94f4219878c21f8e6720b9fae8bdb35cd6c", 
                                     "icon_console"          : "3ced25fab70d17a862ccf95412caae4b97c01239",
                                     "icon_debug_logging"    : "8a0ce8571e8bfb8fd931e08421719dbdd3f1f2eb",
+                                    "icon_rename"           : "34f990c4b7fdf67bf673903526057cc2005d1d1e",
+                                    "icon_delete"           : "6a5499203bb96bfd8d24919cde6c1f1be49f93ce",
+                                    "icon_search"           : "c597342ba89b83d13db5c7cb3445f88c908c2f65",
+                                    "icon_expand"           : "0c99284148ae4106a49153cd5de1a25edad67efd",
+                                    "icon_collapse"         : "3e8173dd6fe4bddd5fae1d452157eac7b54ba0da",
+                                    "icon_select_all"       : "c3e2ac2cb52cb5f9cf0757ed0a5d7165fb14563c",
+                                    "icon_deselect_all"     : "a90fc5defb4877f4d2d28a6753be9d59ef43eb76",
 
                                  },
 
@@ -116,7 +130,14 @@ class SCR_Config(object):
                                     "icon_theme_light"      : "37b4cae8645a18d8aa05903e3097fb3d6832ef9c",
                                     "icon_theme_normal"     : "15b3ae5a17b0af25c1a7aa2b59fc07455e8ea66c",    
                                     "icon_console"          : "a63132e94239950282ed64a8fd45989360a2d48a",  
-                                    "icon_debug_logging"    : "07c4bd74a9514a3805a37c5929c3805194b5f7de",  
+                                    "icon_debug_logging"    : "07c4bd74a9514a3805a37c5929c3805194b5f7de", 
+                                    "icon_rename"           : "e7cec978fe0a220b390f534bc8060904b5a09293",
+                                    "icon_delete"           : "cb8851a8e47ec29dddb5dce4cc450d817a586d6d",
+                                    "icon_search"           : "be58b732a543353a7d6aef85c61afdffcc9c9c44", 
+                                    "icon_expand"           : "2fb192c0d475088e4ad9a2d464087a2d30d05dfd",
+                                    "icon_collapse"         : "9070b91169189052e08b2a0a8730ab285bb9d57d",
+                                    "icon_select_all"       : "0df661bf0206ccea0d5ef89cf9cbad7b61b8055b",
+                                    "icon_deselect_all"     : "b49bc191b2a8c689d3d25431dde459e769349b8f",
                                    },
                       }
 

@@ -15,9 +15,9 @@ from abc                   import abstractmethod
 
 
 
-"""******************************************************************************************
-*********************************************************************************************
-******************************************************************************************"""
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
 class SCR_WDG_ProgressBar(QProgressBar):
 
     def __init__(self,config):
@@ -26,9 +26,9 @@ class SCR_WDG_ProgressBar(QProgressBar):
 
         QProgressBar.__init__(self)
 
-"""******************************************************************************************
-*********************************************************************************************
-******************************************************************************************"""
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
 class SCR_WDG_StatusBar(QStatusBar):
 
     def __init__(self,config):
@@ -40,46 +40,11 @@ class SCR_WDG_StatusBar(QStatusBar):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_WDG_MenuBar(QMenuBar):
+class SCR_WDG_MenuCommon():
 
-    def __init__(self,config,*args):
-
-        QMenuBar.__init__(self,*args)
+    def __init__(self,config):
 
         self.config = config
-
-        _css  = """
-                    QMenuBar::item 
-                    {
-                        background-color: %s;
-                        color: %s;
-                        padding: 4px 20px 4px 20px;
-                    }
-
-                    QMenuBar::item:selected 
-                    {
-                        background-color: %s; 
-                        color: %s;
-                    }
-
-                    QMenuBar QAbstractItemView::item
-                    {
-
-                        border-width: 3px;
-                        border-style: solid;
-                        border-color: #E74C3C; 
-                        border-radius: 5px;
-                    }
-
-                """
-
-        _css = _css % (
-                            self.config.get_theme_background(),
-                            self.config.get_theme_foreground(),
-                            self.config.get_theme_sel_background(),
-                            self.config.get_theme_sel_foreground())
-
-        self.setStyleSheet(_css)
 
     def add_menu(self,parent,name):
 
@@ -121,6 +86,96 @@ class SCR_WDG_MenuBar(QMenuBar):
         parent.addAction(_action)
 
         return _action
+
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_WDG_MenuBar(SCR_WDG_MenuCommon,QMenuBar):
+
+    def __init__(self,config,*args):
+
+        QMenuBar.__init__(self,*args)
+
+        SCR_WDG_MenuCommon.__init__(self,config)
+
+        _css  = """
+                    QMenuBar::item 
+                    {
+                        background-color: %s;
+                        color: %s;
+                        padding: 4px 20px 4px 20px;
+                    }
+
+                    QMenuBar::item:selected 
+                    {
+                        background-color: %s; 
+                        color: %s;
+                    }
+
+                    QMenuBar QAbstractItemView::item
+                    {
+
+                        border-width: 3px;
+                        border-style: solid;
+                        border-color: #E74C3C; 
+                        border-radius: 5px;
+                    }
+
+                """
+
+        _css = _css % (
+                            self.config.get_theme_background(),
+                            self.config.get_theme_foreground(),
+                            self.config.get_theme_sel_background(),
+                            self.config.get_theme_sel_foreground())
+
+        self.setStyleSheet(_css)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_WDG_Menu(SCR_WDG_MenuCommon,QMenu):
+
+    def __init__(self,config,*args):
+
+        QMenuBar.__init__(self,*args)
+
+        SCR_WDG_MenuCommon.__init__(self,config)
+
+        _css  = """
+                    QMenu::item 
+                    {
+                        background-color: %s;
+                        color: %s;
+                        padding: 4px 20px 4px 20px;
+                    }
+
+                    QMenu::item:selected 
+                    {
+                        background-color: %s; 
+                        color: %s;
+                    }
+
+                    QMenu QAbstractItemView::item
+                    {
+
+                        border-width: 3px;
+                        border-style: solid;
+                        border-color: #E74C3C; 
+                        border-radius: 5px;
+                    }
+
+                """
+
+        _css = _css % (
+                            self.config.get_theme_background(),
+                            self.config.get_theme_foreground(),
+                            self.config.get_theme_sel_background(),
+                            self.config.get_theme_sel_foreground())
+
+        self.setStyleSheet(_css)
+
 
 """*************************************************************************************************
 ****************************************************************************************************
