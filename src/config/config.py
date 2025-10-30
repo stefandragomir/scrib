@@ -55,6 +55,9 @@ class SCR_Config(object):
                                     "icon_collapse"         : "9070b91169189052e08b2a0a8730ab285bb9d57d",
                                     "icon_select_all"       : "0df661bf0206ccea0d5ef89cf9cbad7b61b8055b",
                                     "icon_deselect_all"     : "b49bc191b2a8c689d3d25431dde459e769349b8f",
+                                    "icon_find_usage"       : "9f0039262ef0a2515789ea495b603c409106b1c8",
+                                    "icon_move_up"          : "85d95f3e36517321283568bf441922f4cfe53ec1",
+                                    "icon_move_down"        : "8cb8f5436aebe089cb7a9fe81a909675847e0c81",
                                    },
                                   
                         "dark" : {
@@ -96,6 +99,9 @@ class SCR_Config(object):
                                     "icon_collapse"         : "3e8173dd6fe4bddd5fae1d452157eac7b54ba0da",
                                     "icon_select_all"       : "c3e2ac2cb52cb5f9cf0757ed0a5d7165fb14563c",
                                     "icon_deselect_all"     : "a90fc5defb4877f4d2d28a6753be9d59ef43eb76",
+                                    "icon_find_usage"       : "c66332edc07d41621554770cc9c5c299d6c2a2cc",
+                                    "icon_move_up"          : "bd597cf5824e3f81c79fab3022789c42a1972fb6",
+                                    "icon_move_down"        : "e9be16fd6af2587b9bb97b336eb1c95e7476d66f",
 
                                  },
 
@@ -138,6 +144,9 @@ class SCR_Config(object):
                                     "icon_collapse"         : "9070b91169189052e08b2a0a8730ab285bb9d57d",
                                     "icon_select_all"       : "0df661bf0206ccea0d5ef89cf9cbad7b61b8055b",
                                     "icon_deselect_all"     : "b49bc191b2a8c689d3d25431dde459e769349b8f",
+                                    "icon_find_usage"       : "9f0039262ef0a2515789ea495b603c409106b1c8",
+                                    "icon_move_up"          : "85d95f3e36517321283568bf441922f4cfe53ec1",
+                                    "icon_move_down"        : "8cb8f5436aebe089cb7a9fe81a909675847e0c81",
                                    },
                       }
 

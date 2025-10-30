@@ -596,265 +596,352 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
 
         self.context_menu.add_action(
                                         self.context_menu,
-                                    SCR_GetIcon("ca211c47afa3b991350a6c183d8aaf3f33db15a0"), 
-                                    "New Test Case", 
-                                    partial(self.act_testsuite.new_testcase,self.tree_item,data))
+                                        "New Test Case",
+                                        self.config.get_theme_icon_testcase(),
+                                        None,
+                                        partial(self.act_testsuite.new_testcase,self.tree_item,data))
 
         self.context_menu.add_action(
                                         self.context_menu,
-                                    SCR_GetIcon("14b802564477e8b8f64dc869c92a4b983edc1001"), 
-                                    "New Keyword", 
-                                    partial(self.act_testsuite.new_keyword,self.tree_item,data))
+                                        "New Keyword",
+                                        self.config.get_theme_icon_keyword(), 
+                                        None,
+                                        partial(self.act_testsuite.new_keyword,self.tree_item,data))
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("de99afcb2a785eea0974463ae9e7e063a5482b4a"), 
-                                    "New Scalar Variable", 
-                                    partial(self.act_testsuite.new_var_scalar,self.tree_item,data))
+                                        self.context_menu,
+                                        "New Scalar Variable",
+                                        self.config.get_theme_icon_var_scalar(),  
+                                        None, 
+                                        partial(self.act_testsuite.new_var_scalar,self.tree_item,data))
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("000cc208d4e675301e21ed009db52ff361a35a9f"), 
-                                    "New List Variable", 
-                                    partial(self.act_testsuite.new_var_list,self.tree_item,data))
+                                        self.context_menu,
+                                        "New List Variable",
+                                        self.config.get_theme_icon_var_list(),  
+                                        None,
+                                        partial(self.act_testsuite.new_var_list,self.tree_item,data))
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("490daab16fc73f3decf083a5cfb04b47708c8b22"), 
-                                    "New Dictionary Variable", 
-                                    partial(self.act_testsuite.new_var_dict,self.tree_item,data))
+                                        self.context_menu,
+                                        "New Dictionary Variable",
+                                        self.config.get_theme_icon_var_dict(),
+                                        None,
+                                        partial(self.act_testsuite.new_var_dict,self.tree_item,data))
 
         self.context_menu.addSeparator()
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("836b4d076077202c00f2fbd10c605023bb2bbfe5"), 
-                                    "Select All Test Cases", 
-                                    partial(self.act_testsuite.sel_all,self.tree_item,data))
+                                        self.context_menu,
+                                        "Select All Test Cases",
+                                        self.config.get_theme_icon_select_all(),
+                                        None,
+                                        partial(self.act_testsuite.sel_all,self.tree_item,data))
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("98e83543511ae234092459c5450e0d0dee23337d"), 
-                                    "Select All Failed Test Cases", 
-                                    partial(self.act_testsuite.sel_all_failed,self.tree_item,data))
+                                        self.context_menu,
+                                        "Select All Failed Test Cases",
+                                        self.config.get_theme_icon_select_all(),
+                                        None,
+                                        partial(self.act_testsuite.sel_all_failed,self.tree_item,data))
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("a37bb6398d3f69a8f2914f3cdcb209fbf2e2cfc7"), 
-                                    "Select All Passed Test Cases", 
-                                    partial(self.act_testsuite.sel_all_passed,self.tree_item,data))
+                                        self.context_menu,
+                                        "Select All Passed Test Cases",
+                                        self.config.get_theme_icon_select_all(),
+                                        None,
+                                        partial(self.act_testsuite.sel_all_passed,self.tree_item,data))
 
         self.context_menu.addSeparator()
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("b49bc191b2a8c689d3d25431dde459e769349b8f"), 
-                                    "Deselect All Test Cases", 
-                                    partial(self.act_testsuite.desel_all,self.tree_item,data))
+                                        self.context_menu,
+                                        "Deselect All Test Cases",
+                                        self.config.get_theme_icon_deselect_all(), 
+                                        None,
+                                        partial(self.act_testsuite.desel_all,self.tree_item,data))
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("a2588e1c2a378b9710d5a1b74299060ca2271413"), 
-                                    "Deselect All Failed Test Cases", 
-                                    partial(self.act_testsuite.desel_all_failed,self.tree_item,data))
+                                        self.context_menu,
+                                        "Deselect All Failed Test Cases", 
+                                        self.config.get_theme_icon_deselect_all(), 
+                                        None,
+                                        partial(self.act_testsuite.desel_all_failed,self.tree_item,data))
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("8bd133d5a6e9b47ba80a6d774149085b20483fb0"), 
-                                    "Deselect All Passed Test Cases", 
-                                    partial(self.act_testsuite.desel_all_passed,self.tree_item,data))
+
+                                        self.context_menu,
+                                        "Deselect All Passed Test Cases",
+                                        self.config.get_theme_icon_deselect_all(), 
+                                        None,
+                                        partial(self.act_testsuite.desel_all_passed,self.tree_item,data))
 
 
         self.context_menu.addSeparator()
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
-                                    "Delete", 
-                                    partial(self.act_testsuite.delete,self.tree_item,data))
+                                        self.context_menu,
+                                        "Delete", 
+                                        self.config.get_theme_icon_delete(), 
+                                        None,
+                                        partial(self.act_testsuite.delete,self.tree_item,data))
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
-                                    "Rename", 
-                                    partial(self.act_testsuite.rename,self.tree_item,data))
+                                        self.context_menu,
+                                        "Rename", 
+                                        self.config.get_theme_icon_rename(), 
+                                        None,
+                                        partial(self.act_testsuite.rename,self.tree_item,data))
 
         self.context_menu.addSeparator()
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("b28971455cf45af0e2e37a9c33ca8ca01d5a660f"), 
-                                    "Open Folder", 
-                                    partial(self.act_testsuite.open,self.tree_item,data))
+                                        self.context_menu,
+                                        "Open Folder", 
+                                        self.config.get_theme_icon_folder(), 
+                                        None,
+                                        partial(self.act_testsuite.open,self.tree_item,data))
 
         self.context_menu.add_action(
-                                    SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
-                                    "Search in Test Suite", 
-                                    partial(self.act_testsuite.search,self.tree_item,data))
+                                        self.context_menu,
+                                        "Search in Test Suite",
+                                        self.config.get_theme_icon_search(), 
+                                        None,
+                                        partial(self.act_testsuite.search,self.tree_item,data))
 
     def draw_menu_testcase(self,data):
 
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
-                                    "Delete", 
-                                    partial(self.act_testcase.delete,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Delete",
+                                        self.config.get_theme_icon_delete(), 
+                                        None,
+                                        partial(self.act_testcase.delete,self.tree_item,data))
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
-                                    "Rename", 
-                                    partial(self.act_testcase.rename,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Rename",
+                                        self.config.get_theme_icon_rename(), 
+                                        None,
+                                        partial(self.act_testcase.rename,self.tree_item,data))
 
         self.context_menu.addSeparator()
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("85d95f3e36517321283568bf441922f4cfe53ec1"), 
-                                    "Move Up", 
-                                    partial(self.act_testcase.moveup,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Move Up",
+                                        self.config.get_theme_icon_move_up(), 
+                                        None,
+                                        partial(self.act_testcase.moveup,self.tree_item,data))
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("8cb8f5436aebe089cb7a9fe81a909675847e0c81"), 
-                                    "Move Down", 
-                                    partial(self.act_testcase.movedown,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Move Down", 
+                                        self.config.get_theme_icon_move_down(),
+                                        None,
+                                        partial(self.act_testcase.movedown,self.tree_item,data))
 
     def draw_menu_keyword(self,data):
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
-                                    "Delete", 
-                                    partial(self.act_keyword.delete,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Delete", 
+                                        self.config.get_theme_icon_delete(), 
+                                        None,
+                                        partial(self.act_keyword.delete,self.tree_item,data))
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
-                                    "Rename", 
-                                    partial(self.act_keyword.rename,self.tree_item,data))
-
-        self.context_menu.addSeparator()
-
-        self.context_menu.addAction(
-                                    SCR_GetIcon("85d95f3e36517321283568bf441922f4cfe53ec1"), 
-                                    "Move Up", 
-                                    partial(self.act_keyword.moveup,self.tree_item,data))
-
-        self.context_menu.addAction(
-                                    SCR_GetIcon("8cb8f5436aebe089cb7a9fe81a909675847e0c81"), 
-                                    "Move Down", 
-                                    partial(self.act_keyword.movedown,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Rename",
+                                        self.config.get_theme_icon_rename(),
+                                        None,
+                                        partial(self.act_keyword.rename,self.tree_item,data))
 
         self.context_menu.addSeparator()
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("ffc3fb09c5db2b34f971c0ec4979b73de4f14be5"), 
-                                    "Find Usage", 
-                                    partial(self.act_keyword.find_usage,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Move Up",
+                                        self.config.get_theme_icon_move_up(), 
+                                        None,
+                                        partial(self.act_keyword.moveup,self.tree_item,data))
+
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Move Down",
+                                        self.config.get_theme_icon_move_down(), 
+                                        None,
+                                        partial(self.act_keyword.movedown,self.tree_item,data))
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Find Usage", 
+                                        self.config.get_theme_icon_find_usage(), 
+                                        None,
+                                        partial(self.act_keyword.find_usage,self.tree_item,data))
 
     def draw_menu_variable(self,data):
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
-                                    "Delete", 
-                                    partial(self.act_variable.delete,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Delete", 
+                                        self.config.get_theme_icon_delete(), 
+                                        None,
+                                        partial(self.act_variable.delete,self.tree_item,data))
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
-                                    "Rename", 
-                                    partial(self.act_variable.rename,self.tree_item,data))
-
-        self.context_menu.addSeparator()
-
-        self.context_menu.addAction(
-                                    SCR_GetIcon("85d95f3e36517321283568bf441922f4cfe53ec1"), 
-                                    "Move Up", 
-                                    partial(self.act_variable.moveup,self.tree_item,data))
-
-        self.context_menu.addAction(
-                                    SCR_GetIcon("8cb8f5436aebe089cb7a9fe81a909675847e0c81"), 
-                                    "Move Down", 
-                                    partial(self.act_variable.movedown,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Rename", 
+                                        self.config.get_theme_icon_rename(), 
+                                        None,
+                                        partial(self.act_variable.rename,self.tree_item,data))
 
         self.context_menu.addSeparator()
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("ffc3fb09c5db2b34f971c0ec4979b73de4f14be5"), 
-                                    "Find Usage", 
-                                    partial(self.act_variable.find_usage,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Move Up",
+                                        self.config.get_theme_icon_move_up(),
+                                        None,
+                                        partial(self.act_variable.moveup,self.tree_item,data))
+
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Move Down",
+                                        self.config.get_theme_icon_move_down(), 
+                                        None,
+                                        partial(self.act_variable.movedown,self.tree_item,data))
+
+        self.context_menu.addSeparator()
+
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Find Usage", 
+                                        self.config.get_theme_icon_find_usage(), 
+                                        None,
+                                        partial(self.act_variable.find_usage,self.tree_item,data))
 
     def draw_menu_resource(self,data):
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("14b802564477e8b8f64dc869c92a4b983edc1001"), 
-                                    "New Keyword", 
-                                    partial(self.act_resource.new_keyword,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "New Keyword",
+                                        self.config.get_theme_icon_keyword(), 
+                                        None,
+                                        partial(self.act_resource.new_keyword,self.tree_item,data))
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("de99afcb2a785eea0974463ae9e7e063a5482b4a"), 
-                                    "New Scalar Variable", 
-                                    partial(self.act_resource.new_var_scalar,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "New Scalar Variable", 
+                                        self.config.get_theme_icon_var_scalar(), 
+                                        None,
+                                        partial(self.act_resource.new_var_scalar,self.tree_item,data))
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("000cc208d4e675301e21ed009db52ff361a35a9f"), 
-                                    "New List Variable", 
-                                    partial(self.act_resource.new_var_list,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "New List Variable",
+                                        self.config.get_theme_icon_var_list(),
+                                        None,
+                                        partial(self.act_resource.new_var_list,self.tree_item,data))
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("490daab16fc73f3decf083a5cfb04b47708c8b22"), 
-                                    "New Dictionary Variable", 
-                                    partial(self.act_resource.new_var_dict,self.tree_item,data))
-
-        self.context_menu.addSeparator()
-
-        self.context_menu.addAction(
-                                    SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
-                                    "Delete", 
-                                    partial(self.act_resource.delete,self.tree_item,data))
-
-        self.context_menu.addAction(
-                                    SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
-                                    "Rename", 
-                                    partial(self.act_resource.rename,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "New Dictionary Variable", 
+                                        self.config.get_theme_icon_var_dict(), 
+                                        None,
+                                        partial(self.act_resource.new_var_dict,self.tree_item,data))
 
         self.context_menu.addSeparator()
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("b28971455cf45af0e2e37a9c33ca8ca01d5a660f"), 
-                                    "Open Folder", 
-                                    partial(self.act_resource.open,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Delete", 
+                                        self.config.get_theme_icon_delete(), 
+                                        None,
+                                        partial(self.act_resource.delete,self.tree_item,data))
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
-                                    "Search in Resource", 
-                                    partial(self.act_resource.search,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Rename",
+                                        self.config.get_theme_icon_rename(),
+                                        None,
+                                        partial(self.act_resource.rename,self.tree_item,data))
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("ffc3fb09c5db2b34f971c0ec4979b73de4f14be5"), 
-                                    "Find Usage", 
-                                    partial(self.act_resource.find_usage,self.tree_item,data))
+        self.context_menu.addSeparator()
+
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Open Folder",
+                                        self.config.get_theme_icon_folder(), 
+                                        None,
+                                        partial(self.act_resource.open,self.tree_item,data))
+
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Search in Resource",
+                                        self.config.get_theme_icon_search(), 
+                                        None,
+                                        partial(self.act_resource.search,self.tree_item,data))
+
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Find Usage", 
+                                        self.config.get_theme_icon_find_usage(), 
+                                        None,
+                                        partial(self.act_resource.find_usage,self.tree_item,data))
 
     def draw_menu_library(self,data):
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("c4c9e8e0c5587117224d03e1b36d2e25d9d096bb"), 
-                                    "Delete", 
-                                    partial(self.act_library.delete,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Delete",
+                                        self.config.get_theme_icon_delete(),
+                                        None,
+                                        partial(self.act_library.delete,self.tree_item,data))
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("e7cec978fe0a220b390f534bc8060904b5a09293"), 
-                                    "Rename", 
-                                    partial(self.act_library.rename,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Rename", 
+                                        self.config.get_theme_icon_rename(),
+                                        None,
+                                        partial(self.act_library.rename,self.tree_item,data))
 
         self.context_menu.addSeparator()
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("b28971455cf45af0e2e37a9c33ca8ca01d5a660f"), 
-                                    "Open Folder", 
-                                    partial(self.act_library.open,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Open Folder",
+                                        self.config.get_theme_icon_folder(),
+                                        None,
+                                        partial(self.act_library.open,self.tree_item,data))
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("ffc3fb09c5db2b34f971c0ec4979b73de4f14be5"), 
-                                    "Find Usage", 
-                                    partial(self.act_library.find_usage,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Find Usage", 
+                                        self.config.get_theme_icon_find_usage(),                                    
+                                        None,
+                                        partial(self.act_library.find_usage,self.tree_item,data))
 
     def draw_menu_ext_resources(self,data):
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
-                                    "Search in External Resource", 
-                                    partial(self.act_ext_resources.search,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        self.config.get_theme_icon_search(), 
+                                        "Search in External Resource", 
+                                        None,
+                                        partial(self.act_ext_resources.search,self.tree_item,data))
 
     def draw_menu_ext_libraries(self,data):
 
-        self.context_menu.addAction(
-                                    SCR_GetIcon("f12404a4b24f4ee746b13893bb7d7e9e67dafd97"), 
-                                    "Search in External Libraries", 
-                                    partial(self.act_ext_libraries.search,self.tree_item,data))
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Search in External Libraries", 
+                                        self.config.get_theme_icon_search(),
+                                        None,
+                                        partial(self.act_ext_libraries.search,self.tree_item,data))
 
     def create_item(self,parent,text):
 
