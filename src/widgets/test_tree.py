@@ -697,6 +697,22 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
 
         self.context_menu.add_action(
                                         self.context_menu,
+                                        "Expand",
+                                        self.config.get_theme_icon_expand(),    
+                                        None,
+                                        partial(self.expandChildren,self.tree_item))
+
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Collapse",
+                                        self.config.get_theme_icon_collapse(), 
+                                        None,
+                                        partial(self.collapseChildren,self.tree_item))
+
+        self.context_menu.add_separator()
+
+        self.context_menu.add_action(
+                                        self.context_menu,
                                         "Open Folder", 
                                         self.config.get_theme_icon_folder(), 
                                         None,
@@ -874,6 +890,22 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
 
         self.context_menu.add_action(
                                         self.context_menu,
+                                        "Expand",
+                                        self.config.get_theme_icon_expand(),    
+                                        None,
+                                        partial(self.expandChildren,self.tree_item))
+
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Collapse",
+                                        self.config.get_theme_icon_collapse(), 
+                                        None,
+                                        partial(self.collapseChildren,self.tree_item))
+
+        self.context_menu.add_separator()
+
+        self.context_menu.add_action(
+                                        self.context_menu,
                                         "Open Folder",
                                         self.config.get_theme_icon_folder(), 
                                         None,
@@ -929,10 +961,26 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
 
         self.context_menu.add_action(
                                         self.context_menu,
-                                        self.config.get_theme_icon_search(), 
-                                        "Search in External Resource", 
+                                        "Search in External Resource",
+                                        self.config.get_theme_icon_search(),                                          
                                         None,
                                         partial(self.act_ext_resources.search,self.tree_item,data))
+
+        self.context_menu.add_separator()
+        
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Expand",
+                                        self.config.get_theme_icon_expand(),    
+                                        None,
+                                        partial(self.expandChildren,self.tree_item))
+
+        self.context_menu.add_action(
+                                        self.context_menu,
+                                        "Collapse",
+                                        self.config.get_theme_icon_collapse(), 
+                                        None,
+                                        partial(self.collapseChildren,self.tree_item))
 
     def draw_menu_ext_libraries(self,data):
 

@@ -658,33 +658,33 @@ class SCR_WDG_Tree(QTreeView):
         self.with_metadata = with_metadata
         self.custom_model  = model_class(config=self.config, parent=self)
 
-    def expandChildren(self,item):
+    def expandChildren(self,item_index):
 
-        if item.isValid():
+        if item_index.isValid():
 
-            _count = item.model().rowCount(item)
+            _row_count = item_index.model().rowCount(item_index)
             
-            for _index in range(_count):
+            for _row in range(_row_count):
 
-                _child = item.child(_index, 0)
+                _child = item_index.model().index(_row, 0, item_index)
 
                 self.expandChildren(_child);            
 
-                self.expand(item)            
+                self.expand(item_index)            
 
-    def collapseChildren(self,item):
+    def collapseChildren(self,item_index):
 
-        if item.isValid():
+        if item_index.isValid():
 
-            _count = item.model().rowCount(item)
+            _row_count = item_index.model().rowCount(item_index)
             
-            for _index in range(_count):
+            for _row in range(_row_count):
 
-                _child = item.child(_index, 0)
+                _child = item_index.model().index(_row, 0, item_index)
 
                 self.collapseChildren(_child);            
 
-                self.collapse(item)  
+                self.collapse(item_index)  
 
     def populate(self, data, header):
 

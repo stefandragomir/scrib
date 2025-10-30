@@ -114,6 +114,10 @@ class SCR_Actions_Tools():
             self.scrib.main_menu.change_debug_logging_tile(True)
             self.logger.set_debug_level(True)
 
+    def search_in_test_tree(self):
+
+        self.scrib.wdg_tree_test.wdg_search.show()
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -183,7 +187,8 @@ class SCR_Actions_Tree_TestFolder():
 
     def __init__(self,scrib):
 
-        self.scrib     = scrib
+        self.scrib  = scrib
+        self.logger = scrib.logger
 
     def new_test_suite(self,tree_item,data):
 
@@ -235,7 +240,12 @@ class SCR_Actions_Tree_TestFolder():
 
     def open(self,tree_item,data):
 
-        pass
+        self.logger.debug("opening folder [{}]".format(data.folder))
+
+        try:
+            os.startfile(data.folder)
+        except:
+             self.logger.error("could not open folder [{}]".format(data.folder))
 
     def search(self,tree_item,data):
 
@@ -252,7 +262,8 @@ class SCR_Actions_Tree_TestSuite():
 
     def __init__(self,scrib):
 
-        self.scrib     = scrib
+        self.scrib  = scrib
+        self.logger = scrib.logger
 
     def new_testcase(self,tree_item,data):
 
@@ -308,7 +319,12 @@ class SCR_Actions_Tree_TestSuite():
 
     def open(self,tree_item,data):
 
-        pass
+        self.logger.debug("opening folder [{}]".format(data.folder))
+
+        try:
+            os.startfile(data.folder)
+        except:
+             self.logger.error("could not open folder [{}]".format(data.folder))
 
     def search(self,tree_item,data):
 
@@ -321,7 +337,8 @@ class SCR_Actions_Tree_Resource():
 
     def __init__(self,scrib):
 
-        self.scrib     = scrib
+        self.scrib  = scrib
+        self.logger = scrib.logger
 
     def new_keyword(self,tree_item,data):
 
@@ -349,7 +366,12 @@ class SCR_Actions_Tree_Resource():
 
     def open(self,tree_item,data):
 
-        pass
+        self.logger.debug("opening folder [{}]".format(data.folder))
+
+        try:
+            os.startfile(data.folder)
+        except:
+             self.logger.error("could not open folder [{}]".format(data.folder))
 
     def search(self,tree_item,data):
 
@@ -366,7 +388,8 @@ class SCR_Actions_Tree_TestCase():
 
     def __init__(self,scrib):
 
-        self.scrib     = scrib
+        self.scrib  = scrib
+        self.logger = scrib.logger
 
     def delete(self,tree_item,data):
 
@@ -391,7 +414,8 @@ class SCR_Actions_Tree_Keyword():
 
     def __init__(self,scrib):
 
-        self.scrib     = scrib
+        self.scrib  = scrib
+        self.logger = scrib.logger
 
     def delete(self,tree_item,data):
 
@@ -420,7 +444,8 @@ class SCR_Actions_Tree_Variable():
 
     def __init__(self,scrib):
 
-        self.scrib     = scrib
+        self.scrib  = scrib
+        self.logger = scrib.logger
 
     def delete(self,tree_item,data):
 
@@ -449,7 +474,8 @@ class SCR_Actions_Tree_Library():
 
     def __init__(self,scrib):
 
-        self.scrib     = scrib
+        self.scrib  = scrib
+        self.logger = scrib.logger
 
     def delete(self,tree_item,data):
 
@@ -474,7 +500,8 @@ class SCR_Actions_Tree_ExtResources():
 
     def __init__(self,scrib):
 
-        self.scrib     = scrib
+        self.scrib  = scrib
+        self.logger = scrib.logger
 
     def search(self,tree_item,data):
 
@@ -487,7 +514,8 @@ class SCR_Actions_Tree_ExtLibraries():
 
     def __init__(self,scrib):
 
-        self.scrib     = scrib
+        self.scrib  = scrib
+        self.logger = scrib.logger
 
     def search(self,tree_item,data):
 

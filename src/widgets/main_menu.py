@@ -116,6 +116,15 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
                         None, 
                         self.scrib.act_tools.toogle_debug_logging)
 
+        _menu_tools.addSeparator()
+
+        self.add_action(
+                        _menu_tools, 
+                        "Find in Test Tree",              
+                        self.config.get_theme_icon_search(),
+                        None, 
+                        self.scrib.act_tools.search_in_test_tree)
+
     def populate_appearance(self):
 
         _menu_appearance = self.add_menu(self,"Appearance")
