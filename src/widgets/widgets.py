@@ -46,30 +46,87 @@ class SCR_WDG_MenuCommon():
 
         self.config = config
 
+        self.css_menu  = """
+                            QMenu
+                            {
+                                border-width: 2px;
+                                border-style: solid;
+                                border-color: %s; 
+                                border-radius: 5px;
+                                background-color: %s;
+                                padding-left: 5px;
+                            }
+
+                            QMenu::item 
+                            {
+                                background-color: %s;
+                                color: %s;
+                                padding-top: 5px;
+                                padding-right: 5px;
+                                padding-bottom: 5px;
+                                padding-left: 5px;
+                            }
+
+                            QMenu::item:selected 
+                            {
+                                background-color: %s; 
+                                color: %s;
+                            }
+
+                            QMenu::separator 
+                            {
+                                height: 2px; 
+                                background-color: %s; 
+                            }
+                        """
+
+        self.css_menu = self.css_menu % (
+                                            self.config.get_theme_border_color(),
+                                            self.config.get_theme_background(),
+                                            self.config.get_theme_background(),
+                                            self.config.get_theme_foreground(),
+                                            self.config.get_theme_sel_background(),
+                                            self.config.get_theme_sel_foreground(),                                            
+                                            self.config.get_theme_sel_background())        
+
+        self.css_menu_bar  = """
+
+                                QMenuBar::item 
+                                {
+                                    background-color: %s;
+                                    color: %s;
+                                    padding-top: 4px;
+                                    padding-right: 10px;
+                                    padding-bottom: 10px;
+                                    padding-left: 10px;
+                                }
+
+                                QMenuBar::item:selected 
+                                {
+                                    background-color: %s; 
+                                    color: %s;
+                                }
+
+                                QMenuBar::separator 
+                                {
+                                    height: 2px; 
+                                    background-color: %s; 
+                                }
+
+                            """
+
+        self.css_menu_bar = self.css_menu_bar % (
+                                                    self.config.get_theme_background(),
+                                                    self.config.get_theme_foreground(),
+                                                    self.config.get_theme_sel_background(),
+                                                    self.config.get_theme_sel_foreground(),                                                    
+                                                    self.config.get_theme_sel_background(),)
+
     def add_menu(self,parent,name):
 
         _menu = parent.addMenu(name)
 
-        _css  = """
-                    QMenu::item {
-                        background-color: %s;
-                        color: %s;
-                        padding: 4px 20px 4px 20px; 
-                    }
-
-                    QMenu::item:selected {
-                        background-color: %s; 
-                        color: %s;
-                    }
-                """
-
-        _css = _css % (
-                            self.config.get_theme_background(),
-                            self.config.get_theme_foreground(),
-                            self.config.get_theme_sel_background(),
-                            self.config.get_theme_sel_foreground())
-
-        _menu.setStyleSheet(_css)
+        _menu.setStyleSheet(self.css_menu)
 
         return _menu
 
@@ -87,6 +144,9 @@ class SCR_WDG_MenuCommon():
 
         return _action
 
+    def add_separator(self):
+
+        self.addSeparator()
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -99,38 +159,7 @@ class SCR_WDG_MenuBar(SCR_WDG_MenuCommon,QMenuBar):
 
         SCR_WDG_MenuCommon.__init__(self,config)
 
-        _css  = """
-                    QMenuBar::item 
-                    {
-                        background-color: %s;
-                        color: %s;
-                        padding: 4px 20px 4px 20px;
-                    }
-
-                    QMenuBar::item:selected 
-                    {
-                        background-color: %s; 
-                        color: %s;
-                    }
-
-                    QMenuBar QAbstractItemView::item
-                    {
-
-                        border-width: 3px;
-                        border-style: solid;
-                        border-color: #E74C3C; 
-                        border-radius: 5px;
-                    }
-
-                """
-
-        _css = _css % (
-                            self.config.get_theme_background(),
-                            self.config.get_theme_foreground(),
-                            self.config.get_theme_sel_background(),
-                            self.config.get_theme_sel_foreground())
-
-        self.setStyleSheet(_css)
+        self.setStyleSheet(self.css_menu_bar)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -143,39 +172,7 @@ class SCR_WDG_Menu(SCR_WDG_MenuCommon,QMenu):
 
         SCR_WDG_MenuCommon.__init__(self,config)
 
-        _css  = """
-                    QMenu::item 
-                    {
-                        background-color: %s;
-                        color: %s;
-                        padding: 4px 20px 4px 20px;
-                    }
-
-                    QMenu::item:selected 
-                    {
-                        background-color: %s; 
-                        color: %s;
-                    }
-
-                    QMenu QAbstractItemView::item
-                    {
-
-                        border-width: 3px;
-                        border-style: solid;
-                        border-color: #E74C3C; 
-                        border-radius: 5px;
-                    }
-
-                """
-
-        _css = _css % (
-                            self.config.get_theme_background(),
-                            self.config.get_theme_foreground(),
-                            self.config.get_theme_sel_background(),
-                            self.config.get_theme_sel_foreground())
-
-        self.setStyleSheet(_css)
-
+        self.setStyleSheet(self.css_menu)
 
 """*************************************************************************************************
 ****************************************************************************************************

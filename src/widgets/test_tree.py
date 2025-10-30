@@ -498,7 +498,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_testfolder.new_folder,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -514,7 +514,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_testfolder.rename,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -537,7 +537,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_testfolder.sel_all_passed,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -560,7 +560,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_testfolder.desel_all_passed,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -576,19 +576,19 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.collapseChildren,self.tree_item))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
                                         "Open Folder",
-                                        self.config.get_theme_icon_search(), 
+                                        self.config.get_theme_icon_folder(), 
                                         None,
                                         partial(self.act_testfolder.open,self.tree_item,data))
 
         self.context_menu.add_action(
                                         self.context_menu,
                                         "Search in Folder",
-                                        self.config.get_theme_icon_folder(), 
+                                        self.config.get_theme_icon_search(), 
                                         None,
                                         partial(self.act_testfolder.search,self.tree_item,data))
 
@@ -629,7 +629,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_testsuite.new_var_dict,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -652,7 +652,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_testsuite.sel_all_passed,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -677,7 +677,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         partial(self.act_testsuite.desel_all_passed,self.tree_item,data))
 
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -693,7 +693,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_testsuite.rename,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -726,7 +726,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_testcase.rename,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -758,7 +758,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_keyword.rename,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -774,7 +774,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_keyword.movedown,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -799,7 +799,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_variable.rename,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -815,7 +815,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_variable.movedown,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -854,7 +854,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_resource.new_var_dict,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -870,7 +870,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_resource.rename,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
@@ -909,7 +909,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                                         None,
                                         partial(self.act_library.rename,self.tree_item,data))
 
-        self.context_menu.addSeparator()
+        self.context_menu.add_separator()
 
         self.context_menu.add_action(
                                         self.context_menu,
