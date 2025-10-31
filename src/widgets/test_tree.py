@@ -24,7 +24,7 @@ from actions.actions       import SCR_Actions_Tree_Library
 from actions.actions       import SCR_Actions_Tree_ExtResources
 from actions.actions       import SCR_Actions_Tree_ExtLibraries
 from functools             import partial
-
+from messenger.messenger   import SCR_Messenger
 
 """******************************************************************************************
 *********************************************************************************************
@@ -393,6 +393,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
         self.act_library       = SCR_Actions_Tree_Library(self.scrib)
         self.act_ext_resources = SCR_Actions_Tree_ExtResources(self.scrib)
         self.act_ext_libraries = SCR_Actions_Tree_ExtLibraries(self.scrib)
+        self.messenger         = SCR_Messenger()
 
         SCR_WDG_Tree.__init__(
                                 self,
@@ -1018,6 +1019,8 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
                 _data = self.custom_model.data(_item_index,Qt.ItemDataRole.UserRole)
 
                 if _data["data"] != None:
+
+                    self.messenger.publish("TestTreeSelectionChange",_data)
 
                     _status_bar_label = _data["data"].get_status_label()
 

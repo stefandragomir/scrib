@@ -23,6 +23,7 @@ from actions.actions          import SCR_Actions_Help
 from logger.logger            import SCR_Logger
 from utils.utils              import scr_get_logger_dir
 from widgets.console          import SCR_WDG_Console
+from messenger.messenger      import SCR_Messenger
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -35,6 +36,10 @@ class SCR_UI(QMainWindow):
 
         self.config          = config
         self.logger          = SCR_Logger()
+        self.messenger       = SCR_Messenger()
+
+        self.configure_messenger()
+
         self.ctrl            = SCR_Control(self.logger)
         self.app             = app
         self.preferences     = SCR_Preferences()
@@ -42,6 +47,7 @@ class SCR_UI(QMainWindow):
         self.act_tools       = SCR_Actions_Tools(self,self.logger)
         self.act_help        = SCR_Actions_Help(self,self.logger)
         self.act_appearance  = SCR_Actions_Appearance(self,self.logger)
+        
         self.console_visible = False
 
         self.preferences.load()
@@ -168,6 +174,14 @@ class SCR_UI(QMainWindow):
         self.logger.set_path(_path)
 
         self.logger.set_ui(self.wdg_console)
+
+    def configure_messenger(self):
+
+        #used to signal that the Test Tree selected item (no matter the item) has changed
+        self.messenger.create_message("TestTreeSelectionChange")
+
+        #used to signal that the Test Tree selection has changed from one editable item to another
+        self.messenger.create_message("TestTreeEditorSelectionChange")
 
 """*************************************************************************************************
 ****************************************************************************************************
