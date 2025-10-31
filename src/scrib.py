@@ -5,24 +5,25 @@ import error.error
 from PyQt6.QtCore             import *
 from PyQt6.QtGui              import *
 from PyQt6.QtWidgets          import * 
-from config.config            import SCR_Config
 from widgets.widgets          import SCR_WDG_DockWidget
 from widgets.widgets          import SCR_WDG_ToolBar
 from widgets.widgets          import SCR_WDG_ActionBar
 from widgets.status_bar       import SCR_WDG_MainStatusBar
 from widgets.main_menu        import SCR_WDG_MainMenu
-from icons.icons              import SCR_GetIcon
 from widgets.test_tree        import SCR_WDG_TestTree_Widget
 from widgets.test_tab         import SCR_WDG_Test_Tab
-from control.control          import SCR_Control
-from preferences.preferences  import SCR_Preferences
+from widgets.console          import SCR_WDG_Console
+from widgets.plugin_manager   import SCR_PluginManager
 from actions.actions          import SCR_Actions_File
 from actions.actions          import SCR_Actions_Tools
 from actions.actions          import SCR_Actions_Appearance
 from actions.actions          import SCR_Actions_Help
+from config.config            import SCR_Config
+from icons.icons              import SCR_GetIcon
+from control.control          import SCR_Control
+from preferences.preferences  import SCR_Preferences
 from logger.logger            import SCR_Logger
 from utils.utils              import scr_get_logger_dir
-from widgets.console          import SCR_WDG_Console
 from messenger.messenger      import SCR_Messenger
 
 """*************************************************************************************************
@@ -47,6 +48,7 @@ class SCR_UI(QMainWindow):
         self.act_tools       = SCR_Actions_Tools(self,self.logger)
         self.act_help        = SCR_Actions_Help(self,self.logger)
         self.act_appearance  = SCR_Actions_Appearance(self,self.logger)
+        self.plugin_manager  = SCR_PluginManager(self.logger)
         
         self.console_visible = False
 
@@ -177,11 +179,133 @@ class SCR_UI(QMainWindow):
 
     def configure_messenger(self):
 
+        self.configure_messenger_test_tree()
+
+        self.configure_messenger_main_menu()
+
+        self.configure_messenger_new_items()
+
+        self.configure_messenger_delete_items()
+
+        self.configure_messenger_rename_items()
+
+    def configure_messenger_test_tree(self):
+
         #used to signal that the Test Tree selected item (no matter the item) has changed
+        #data - controller of object in tree
         self.messenger.create_message("TestTreeSelectionChange")
 
-        #used to signal that the Test Tree selection has changed from one editable item to another
-        self.messenger.create_message("TestTreeEditorSelectionChange")
+    def configure_messenger_main_menu(self):
+
+        #used to signal that the Main Menu New option has been selected
+        #data - path to the new test folder
+        self.messenger.create_message("MainMenuNew")
+
+        #used to signal that the Main Menu Open Test Folder or Recent Folder has been selected
+        #data - path to the new test folder
+        self.messenger.create_message("MainMenuOpenTestFolder")
+
+        #used to signal that the Main Menu Save has been selected
+        #data - None
+        self.messenger.create_message("MainMenuSave")
+
+        #used to signal that the Main Menu Show Console has been selected
+        #data - None
+        self.messenger.create_message("MainMenuShowConsole")
+
+        #used to signal that the Main Menu Hide Console has been selected
+        #data - None
+        self.messenger.create_message("MainMenuHideConsole")
+
+    def configure_messenger_new_items(self):
+
+        #used to signal that a new Test Suite has been created
+        #data - controller of new Test Suite
+        self.messenger.create_message("NewTestSuite")
+
+        #used to signal that a new Resource has been created
+        #data - controller of new Resource
+        self.messenger.create_message("NewResource")
+
+        #used to signal that a new Test Case has been created
+        #data - controller of new Test Case
+        self.messenger.create_message("NewTestCase")
+
+        #used to signal that a new Keyword has been created
+        #data - controller of new Keyword
+        self.messenger.create_message("NewTestKeyword")
+
+        #used to signal that a new Scalar Variable has been created
+        #data - controller of new Scalar Variable
+        self.messenger.create_message("NewVariableScalar")
+
+        #used to signal that a new List Variable has been created
+        #data - controller of new List Variable
+        self.messenger.create_message("NewVariableList")
+
+        #used to signal that a new Dictionary Variable has been created
+        #data - controller of new Dictionary Variable
+        self.messenger.create_message("NewVariableDictionary")
+
+    def configure_messenger_delete_items(self):
+
+        #used to signal that a Test Suite has been deleted
+        #data - controller of old Test Suite
+        self.messenger.create_message("DeleteTestSuite")
+
+        #used to signal that a Resource has been deleted
+        #data - controller of old Resource
+        self.messenger.create_message("DeleteResource")
+
+        #used to signal that a Test Case has been deleted
+        #data - controller of old Test Case
+        self.messenger.create_message("DeleteTestCase")
+
+        #used to signal that a Keyword has been deleted
+        #data - controller of old Keyword
+        self.messenger.create_message("DeleteTestKeyword")
+
+        #used to signal that a Scalar Variable has been deleted
+        #data - controller of old Scalar Variable
+        self.messenger.create_message("DeleteVariableScalar")
+
+        #used to signal that a List Variable has been deleted
+        #data - controller of old List Variable
+        self.messenger.create_message("DeleteVariableList")
+
+        #used to signal that a Dictionary Variable has been deleted
+        #data - controller of old Dictionary Variable
+        self.messenger.create_message("DeleteVariableDictionary")
+
+    def configure_messenger_rename_items(self):
+
+        #used to signal that a Test Suite has been renamed
+        #data - [controller of Test Suite, old name]
+        self.messenger.create_message("RenameTestSuite")
+
+        #used to signal that a Resource has been renamed
+        #data - [controller of Resource, old name]
+        self.messenger.create_message("RenameResource")
+
+        #used to signal that a Test Case has been renamed
+        #data - [controller of Test Case, old name]
+        self.messenger.create_message("RenameTestCase")
+
+        #used to signal that a Keyword has been renamed
+        #data - [controller of Keyword, old name]
+        self.messenger.create_message("RenameTestKeyword")
+
+        #used to signal that a Scalar Variable has been renamed
+        #data - [controller of Scalar Variable, old name]
+        self.messenger.create_message("RenameVariableScalar")
+
+        #used to signal that a List Variable has been renamed
+        #data - [controller of List Variable, old name]
+        self.messenger.create_message("RenameVariableList")
+
+        #used to signal that a Dictionary Variable has been renamed
+        #data - [controller of Dictionary Variable, old name]
+        self.messenger.create_message("RenameVariableDictionary")
 
 """*************************************************************************************************
 ****************************************************************************************************

@@ -66,11 +66,10 @@ class SCR_Message():
         self.name        = name
         self.subscribers = SCR_Base_List()
 
-    def add_subscriber(self,name,callout):
+    def add_subscriber(self,callout):
 
         _subscriber = SCR_Messenger_Subscriber()
 
-        _subscriber.name    = name
         _subscriber.callout = callout
 
         self.subscribers.add(_subscriber)
@@ -108,7 +107,6 @@ class SCR_Messenger_Subscriber():
 
     def __init__(self):
 
-        self.name     = ""
         self.callout = None
 
     def __repr__(self):
@@ -121,6 +119,6 @@ class SCR_Messenger_Subscriber():
 
     def __print(self):
         
-        _txt = "    Subscriber [{}] [{}]".format(self.name, self.callout)
+        _txt = "    Subscriber [{}]".format(self.name, self.callout)
 
         return _txt
