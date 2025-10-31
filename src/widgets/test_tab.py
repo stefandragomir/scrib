@@ -13,9 +13,10 @@ from widgets.widgets       import SCR_WDG_Tab
 ******************************************************************************************"""
 class SCR_WDG_Test_Tab(SCR_WDG_Tab):
 
-	def __init__(self,config):
+	def __init__(self,config,plugins):
 
-		self.config = config
+		self.config  = config
+		self.plugins = plugins
 
 		SCR_WDG_Tab.__init__(self,config)
 
@@ -23,16 +24,18 @@ class SCR_WDG_Test_Tab(SCR_WDG_Tab):
 
 	def draw_gui(self):
 
-		pass
+		for _plugin in self.plugins:
 
-		# self.wdg_editor      = self.add_tab("Edit")
-		# self.wdg_editor_grid = SCR_WDG_EditorGrid(self.config,self.wdg_editor)
+			self.draw_plugin(_plugin)
 
-		# self.ly = QVBoxLayout()
+	def draw_plugin(self,plugin):
 
-		# self.ly.addWidget(self.wdg_editor_grid)
+		_wdg_tab = self.add_tab(plugin.instance.name)
 
-		# self.wdg_editor.setLayout(self.ly)
+		plugin.instance.load()
 
-		# #debug
-		# self.wdg_editor_grid.populate()
+		self.ly = QVBoxLayout()
+
+		self.ly.addWidget(plugin.instance)
+
+		_wdg_tab.setLayout(self.ly)

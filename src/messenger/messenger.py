@@ -30,13 +30,13 @@ class SCR_Messenger():
 
             _message.publish(data)
 
-    def subscribe(self,message_name,subscriber_name,callout):
+    def subscribe(self,message_name,callout):
 
         _message = self.messages.find_by_attribute("name",message_name)
 
         if _message != None:
 
-            _message.add_subscriber(subscriber_name,callout)
+            _message.add_subscriber(callout)
 
     def __repr__(self):
 

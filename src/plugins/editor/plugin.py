@@ -21,7 +21,7 @@ class SCR_EditorPlugin(SCR_Plugin):
                                 self,
                                 name="Editor",
                                 author="stefan.dragomir",
-                                version="1.0.0"
+                                version="1.0.0",
                                 config=config,
                                 logger=logger,
                                 preferences=preferences)
@@ -32,10 +32,14 @@ class SCR_EditorPlugin(SCR_Plugin):
 
         self.subscribe()
 
+    def unload(self):
+
+        pass
+
     def draw_gui(self):
 
         self.table = SCR_WDG_Table(
-                                    config=config, 
+                                    config=self.config, 
                                     search_clbk=None, 
                                     with_metadata=True, 
                                     model_class=SCR_WDG_EditorGrid_Model)

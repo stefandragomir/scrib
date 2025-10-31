@@ -26,8 +26,6 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
 
         self.populate_tools()
 
-        self.populate_plugins()
-
         self.populate_appearance()
 
         self.populate_help()
@@ -149,10 +147,6 @@ class SCR_WDG_MainMenu(SCR_WDG_MenuBar):
                         self.config.get_theme_icon_theme_normal(),
                         None, 
                         self.scrib.act_appearance.set_theme_normal)
-
-    def populate_plugins(self):
-
-        _menu_plugins = self.add_menu(self,"Plugins")
 
     def populate_help(self):
 

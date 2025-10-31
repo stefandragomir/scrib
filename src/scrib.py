@@ -35,28 +35,27 @@ class SCR_UI(QMainWindow):
 
         QMainWindow.__init__(self)
 
+        self.app             = app
         self.config          = config
         self.logger          = SCR_Logger()
         self.messenger       = SCR_Messenger()
+        self.preferences     = SCR_Preferences()
 
+        self.preferences.load()
+        self.configure_logger()
         self.configure_messenger()
 
-        self.ctrl            = SCR_Control(self.logger)
-        self.app             = app
-        self.preferences     = SCR_Preferences()
+        self.ctrl            = SCR_Control(self.logger)        
         self.act_file        = SCR_Actions_File(self,self.logger)
         self.act_tools       = SCR_Actions_Tools(self,self.logger)
         self.act_help        = SCR_Actions_Help(self,self.logger)
         self.act_appearance  = SCR_Actions_Appearance(self,self.logger)
-        self.plugin_manager  = SCR_PluginManager(self.logger)
-        
+        self.plugin_manager  = SCR_PluginManager(self.config,self.logger,self.preferences)
         self.console_visible = False
 
-        self.preferences.load()
+        self.plugin_manager.load_plugins()
 
-        self.draw_gui() 
-
-        self.configure_logger()
+        self.draw_gui()       
 
     def draw_gui(self):
 
@@ -127,7 +126,9 @@ class SCR_UI(QMainWindow):
 
     def draw_test_tab(self):
 
-        self.wdg_test_tab = SCR_WDG_Test_Tab(self.config)
+        self.wdg_test_tab = SCR_WDG_Test_Tab(
+                                                self.config,
+                                                self.plugin_manager.plugins)
 
         _policy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
 
@@ -165,6 +166,8 @@ class SCR_UI(QMainWindow):
 
         self.dock_console.hide()
 
+        self.logger.set_ui(self.wdg_console)
+
     def configure_logger(self):
 
         _path = scr_get_logger_dir() 
@@ -173,9 +176,7 @@ class SCR_UI(QMainWindow):
 
         self.logger.set_debug_level(self.preferences.get("debug_logging"))
 
-        self.logger.set_path(_path)
-
-        self.logger.set_ui(self.wdg_console)
+        self.logger.set_path(_path)        
 
     def configure_messenger(self):
 
