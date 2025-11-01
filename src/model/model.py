@@ -150,25 +150,39 @@ class SCR_Model_WithStatements():
 
     def __init__(self):
 
+        #map of statement types to methods that return 
+        #the number of cells ocupied by the statement
         self._map_size = {
                                 EmptyLine  :  self.get_statement_empty_line_size,
                                 KeywordCall:  self.get_statement_keyword_call_size,
                         }
 
     def get_statements(self):
+        """
+        Method returns a list of all statements in the model
+        """
 
         return self.rf_model.body
 
     def get_statement_by_index(self,index):
+        """
+        Method returns the statement positioned at an index in the model
+        """
 
         return self.rf_model.body[index]
 
     def get_statement_text_by_index(self,index):
+        """
+        Return the entire text of a statement
+        Each relevant token will be placed the list
+        Method does not return text control tokens (spaces, end of lines, etc)
+        """
 
         _text = []
 
         for _token in self.rf_model.body[index].tokens:
 
+            #statement text control token will not be returned
             if _token.type not in  [Token.SEPARATOR,Token.EOL,Token.EOS]:
 
                 _text.append(_token.value)
@@ -176,28 +190,36 @@ class SCR_Model_WithStatements():
         return _text
 
     def get_nr_of_statements(self):
+        """
+        Return the number of statements in the model without the last one
+        Last statement is End Of File
+        """
 
-        return len(self.rf_model.body)
+        return len(self.rf_model.body) - 1
 
     def get_max_statement_size(self):
         """
-        Get the maximum number of operands used in any statement in the model
+        Get the maximum number of cells used in any statement in the model
         Used to determine the number of columns needed in the editor grid
         """
 
+        #depending on the type of the statement, the maximum number of cells is returned
         _size = max(self._map_size[type(_statement)](_statement) for _statement in self.rf_model.body)
 
         return _size
 
     def get_statement_size(self,statement):
         """
-        Get the number of operands used in any statement in the model
+        Get the number of cells used in any statement in the model
         Used to determine the number of columns needed in the editor grid
         """
 
         return self._map_size[type(statement)](statement)
 
     def get_statement_keyword_call_size(self,statement):
+        """
+        Method returns the number of cells used by a keyword call statement
+        """
 
         #add one for the keyword call
         _statement_size = 1
@@ -211,6 +233,9 @@ class SCR_Model_WithStatements():
         return _statement_size
 
     def get_statement_empty_line_size(self,statement):
+        """
+        Method returns the number of cells used by an empty statement
+        """
 
         return 0
 

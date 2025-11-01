@@ -2,6 +2,7 @@
 import os
 import sys
 import error.error
+from functools                import partial
 from PyQt6.QtCore             import *
 from PyQt6.QtGui              import *
 from PyQt6.QtWidgets          import * 
@@ -313,11 +314,11 @@ class SCR_UI(QMainWindow):
 *************************************************************************************************"""
 def SCR():
 
-    sys.excepthook = error.error.SCR_Err_Net
+    _config = SCR_Config()
+
+    sys.excepthook = partial(error.error.SCR_Err_Net,_config)
 
     _app    = QApplication(sys.argv)  
-
-    _config = SCR_Config()
 
     _ui     = SCR_UI(_app,_config)    
 

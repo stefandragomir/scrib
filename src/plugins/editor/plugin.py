@@ -79,12 +79,13 @@ class SCR_EditorPlugin(SCR_Plugin):
 *************************************************************************************************"""
 class SCR_WDG_EditorGrid_Item(object):
 
-    def __init__(self,config,data,row,column):
+    def __init__(self,config,data,row,column,empty):
 
         self.item_data        = data
         self.item_row         = row
         self.item_column      = column
         self.tooltip          = None
+        self.empty            = empty
         self.background_color = config.get_theme_background()
 
     def clear(self):
@@ -92,14 +93,23 @@ class SCR_WDG_EditorGrid_Item(object):
         Empty the table item of all data
         """
 
-        self.item_data   = None
-        self.tooltip     = None
+        self.item_data  = None
+        self.tooltip    = None
+        self.empty      = True
 
     def get_text(self):
+        """
+        Get the text held by this table cell item
+        If the table cell item is empty no text is returned
+        """
 
-        _text_cells = self.item_data.model.get_statement_text_by_index(self.item_row)
+        _text = ""
 
-        return _text_cells[self.item_column]
+        if self.empty == False:
+
+            _text = self.item_data.model.get_statement_text_by_index(self.item_row)[self.item_column]
+
+        return _text
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -126,33 +136,57 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
         #the table received data will be a scrib controller
         self.data = data
 
-        _row = 0
+        _max_rows    = self.rowCount(None) + 1
+        _max_columns = self.columnCount(None) + 1
+        _statements  = self.data.model.get_statements()
 
-        for _statement in self.data.model.get_statements():
+        print("_max_rows [{}] _max_columns [{}]".format(_max_rows,_max_columns))
 
-            _list_operands = SCR_Base_List()
+        #number of rows is equal to the number of statements (usefull) in the model
+        for _row in range(_max_rows):
 
-            for _column in range(self.data.model.get_statement_size(_statement)):
+            _list_cells     = SCR_Base_List()
 
+            if _row < len(_statements):
+
+                _statement_size = self.data.model.get_statement_size(_statements[_row])
+            else:
+                _statement_size = 0
+
+            #number of columns is the numbers of cells of the largest statement plus one (for design)
+            for _column in range(_max_columns):
+
+                print("empty: empty [{}] _row [{}] _column [{}] _statement_size [{}]".format(_column > (_statement_size - 1),_row,_column,_statement_size))
+
+                #create a new table item for each statement and each cell
                 _item = SCR_WDG_EditorGrid_Item(
                                                     config=self.config, 
                                                     data=self.data, 
                                                     row=_row,
-                                                    column=_column)
+                                                    column=_column,
+                                                    empty=_column > (_statement_size - 1))
 
-                _list_operands.add(_item)
+                _list_cells.add(_item)
 
-            _row += 1
-
-            self.items.add(_list_operands)
+            self.items.add(_list_cells)
 
     def rowCount(self, index):
+        """
+        Method called by QTableView widget to know how many roes to create
+        """
 
-        return 2
+        #number of row is the number of statements minus the last one (EOF)
+        #added one more row for visual reasons and editing
+        return self.data.model.get_nr_of_statements() + 1
 
     def columnCount(self, index):
+        """
+        Method called by QTableView widget to know how many roes to create
+        """
 
-        return 3
+        #number of columns is the maximum number of cells used by any statement
+        #added one more column vor visual reasons and editing
+        return self.data.model.get_max_statement_size() + 1
 
     def insertRow(self,row,data,data_index):
         """
@@ -180,6 +214,10 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
         return _index
         
     def data(self, index, role):
+        """
+        Method called by QTableView when data about a table index is needed
+        Role defines what type of data is requested
+        """
 
         _data = None
 
@@ -202,7 +240,7 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
             elif role == Qt.ItemDataRole.UserRole:
 
                 _item = index.internalPointer()
-                _data = [_item.item_data,_item.item_data_index]
+                _data = _item.item_data
 
             elif role == Qt.ItemDataRole.BackgroundRole:
 
@@ -233,6 +271,10 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
         return _index
 
     def parent(self, index):
+        """
+        Table indexes do not have parent
+        Return Nothing
+        """
 
         _parent = QModelIndex()
 

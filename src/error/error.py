@@ -12,8 +12,9 @@ from config.config       import SCR_VERSION
 *************************************************************************************************"""
 class SCR_Err(object):
 
-    def __init__(self, err_type, err_value, err_traceback):
+    def __init__(self, config, err_type, err_value, err_traceback):
 
+        self.config    = config
         self.err_value = str(err_value)
         self.err_type  = str(err_type)
         self.traceback = "\n".join(traceback.format_exception(err_type, err_value, err_traceback))
@@ -41,10 +42,11 @@ class SCR_Err(object):
 
             _trans.write( yaml.dump(_data, default_flow_style=False))
 
-        SCR_WDG_PopUp(
-                        title="Scrib Error", 
-                        txt="Scrib has encountered an error. Please contact development and send them the file %s" % (self.path,), 
-                        msgtype="information")
+        # SCR_WDG_PopUp(
+        #                 self.config,
+        #                 title="Scrib Error", 
+        #                 txt="Scrib has encountered an error. Please contact development and send them the file %s" % (self.path,), 
+        #                 msgtype="information")
 
     def __repr__(self):
 
@@ -68,9 +70,9 @@ class SCR_Err(object):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-def SCR_Err_Net(err_type, err_value, err_traceback):
+def SCR_Err_Net(config, err_type, err_value, err_traceback):
 
-    _err = SCR_Err(err_type, err_value, err_traceback)
+    _err = SCR_Err(config, err_type, err_value, err_traceback)
 
     _err.save()
 

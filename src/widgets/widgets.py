@@ -747,9 +747,10 @@ class SCR_WDG_Table(QTableView):
         _css += "color: {};".format(self.config.get_theme_foreground(),)  
         _css += "selection-color: {};".format(self.config.get_theme_sel_foreground(),) 
         _css += "selection-background-color: {};".format(self.config.get_theme_sel_background(),) 
-        _css += "font-family: Arial;"
-        _css += "font-size: 9pt;"
+        _css += "font-family: Consolas;"
+        _css += "font-size: 10pt;"
         _css += "border: 1px solid {};".format(self.config.get_theme_border_color())
+        _css += "border-color: {}".format(self.config.get_theme_border_color())
 
         self.setStyleSheet(_css)
 
