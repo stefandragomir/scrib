@@ -53,6 +53,8 @@ class SCR_EditorPlugin(SCR_Plugin):
                                     config=self.config, 
                                     model_class=SCR_WDG_EditorGrid_Model)
 
+        self.table.setWordWrap(True)
+
         self.ly = QVBoxLayout()
 
         self.ly.addWidget(self.table)    

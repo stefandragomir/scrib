@@ -6,12 +6,15 @@ from robot.parsing.model.blocks       import TestCaseSection
 from robot.parsing.model.blocks       import VariableSection
 from robot.parsing.model.blocks       import KeywordSection
 from robot.parsing.model.blocks       import SettingSection
+from robot.parsing.model.blocks       import Keyword
 from robot.parsing.model.statements   import Variable
 from robot.parsing.model.statements   import ResourceImport
 from robot.parsing.model.statements   import LibraryImport
-from robot.parsing.model.blocks       import Keyword
+from robot.parsing.model.statements   import Documentation
 from robot.parsing.model.statements   import KeywordCall
 from robot.parsing.model.statements   import EmptyLine
+from robot.parsing.model.statements   import Tags
+from robot.parsing.model.statements   import Comment
 from robot.parsing.lexer.tokens       import Token
 
 """*************************************************************************************************
@@ -153,9 +156,25 @@ class SCR_Model_WithStatements():
         #map of statement types to methods that return 
         #the number of cells ocupied by the statement
         self._map_size = {
-                                EmptyLine  :  self.get_statement_empty_line_size,
-                                KeywordCall:  self.get_statement_keyword_call_size,
+                                EmptyLine     : self.get_statement_empty_line_size,
+                                KeywordCall   : self.get_statement_keyword_call_size,
+                                Documentation : self.get_statement_documentation_size,
+                                Tags          : self.get_statement_tags_size,
+                                Comment       : self.get_statement_comment_size,
                         }
+
+    def get_statement_visible_tokens(self,statement):
+        """
+        Method receives a rf statement and returns tokens that should be visible to the user
+        Returns token that are not space separators of end of line
+        """
+
+        _non_functional_tokens = [
+                                    Token.SEPARATOR,
+                                    Token.EOL,
+                                    Token.EOS]
+
+        return [_token for _token in statement.tokens if _token.type not in _non_functional_tokens]
 
     def get_statements(self):
         """
@@ -178,14 +197,7 @@ class SCR_Model_WithStatements():
         Method does not return text control tokens (spaces, end of lines, etc)
         """
 
-        _text = []
-
-        for _token in self.rf_model.body[index].tokens:
-
-            #statement text control token will not be returned
-            if _token.type not in  [Token.SEPARATOR,Token.EOL,Token.EOS]:
-
-                _text.append(_token.value)
+        _text = [_token.value for _token in self.get_statement_visible_tokens(self.rf_model.body[index])]
 
         return _text
 
@@ -238,6 +250,20 @@ class SCR_Model_WithStatements():
         """
 
         return 0
+
+    def get_statement_documentation_size(self,statement):
+
+        return 0
+
+    def get_statement_tags_size(self,statement):
+
+        return 0
+
+    def get_statement_comment_size(self,statement):
+
+        _statement_size = len(self.get_statement_visible_tokens(statement))
+
+        return _statement_size
 
 """*************************************************************************************************
 ****************************************************************************************************
