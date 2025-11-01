@@ -9,6 +9,7 @@ from widgets.widgets        import SCR_WDG_Widget
 from widgets.widgets        import SCR_WDG_Table
 from widgets.plugin_manager import SCR_Plugin
 from control.control        import SCR_Control_TestCase
+from control.control        import SCR_Control_Keyword
 from model.model            import SCR_Base_List
 
 """******************************************************************************************
@@ -70,8 +71,13 @@ class SCR_EditorPlugin(SCR_Plugin):
         Function called by scrib when the user selects a new item in the test tree
         """
 
-        if type(data) == SCR_Control_TestCase:
+        #only test case and keyword populate the editor table
+        if type(data) in [SCR_Control_TestCase,SCR_Control_Keyword]:
 
+            #empty entire table
+            self.table.clear()
+
+            #populate table with new controller
             self.table.populate(data)
 
 """*************************************************************************************************
@@ -93,9 +99,11 @@ class SCR_WDG_EditorGrid_Item(object):
         Empty the table item of all data
         """
 
-        self.item_data  = None
-        self.tooltip    = None
-        self.empty      = True
+        self.item_data        = None
+        self.item_row         = -1
+        self.item_column      = -1
+        self.tooltip          = None
+        self.empty            = True
 
     def get_text(self):
         """
@@ -133,14 +141,14 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
         Load all data from a scrib controller in the table view
         """
 
+        self.items = SCR_Base_List()
+
         #the table received data will be a scrib controller
         self.data = data
 
         _max_rows    = self.rowCount(None) + 1
         _max_columns = self.columnCount(None) + 1
         _statements  = self.data.model.get_statements()
-
-        print("_max_rows [{}] _max_columns [{}]".format(_max_rows,_max_columns))
 
         #number of rows is equal to the number of statements (usefull) in the model
         for _row in range(_max_rows):
@@ -155,8 +163,6 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
 
             #number of columns is the numbers of cells of the largest statement plus one (for design)
             for _column in range(_max_columns):
-
-                print("empty: empty [{}] _row [{}] _column [{}] _statement_size [{}]".format(_column > (_statement_size - 1),_row,_column,_statement_size))
 
                 #create a new table item for each statement and each cell
                 _item = SCR_WDG_EditorGrid_Item(
@@ -283,5 +289,11 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
     def clear(self):
 
         self.beginResetModel()
+
+        for _row in self.items:
+
+            for _item in _row:
+
+                _item.clear()
 
         self.endResetModel()
