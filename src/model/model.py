@@ -154,6 +154,14 @@ class SCR_Model_WithStatements():
                                 KeywordCall:  self.get_statement_keyword_call_size,
                         }
 
+    def get_statements(self):
+
+        return self.rf_model.body
+
+    def get_statement_by_index(self,index):
+
+        return self.rf_model.body[index]
+
     def get_nr_of_statements(self):
 
         return len(self.rf_model.body)
@@ -164,7 +172,7 @@ class SCR_Model_WithStatements():
         Used to determine the number of columns needed in the editor grid
         """
 
-        _size = max(_map[type(_statement)](_statement) for _statement in self.rf_model.body)
+        _size = max(self._map_size[type(_statement)](_statement) for _statement in self.rf_model.body)
 
         return _size
 
@@ -174,7 +182,7 @@ class SCR_Model_WithStatements():
         Used to determine the number of columns needed in the editor grid
         """
 
-        return self._map_size[type(statement)]
+        return self._map_size[type(statement)](statement)
 
     def get_statement_keyword_call_size(self,statement):
 

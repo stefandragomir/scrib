@@ -736,7 +736,7 @@ class SCR_WDG_Tree(QTreeView):
 *************************************************************************************************"""
 class SCR_WDG_Table(QTableView):
 
-    def __init__(self, config, search_clbk, model_class):
+    def __init__(self, config, model_class):
 
         QTreeView.__init__(self)
 
@@ -755,8 +755,7 @@ class SCR_WDG_Table(QTableView):
 
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
-        self.search_clbk   = search_clbk
-        self.custom_model  = model_class(config=self.config, parent=self)
+        self.custom_model = model_class(config=self.config, parent=self)
 
     def populate(self, data):
 
