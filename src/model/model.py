@@ -12,6 +12,7 @@ from robot.parsing.model.statements   import LibraryImport
 from robot.parsing.model.blocks       import Keyword
 from robot.parsing.model.statements   import KeywordCall
 from robot.parsing.model.statements   import EmptyLine
+from robot.parsing.lexer.tokens       import Token
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -161,6 +162,18 @@ class SCR_Model_WithStatements():
     def get_statement_by_index(self,index):
 
         return self.rf_model.body[index]
+
+    def get_statement_text_by_index(self,index):
+
+        _text = []
+
+        for _token in self.rf_model.body[index].tokens:
+
+            if _token.type not in  [Token.SEPARATOR,Token.EOL,Token.EOS]:
+
+                _text.append(_token.value)
+
+        return _text
 
     def get_nr_of_statements(self):
 

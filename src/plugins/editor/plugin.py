@@ -95,6 +95,12 @@ class SCR_WDG_EditorGrid_Item(object):
         self.item_data   = None
         self.tooltip     = None
 
+    def get_text(self):
+
+        _text_cells = self.item_data.model.get_statement_text_by_index(self.item_row)
+
+        return _text_cells[self.item_column]
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -142,8 +148,6 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
 
     def rowCount(self, index):
 
-        print(index.internalPointer())
-
         return 2
 
     def columnCount(self, index):
@@ -184,7 +188,7 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
             if role == Qt.ItemDataRole.DisplayRole:
 
                 _item = index.internalPointer()
-                _data = "DEBUG"
+                _data = _item.get_text()
 
             elif role == Qt.ItemDataRole.DecorationRole:
 
@@ -235,8 +239,6 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
         return _parent
 
     def clear(self):
-
-        print("SCR_WDG_EditorGrid_Model: clear()")
 
         self.beginResetModel()
 
