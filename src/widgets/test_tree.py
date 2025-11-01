@@ -1020,7 +1020,7 @@ class SCR_WDG_TestTree(SCR_WDG_Tree):
 
                 if _data["data"] != None:
 
-                    self.messenger.publish("TestTreeSelectionChange",_data)
+                    self.messenger.publish("TestTreeSelectionChange",_data["data"])
 
                     _status_bar_label = _data["data"].get_status_label()
 

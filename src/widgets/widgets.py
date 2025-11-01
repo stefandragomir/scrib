@@ -734,252 +734,9 @@ class SCR_WDG_Tree(QTreeView):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_WDG_Table_Item(object):
-
-    def __init__(self, data, config, parent=None):
-
-        self.parent_item      = parent
-        self.item_data        = data
-        self.tooltip          = None
-        self.userdata         = None
-        self.background_color = config.get_theme_background()
-
-    def column_count(self):
-
-        return len(self.item_data)
-
-    def data(self, column):
-
-        _data = None
-
-        try:
-            _data = self.item_data[column]
-
-        except IndexError:
-
-            _data =  None
-
-        return _data
-
-    def parent(self):
-
-        return self.parent_item
-
-    def row(self):
-        
-        if self.parent_item:
-
-            return self.parent_item.child_items.index(self)
-
-        return 0
-
-    def clear(self):
-
-        self.tooltip     = None
-        self.userdata    = None
-
-"""*************************************************************************************************
-****************************************************************************************************
-*************************************************************************************************"""
-class SCR_WDG_Table_Model(QAbstractItemModel):
-    # this class cannot be used as is
-    # it must be inherited and certain methods reimplemented
-
-    def __init__(self, config, parent=None):
-
-        QAbstractItemModel.__init__(self)
-
-        self.root = None
-
-        self.config = config
-
-    @abstractmethod
-    def load(self, data, parent):
-
-        #to be implemented in child class
-        pass
-
-    def columnCount(self, parent):
-
-        if parent.isValid():
-
-            return parent.internalPointer().column_count()
-        else:
-            return self.root.column_count()
-
-    def data(self, index, role):
-
-        _data = None
-
-        if index.isValid():
-            if role == Qt.ItemDataRole.DisplayRole:
-
-                _item = index.internalPointer()
-                _data = _item.data(index.column())
-            else:
-                if role == Qt.ItemDataRole.DecorationRole:
-                    _item = index.internalPointer()
-                else:
-                    if role == Qt.ItemDataRole.ToolTipRole:
-                        if index.column() == 0:
-                            _item = index.internalPointer()
-                            _data = _item.tooltip
-                    else:
-                        if role == Qt.ItemDataRole.UserRole:
-                            _item = index.internalPointer()
-                            _data = _item.userdata
-                        else:
-                            if role == Qt.ItemDataRole.BackgroundRole:
-                                _item = index.internalPointer()
-                                _data = _item.background_color
-                            else:
-                                _data = None
-        else:
-            _data = None
-
-        return _data
-
-    def flags(self, index):
-
-        _flags = Qt.ItemFlag.NoItemFlags
-
-        if index.isValid():
-
-            _flags = Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEditable
-
-        return _flags
-
-    def headerData(self, section, orientation, role):
-
-        _hader_data = None
-
-        if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
-
-            _hader_data = self.root.data(section)
-
-        return _hader_data
-
-    def index(self, row, column, parent):
-
-        _index = QModelIndex()
-
-        if self.hasIndex(row, column, parent):
-
-            if not parent.isValid():
-                _parent_item = self.root
-            else:
-                _parent_item = parent.internalPointer()
-
-            _child_item = _parent_item.child(row)
-
-            if _child_item:
-
-                _index = self.createIndex(row, column, _child_item)
-
-        return _index
-
-    def parent(self, index):
-
-        _parent = QModelIndex()
-
-        if index.isValid():
-
-            _child_item  = index.internalPointer()
-            _parent_item = _child_item.parent()
-
-            if _parent_item != self.root:
-
-                if _parent_item != None:
-
-                    _parent = self.createIndex(_parent_item.row(), 0, _parent_item)
-
-        return _parent
-
-    def rowCount(self, parent):
-
-        _count = 0
-
-        if parent.column() > 0:
-
-            _count = 0
-        else:
-
-            if not parent.isValid():
-                _parent_item = self.root
-            else:
-                _parent_item = parent.internalPointer()
-
-            _count = _parent_item.child_count()
-
-        return _count
-
-    def clear(self):
-
-        if self.root != None:
-
-            self.beginResetModel()
-            self.root.clear()
-            self.endResetModel()
-
-    def find_items(self,text,column):
-
-        _items = []
-
-        for _row in range(self.root.child_count()):
-
-            _items += self.find(
-                                _row,
-                                column,
-                                text,
-                                QModelIndex())
-
-        return _items
-
-    def find(self,row,column,text,parent):
-
-        _finds = []
-        _index = self.index(row, column, parent)
-        _data  = _index.data(Qt.ItemDataRole.DisplayRole)
-
-        if text.lower() in _data.lower():
-
-            _finds.append(_index)
-
-        _index_root = self.index(row, 0, parent)
-
-        for _child_row in range(self.rowCount(_index_root)):
-
-            _finds += self.find(
-                                _child_row, 
-                                column, 
-                                text, 
-                                _index_root)
-
-        return _finds
-
-    def insertRow(self,row,parent,text):
-
-        self.beginInsertRows(parent,row,row)
-
-        _parent_item = parent.internalPointer()
-
-        _new_item = SCR_WDG_Tree_Item(
-                                        data=[text],
-                                        config=self.config,
-                                        parent=_parent_item)
-
-        _parent_item.add_child(_new_item)
-
-        self.endInsertRows()
-
-        return self.index(_parent_item.child_count() - 1,0,parent)
-
-"""*************************************************************************************************
-****************************************************************************************************
-*************************************************************************************************"""
 class SCR_WDG_Table(QTableView):
 
-    def __init__(self, config, search_clbk, with_metadata=True, model_class=SCR_WDG_Table_Model):
+    def __init__(self, config, search_clbk, model_class):
 
         QTreeView.__init__(self)
 
@@ -1001,12 +758,11 @@ class SCR_WDG_Table(QTableView):
         self.search_clbk   = search_clbk
         self.custom_model  = model_class(config=self.config, parent=self)
 
-    def populate(self, data, header):
+    def populate(self, data):
 
-        self.custom_model.load(data, None) 
+        self.custom_model.load(data) 
 
         self.setModel(self.custom_model)  
-
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -1280,25 +1036,25 @@ class SCR_WDG_Tab(QTabWidget):
 
         QTabBar::tab {
                     border: 1px solid %s;
-                    border-bottom-color: #bfc0c1;
-                    min-width: 55ex;
+                    border-bottom-color: %s;
+                    width:70px;
                     font-family: Arial;
                     padding: 2px;
                     border-radius: 3px;
-                    color: #494949
+                    color: %s
                 }
 
         QTabBar::tab:selected {
             border-color: gray;
             border-bottom-color: %s; 
-            background-color: #c1c1c1;
-            border-radius: 3px;
+            background-color: %s;
+            border-radius: 5px;
             color:%s
 
         }
 
         QTabBar::tab:!selected {
-            margin-top: 4px; /* make non-selected tabs look smaller */
+            margin-top: 4px;
             color:%s
         }
 
@@ -1306,6 +1062,9 @@ class SCR_WDG_Tab(QTabWidget):
                 self.config.get_theme_border_color(),
                 self.config.get_theme_border_color(),
                 self.config.get_theme_border_color(),
+                self.config.get_theme_border_color(),
+                self.config.get_theme_foreground(),
+                self.config.get_theme_sel_background(),
                 self.config.get_theme_foreground(),
                 self.config.get_theme_foreground())
 

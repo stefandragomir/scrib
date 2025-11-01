@@ -81,6 +81,8 @@ class _SCR_Control_Base():
 
     def get_status_label(self):
 
+        #this label will be used by the ui status bar (at the bottom) 
+        #to show what element is selected
         _text = "[{}]   [{}]".format(self.ctrl_type,self.path)
 
         return _text
@@ -600,15 +602,25 @@ class SCR_Control_TestCase(_SCR_Control_Base):
                                     folder=os.path.split(path)[0],
                                     parent=parent,
                                     main_ctrl=main_ctrl,
-                                    model=SCR_Model_Keyword(),
+                                    model=SCR_Model_TestCase(),
                                     ctrl_type="TestCase",
                                     logger=logger)
 
     def read(self,observer):
 
+        #add the testcase controller to the scrib main controller list of testcase controllers
         self.main_ctrl.testcases.add(self)
 
+        #add the testcase controller to the parent suite list of testcase controllers
         self.parent.testcases.add(self)
+
+        #search in the suite rf models to find the rf model of this test case
+        #once found load the testcase rf model in the scrib testcase model
+        for _rf_model_name,_rf_model in self.parent.model.get_testcases_rf_models():
+
+            if self.name == _rf_model_name:
+
+                self.model.load_rf_model(_rf_model)
 
 """*************************************************************************************************
 ****************************************************************************************************

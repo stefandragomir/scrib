@@ -10,11 +10,13 @@ from robot.parsing.model.statements   import Variable
 from robot.parsing.model.statements   import ResourceImport
 from robot.parsing.model.statements   import LibraryImport
 from robot.parsing.model.blocks       import Keyword
+from robot.parsing.model.statements   import KeywordCall
+from robot.parsing.model.statements   import EmptyLine
 
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Base_List(object):
+class SCR_Base_List():
 
     def __init__(self):
 
@@ -93,7 +95,7 @@ class SCR_Base_List(object):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Model_Base_Item(object):
+class SCR_Model_Base_Item():
 
     def __init__(self):
 
@@ -135,6 +137,61 @@ class SCR_Model_Base_Item(object):
     def is_statement_library_import(self,statement):
 
         return isinstance(statement,LibraryImport)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_Model_WithStatements():
+    """
+    Used by models that contain statements (calls, assignments)
+    Used for Test Cases and Keywords
+    """
+
+    def __init__(self):
+
+        self._map_size = {
+                                EmptyLine  :  self.get_statement_empty_line_size,
+                                KeywordCall:  self.get_statement_keyword_call_size,
+                        }
+
+    def get_nr_of_statements(self):
+
+        return len(self.rf_model.body)
+
+    def get_max_statement_size(self):
+        """
+        Get the maximum number of operands used in any statement in the model
+        Used to determine the number of columns needed in the editor grid
+        """
+
+        _size = max(_map[type(_statement)](_statement) for _statement in self.rf_model.body)
+
+        return _size
+
+    def get_statement_size(self,statement):
+        """
+        Get the number of operands used in any statement in the model
+        Used to determine the number of columns needed in the editor grid
+        """
+
+        return self._map_size[type(statement)]
+
+    def get_statement_keyword_call_size(self,statement):
+
+        #add one for the keyword call
+        _statement_size = 1
+
+        #add the number of assignments
+        _statement_size += len(statement.assign)
+
+        #add the number of arguments
+        _statement_size += len(statement.args)
+
+        return _statement_size
+
+    def get_statement_empty_line_size(self,statement):
+
+        return 0
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -342,11 +399,13 @@ class SCR_Model_Resource(SCR_Model_Base_Item):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Model_TestCase(SCR_Model_Base_Item):
+class SCR_Model_TestCase(SCR_Model_Base_Item,SCR_Model_WithStatements):
 
     def __init__(self):
 
         SCR_Model_Base_Item.__init__(self)
+
+        SCR_Model_WithStatements.__init__(self)
 
     def load_rf_model(self,rf_model):
 
@@ -368,11 +427,13 @@ class SCR_Model_Variable(SCR_Model_Base_Item):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Model_Keyword(SCR_Model_Base_Item):
+class SCR_Model_Keyword(SCR_Model_Base_Item,SCR_Model_WithStatements):
 
     def __init__(self):
 
         SCR_Model_Base_Item.__init__(self)
+
+        SCR_Model_WithStatements.__init__(self)
 
     def load_rf_model(self,rf_model):
 
