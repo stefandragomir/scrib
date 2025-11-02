@@ -89,13 +89,28 @@ class SCR_WDG_EditorGrid_Item(object):
 
     def __init__(self,config,data,row,column,empty):
 
+        #global scrib configuraiton
         self.config           = config
+
+        #scrib controller for entire row
         self.item_data        = data
+
+        #the row in the scrib controller model
         self.item_row         = row
+
+        #the column in the scrib controller model
         self.item_column      = column
+
+        #tooltip shown in the table
         self.tooltip          = None
+
+        #mark if the table cell is empty or not
         self.empty            = empty
+
+        #background color depending on theme
         self.background_color = config.get_theme_color_background()
+
+        #foreground color default value. will be changed by validator
         self.foreground_color = config.get_theme_color_foreground()
 
     def validate(self):
@@ -131,7 +146,7 @@ class SCR_WDG_EditorGrid_Item(object):
 
         if self.empty == False:
 
-            _text = self.item_data.model.get_statement_text_by_index(self.item_row)[self.item_column]
+            _text = self.item_data.get_cell_text(self.item_row, self.item_column)
 
         return _text
 
@@ -147,9 +162,17 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
 
         QAbstractItemModel.__init__(self)
 
+        #table model parent is none. table items do not have parent like trees
         self.parent  = parent
+
+        #global scrib configuration
         self.config  = config
+
+        #scrib controller for the testcase or keyword
         self.data    = None
+
+        #list of all model items stored in cells in the table
+        #used for searching
         self.items   = SCR_Base_List()
 
     def load(self,data):
@@ -162,20 +185,20 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
         #the table received data will be a scrib controller
         self.data = data
 
-        _max_rows    = self.rowCount(None) + 1
-        _max_columns = self.columnCount(None) + 1
-        _statements  = self.data.model.get_statements()
+        _max_rows      = self.rowCount(None) + 1
+        _max_columns   = self.columnCount(None) + 1
+        _column_counts = self.data.get_each_row_nr_of_columns()
 
         #number of rows is equal to the number of statements (usefull) in the model
         for _row in range(_max_rows):
 
             _list_cells     = SCR_Base_List()
 
-            if _row < len(_statements):
+            if _row < len(_column_counts):
 
-                _statement_size = self.data.model.get_statement_size(_statements[_row])
+                _column_count = _column_counts[_row]
             else:
-                _statement_size = 0
+                _column_count = 0
 
             #number of columns is the numbers of cells of the largest statement plus one (for design)
             for _column in range(_max_columns):
@@ -186,7 +209,7 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
                                                     data=self.data, 
                                                     row=_row,
                                                     column=_column,
-                                                    empty=_column > (_statement_size - 1))
+                                                    empty=_column > (_column_count - 1))
 
                 _item.validate()
 
@@ -201,7 +224,7 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
 
         #number of row is the number of statements minus the last one (EOF)
         #added one more row for visual reasons and editing
-        return self.data.model.get_nr_of_statements() + 1
+        return self.data.get_nr_of_rows()
 
     def columnCount(self, index):
         """
@@ -210,7 +233,7 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
 
         #number of columns is the maximum number of cells used by any statement
         #added one more column vor visual reasons and editing
-        return self.data.model.get_max_statement_size() + 1
+        return self.data.get_nr_of_columns()
 
     def insertRow(self,row,data,data_index):
         """
@@ -303,7 +326,7 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
 
     def parent(self, index):
         """
-        Table indexes do not have parent
+        Table indexes do not have parents
         Return Nothing
         """
 
@@ -312,6 +335,10 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
         return _parent
 
     def clear(self):
+        """
+        Empty the entire table
+        This is mostly used when selecting a new items in the test tree
+        """
 
         self.beginResetModel()
 

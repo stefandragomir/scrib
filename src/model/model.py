@@ -112,7 +112,7 @@ class SCR_Model_Error():
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Model_Base_Item():
+class _SCR_Model_Base_Item():
 
     def __init__(self):
 
@@ -160,7 +160,7 @@ class SCR_Model_Base_Item():
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Model_WithStatements():
+class _SCR_Model_WithStatements():
     """
     Used by models that contain statements (calls, assignments)
     Used for Test Cases and Keywords
@@ -283,11 +283,11 @@ class SCR_Model_WithStatements():
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Model_Folder(SCR_Model_Base_Item):
+class SCR_Model_Folder(_SCR_Model_Base_Item):
 
     def __init__(self):
 
-        SCR_Model_Base_Item.__init__(self)
+        _SCR_Model_Base_Item.__init__(self)
 
     def load_rf_model(self,rf_model):
 
@@ -296,11 +296,11 @@ class SCR_Model_Folder(SCR_Model_Base_Item):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Model_TestSuite(SCR_Model_Base_Item):
+class SCR_Model_TestSuite(_SCR_Model_Base_Item):
 
     def __init__(self):
 
-        SCR_Model_Base_Item.__init__(self)
+        _SCR_Model_Base_Item.__init__(self)
 
     def read_rf_model(self,path):
 
@@ -391,11 +391,11 @@ class SCR_Model_TestSuite(SCR_Model_Base_Item):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Model_Resource(SCR_Model_Base_Item):
+class SCR_Model_Resource(_SCR_Model_Base_Item):
 
     def __init__(self):
 
-        SCR_Model_Base_Item.__init__(self)
+        _SCR_Model_Base_Item.__init__(self)
 
     def read_rf_model(self,path):
 
@@ -486,13 +486,13 @@ class SCR_Model_Resource(SCR_Model_Base_Item):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Model_TestCase(SCR_Model_Base_Item,SCR_Model_WithStatements):
+class SCR_Model_TestCase(_SCR_Model_Base_Item,_SCR_Model_WithStatements):
 
     def __init__(self):
 
-        SCR_Model_Base_Item.__init__(self)
+        _SCR_Model_Base_Item.__init__(self)
 
-        SCR_Model_WithStatements.__init__(self)
+        _SCR_Model_WithStatements.__init__(self)
 
     def load_rf_model(self,rf_model):
 
@@ -501,11 +501,11 @@ class SCR_Model_TestCase(SCR_Model_Base_Item,SCR_Model_WithStatements):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Model_Variable(SCR_Model_Base_Item):
+class SCR_Model_Variable(_SCR_Model_Base_Item):
 
     def __init__(self):
 
-        SCR_Model_Base_Item.__init__(self)
+        _SCR_Model_Base_Item.__init__(self)
 
     def load_rf_model(self,rf_model):
 
@@ -514,13 +514,13 @@ class SCR_Model_Variable(SCR_Model_Base_Item):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Model_Keyword(SCR_Model_Base_Item,SCR_Model_WithStatements):
+class SCR_Model_Keyword(_SCR_Model_Base_Item,_SCR_Model_WithStatements):
 
     def __init__(self):
 
-        SCR_Model_Base_Item.__init__(self)
+        _SCR_Model_Base_Item.__init__(self)
 
-        SCR_Model_WithStatements.__init__(self)
+        _SCR_Model_WithStatements.__init__(self)
 
     def load_rf_model(self,rf_model):
 
@@ -529,11 +529,11 @@ class SCR_Model_Keyword(SCR_Model_Base_Item,SCR_Model_WithStatements):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Model_Library(SCR_Model_Base_Item):
+class SCR_Model_Library(_SCR_Model_Base_Item):
 
     def __init__(self):
 
-        SCR_Model_Base_Item.__init__(self)
+        _SCR_Model_Base_Item.__init__(self)
 
     def load_rf_model(self,rf_model):
 

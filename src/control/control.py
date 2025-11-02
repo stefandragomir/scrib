@@ -90,6 +90,51 @@ class _SCR_Control_Base():
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
+class _SCR_Control_WitTable():
+    """
+    Used by controllers that contain statements (calls, assignments)
+    Used for Test Cases and Keywords
+    """
+
+    def __init__(self):
+
+        pass
+
+    def get_nr_of_rows(self):
+
+        #number of row is the number of statements minus the last one (EOF)
+        #added one more row for visual reasons and editing
+        return self.model.get_nr_of_statements() + 1
+
+    def get_nr_of_columns(self):
+
+        #number of columns is the maximum number of cells used by any statement
+        #added one more column vor visual reasons and editing
+        return self.model.get_max_statement_size() + 1
+
+    def get_cell_text(self,row,column):
+
+        #get the actual text in the rf statement at row and column
+        return self.model.get_statement_text_by_index(row)[column]
+
+    def get_each_row_nr_of_columns(self):
+        """
+        Get the number of columns needed for each statement
+        """
+
+        _count = []
+
+        _statements = self.model.get_statements()
+
+        for _statement in _statements:
+
+            _count.append(self.model.get_statement_size(_statement))
+
+        return _count
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
 class SCR_Control_Folders(SCR_Base_List):
 
     def __init__(self):
@@ -592,7 +637,7 @@ class SCR_Control_TestCases(SCR_Base_List):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Control_TestCase(_SCR_Control_Base):
+class SCR_Control_TestCase(_SCR_Control_Base,_SCR_Control_WitTable):
 
     def __init__(self,parent,main_ctrl,path,name,logger):
 
@@ -606,6 +651,8 @@ class SCR_Control_TestCase(_SCR_Control_Base):
                                     model=SCR_Model_TestCase(),
                                     ctrl_type="TestCase",
                                     logger=logger)
+
+        _SCR_Control_WitTable.__init__(self)
 
     def read(self,observer):
 
@@ -668,7 +715,7 @@ class SCR_Control_Keywords(SCR_Base_List):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Control_Keyword(_SCR_Control_Base):
+class SCR_Control_Keyword(_SCR_Control_Base,_SCR_Control_WitTable):
 
     def __init__(self,parent,main_ctrl,path,name,logger):
 
@@ -682,6 +729,8 @@ class SCR_Control_Keyword(_SCR_Control_Base):
                                     model=SCR_Model_Keyword(),
                                     ctrl_type="Keyword",
                                     logger=logger)
+
+        _SCR_Control_WitTable.__init__(self)
 
     def read(self,observer):
 
