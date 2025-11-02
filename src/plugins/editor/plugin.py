@@ -121,7 +121,14 @@ class SCR_WDG_EditorGrid_Item(object):
 
         if self.empty == False:
 
-            self.foreground_color = self.config.get_theme_color_keyword_valid()
+            self.item_data.validate(self.item_row,self.item_column)
+
+            if self.item_data.is_valid():
+
+                self.foreground_color = self.config.get_theme_color_keyword_valid()
+            else:
+                self.tooltip = self.item_data.get_error_text(self.item_row,self.item_column)
+                self.foreground_color = self.config.get_theme_color_keyword_invalid()
         else:
             self.foreground_color = self.config.get_theme_color_foreground()
 
@@ -187,7 +194,7 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
 
         _max_rows      = self.rowCount(None) + 1
         _max_columns   = self.columnCount(None) + 1
-        _column_counts = self.data.get_each_row_nr_of_columns()
+        _column_counts = self.data.get_column_counts()
 
         #number of rows is equal to the number of statements (usefull) in the model
         for _row in range(_max_rows):

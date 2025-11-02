@@ -1,6 +1,7 @@
 
 import os
 
+from abc          import abstractmethod
 from utils.utils  import get_all_folders
 from utils.utils  import get_all_files
 from utils.utils  import SCR_UtilProgress
@@ -12,6 +13,7 @@ from model.model  import SCR_Model_TestCase
 from model.model  import SCR_Model_Variable
 from model.model  import SCR_Model_Keyword
 from model.model  import SCR_Model_Library
+from model.model  import SCR_Model_Error
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -87,18 +89,32 @@ class _SCR_Control_Base():
 
         return _text
 
+    @abstractmethod
+    def validate(self):
+
+        raise NotImplementedError
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class _SCR_Control_WitTable():
+class _SCR_Control_WitTable(_SCR_Control_Base):
     """
     Used by controllers that contain statements (calls, assignments)
     Used for Test Cases and Keywords
     """
 
-    def __init__(self):
+    def __init__(self,path,name,folder,parent,main_ctrl,model,ctrl_type,logger):
 
-        pass
+        _SCR_Control_Base.__init__(
+                                    self,
+                                    path=path,
+                                    name=name,
+                                    folder=folder,
+                                    parent=parent,
+                                    main_ctrl=main_ctrl,
+                                    model=model,
+                                    ctrl_type=ctrl_type,
+                                    logger=logger)
 
     def get_nr_of_rows(self):
 
@@ -117,7 +133,7 @@ class _SCR_Control_WitTable():
         #get the actual text in the rf statement at row and column
         return self.model.get_statement_text_by_index(row)[column]
 
-    def get_each_row_nr_of_columns(self):
+    def get_column_counts(self):
         """
         Get the number of columns needed for each statement
         """
@@ -131,6 +147,50 @@ class _SCR_Control_WitTable():
             _count.append(self.model.get_statement_size(_statement))
 
         return _count
+
+    def is_valid(self):
+
+        return self.model.valid
+
+    def validate(self,row,column):
+
+        _keywords_db = []
+
+        _statement = self.model.get_statement_by_index(row)
+
+        if self.model.is_statement_keyword_call(_statement):
+
+            _keyword_name = self.model.get_statement_keyword_name(_statement)
+
+            _keywords_db += [_keyword.name for _keyword in self.parent.keywords]
+
+            for _resource in self.parent.resources:
+
+                _keywords_db += [_keyword.name for _keyword in _resource.keywords]
+
+            if _keyword_name in _keywords_db:
+
+                self.model.valid = True
+            else:
+                self.model.add_error(
+                                        row,
+                                        column,
+                                        SCR_Model_Error.ERROR_UNKNOWN_KEYWORD,
+                                        _keyword_name)
+
+                self.model.valid = False
+
+    def get_error_text(self,row,column):
+
+        _text = ""
+
+        for _error in self.model.errors:
+
+            if _error.row == row and _error.column == column:
+
+                _text += "{}\n".format(_error.text)
+
+        return _text
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -264,6 +324,10 @@ class SCR_Control_Folder(_SCR_Control_Base):
     def has_files(self):
 
         return self.testfolders.has_files() or len(self.testsuites) != 0 or len(self.resources) != 0
+
+    def validate(self):
+
+        self.model.valid = True
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -419,6 +483,10 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
 
             _ctrl.model.load_rf_model(_model)
 
+    def validate(self):
+
+        self.model.valid = True
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -572,6 +640,10 @@ class SCR_Control_Resource(_SCR_Control_Base):
 
             _ctrl.model.load_rf_model(_model)
 
+    def validate(self):
+
+        self.model.valid = True
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -625,6 +697,10 @@ class SCR_Control_Library(_SCR_Control_Base):
 
             observer.message("reading library {}".format(self.name,))
 
+    def validate(self):
+
+        self.model.valid = True
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -637,22 +713,20 @@ class SCR_Control_TestCases(SCR_Base_List):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Control_TestCase(_SCR_Control_Base,_SCR_Control_WitTable):
+class SCR_Control_TestCase(_SCR_Control_WitTable):
 
     def __init__(self,parent,main_ctrl,path,name,logger):
 
-        _SCR_Control_Base.__init__(
-                                    self,
-                                    path=path,
-                                    name=name,
-                                    folder=os.path.split(path)[0],
-                                    parent=parent,
-                                    main_ctrl=main_ctrl,
-                                    model=SCR_Model_TestCase(),
-                                    ctrl_type="TestCase",
-                                    logger=logger)
-
-        _SCR_Control_WitTable.__init__(self)
+        _SCR_Control_WitTable.__init__(
+                                        self,
+                                        path=path,
+                                        name=name,
+                                        folder=os.path.split(path)[0],
+                                        parent=parent,
+                                        main_ctrl=main_ctrl,
+                                        model=SCR_Model_TestCase(),
+                                        ctrl_type="TestCase",
+                                        logger=logger)
 
     def read(self,observer):
 
@@ -703,6 +777,10 @@ class SCR_Control_Variable(_SCR_Control_Base):
 
         self.parent.variables.add(self)
 
+    def validate(self):
+
+        self.model.valid = True
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -715,22 +793,20 @@ class SCR_Control_Keywords(SCR_Base_List):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
-class SCR_Control_Keyword(_SCR_Control_Base,_SCR_Control_WitTable):
+class SCR_Control_Keyword(_SCR_Control_WitTable):
 
     def __init__(self,parent,main_ctrl,path,name,logger):
 
-        _SCR_Control_Base.__init__(
-                                    self,
-                                    path=path,
-                                    name=name,
-                                    folder=os.path.split(path)[0],
-                                    parent=parent,
-                                    main_ctrl=main_ctrl,
-                                    model=SCR_Model_Keyword(),
-                                    ctrl_type="Keyword",
-                                    logger=logger)
-
-        _SCR_Control_WitTable.__init__(self)
+        _SCR_Control_WitTable.__init__(
+                                        self,
+                                        path=path,
+                                        name=name,
+                                        folder=os.path.split(path)[0],
+                                        parent=parent,
+                                        main_ctrl=main_ctrl,
+                                        model=SCR_Model_Keyword(),
+                                        ctrl_type="Keyword",
+                                        logger=logger)
 
     def read(self,observer):
 

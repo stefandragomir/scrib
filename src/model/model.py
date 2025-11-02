@@ -103,9 +103,13 @@ class SCR_Base_List():
 *************************************************************************************************"""
 class SCR_Model_Error():
 
+    ERROR_OK              = 0
+    ERROR_UNKNOWN_KEYWORD = 1
+
     def __init__(self):
 
-        self.line   = 0
+        self.row    = 0
+        self.column = 0
         self.number = 0
         self.text   = ""
 
@@ -116,9 +120,25 @@ class _SCR_Model_Base_Item():
 
     def __init__(self):
 
-        self.rf_model = None
-        self.valid    = True
-        self.errors   = SCR_Base_List()
+        self.rf_model   = None
+        self.valid      = True
+        self.errors     = SCR_Base_List()
+        self._error_map = {
+
+                            SCR_Model_Error.ERROR_UNKNOWN_KEYWORD: 'Keyword "{}" cannot be found in any Test Suite, Resource or Library',
+
+
+                          }
+
+    def add_error(self,row,column,number,*args):
+
+        _error        = SCR_Model_Error()
+        _error.line   = row
+        _error.column = column
+        _error.number = number
+        _error.text   = self._error_map[number].format(*args)
+
+        self.errors.add(_error)
 
     @abstractmethod
     def load_rf_model(self,rf_model):
@@ -177,6 +197,14 @@ class _SCR_Model_WithStatements():
                                 Tags          : self.get_statement_tags_size,
                                 Comment       : self.get_statement_comment_size,
                         }
+
+    def is_statement_keyword_call(self,statement):
+
+        return type(statement) == KeywordCall
+
+    def get_statement_keyword_name(self,statement):
+
+        return statement.tokens[len(statement.assign) + 1].value
 
     def get_statement_visible_tokens(self,statement):
         """
