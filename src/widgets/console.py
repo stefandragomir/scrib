@@ -38,7 +38,7 @@ class SCR_WDG_Console(SCR_WDG_Widget):
         self.text_area.setReadOnly(True)
 
         _css = ""
-        _css += "border: 1px solid {};".format(self.config.get_theme_border_color())
+        _css += "border: 1px solid {};".format(self.config.get_theme_color_border())
 
         self.setStyleSheet(_css)
 

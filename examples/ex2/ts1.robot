@@ -7,8 +7,9 @@ tc1
     Should Be Equal    6    7
     Should Be Equal    8    9
     Comment    debug test    debug test 2    debug test 3    debug test 4
+    wrong_keyword    ${var1}
     kw1
-    kw3
+    kw3    ${var2}
 
 *** Keywords ***
 kw1

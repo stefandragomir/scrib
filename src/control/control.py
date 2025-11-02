@@ -31,12 +31,12 @@ class SCR_Control():
 
         #list of all items in the control. usefull for searching
         self.testsuites  = SCR_Control_TestSuites()
-        self.resources   = SCR_Control_Resources()
-        self.libraries   = SCR_Control_Libraries()
-        self.variables   = SCR_Control_Variables()
-        self.keywords    = SCR_Control_Keywords()
         self.testcases   = SCR_Control_TestCases()
-
+        self.keywords    = SCR_Control_Keywords()
+        self.variables   = SCR_Control_Variables()
+        self.resources   = SCR_Control_Resources()
+        self.libraries   = SCR_Control_Libraries()      
+        
     def read(self,path,observer):
 
         self.logger.debug("load test folder by path [{}]".format(path))
@@ -247,11 +247,11 @@ class SCR_Control_TestSuite(_SCR_Control_Base):
                                     ctrl_type="Test Suite",
                                     logger=logger)
 
-        self.variables   = SCR_Control_Variables()
+        self.testcases   = SCR_Control_TestCases()
         self.keywords    = SCR_Control_Keywords()
+        self.variables   = SCR_Control_Variables()        
         self.resources   = SCR_Control_Resources()
         self.libraries   = SCR_Control_Libraries()
-        self.testcases   = SCR_Control_TestCases()
 
     def read(self,observer):
 
@@ -417,8 +417,9 @@ class SCR_Control_Resource(_SCR_Control_Base):
                                     ctrl_type="Test Resource",
                                     logger=logger)
 
-        self.variables   = SCR_Control_Variables()
         self.keywords    = SCR_Control_Keywords()
+        self.variables   = SCR_Control_Variables()
+        
         self.resources   = SCR_Control_Resources()
         self.libraries   = SCR_Control_Libraries()
 

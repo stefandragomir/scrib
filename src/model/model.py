@@ -7,6 +7,7 @@ from robot.parsing.model.blocks       import VariableSection
 from robot.parsing.model.blocks       import KeywordSection
 from robot.parsing.model.blocks       import SettingSection
 from robot.parsing.model.blocks       import Keyword
+from robot.parsing.model.blocks       import ValidationContext
 from robot.parsing.model.statements   import Variable
 from robot.parsing.model.statements   import ResourceImport
 from robot.parsing.model.statements   import LibraryImport
@@ -15,6 +16,7 @@ from robot.parsing.model.statements   import KeywordCall
 from robot.parsing.model.statements   import EmptyLine
 from robot.parsing.model.statements   import Tags
 from robot.parsing.model.statements   import Comment
+
 from robot.parsing.lexer.tokens       import Token
 
 """*************************************************************************************************
@@ -99,11 +101,24 @@ class SCR_Base_List():
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
+class SCR_Model_Error():
+
+    def __init__(self):
+
+        self.line   = 0
+        self.number = 0
+        self.text   = ""
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
 class SCR_Model_Base_Item():
 
     def __init__(self):
 
         self.rf_model = None
+        self.valid    = True
+        self.errors   = SCR_Base_List()
 
     @abstractmethod
     def load_rf_model(self,rf_model):

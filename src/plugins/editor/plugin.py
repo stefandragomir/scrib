@@ -89,12 +89,26 @@ class SCR_WDG_EditorGrid_Item(object):
 
     def __init__(self,config,data,row,column,empty):
 
+        self.config           = config
         self.item_data        = data
         self.item_row         = row
         self.item_column      = column
         self.tooltip          = None
         self.empty            = empty
-        self.background_color = config.get_theme_background()
+        self.background_color = config.get_theme_color_background()
+        self.foreground_color = config.get_theme_color_foreground()
+
+    def validate(self):
+        """
+        Method will check if the table item RF syntax is correct
+        It will chose the appropriate color depending on the validity of the syntax
+        """
+
+        if self.empty == False:
+
+            self.foreground_color = self.config.get_theme_color_keyword_valid()
+        else:
+            self.foreground_color = self.config.get_theme_color_foreground()
 
     def clear(self):
         """
@@ -174,6 +188,8 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
                                                     column=_column,
                                                     empty=_column > (_statement_size - 1))
 
+                _item.validate()
+
                 _list_cells.add(_item)
 
             self.items.add(_list_cells)
@@ -209,6 +225,8 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
                                             config=self.config, 
                                             data=self.data, 
                                             data_index=_statement_index)
+
+        _item.validate()
 
         #this is not ok: should be inserted not added
         self.items.add(_item)
@@ -253,7 +271,12 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
             elif role == Qt.ItemDataRole.BackgroundRole:
 
                 _item = index.internalPointer()
-                _data = _item.background_color
+                _data = QColor(_item.background_color)
+
+            elif role == Qt.ItemDataRole.ForegroundRole:
+
+                _item = index.internalPointer()
+                _data = QColor(_item.foreground_color)
 
             else:
                 _data = None

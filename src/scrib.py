@@ -66,7 +66,7 @@ class SCR_UI(QMainWindow):
         self.setMinimumSize(1300, 800)       
         self.setMinimumHeight(800)
         self.setWindowIcon(SCR_GetIcon("08e0c30ab7f9c6d43c70165c4ae42460d460c0aa"))
-        self.setStyleSheet("background-color: %s; border: 0px;" % (self.config.get_theme_background()))
+        self.setStyleSheet("background-color: %s; border: 0px;" % (self.config.get_theme_color_background()))
 
         self.wdg_central = QWidget()
 

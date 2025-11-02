@@ -81,13 +81,13 @@ class SCR_WDG_MenuCommon():
                         """
 
         self.css_menu = self.css_menu % (
-                                            self.config.get_theme_border_color(),
-                                            self.config.get_theme_background(),
-                                            self.config.get_theme_background(),
-                                            self.config.get_theme_foreground(),
-                                            self.config.get_theme_sel_background(),
-                                            self.config.get_theme_sel_foreground(),                                            
-                                            self.config.get_theme_sel_background())        
+                                            self.config.get_theme_color_border(),
+                                            self.config.get_theme_color_background(),
+                                            self.config.get_theme_color_background(),
+                                            self.config.get_theme_color_foreground(),
+                                            self.config.get_theme_color_sel_background(),
+                                            self.config.get_theme_color_sel_foreground(),                                            
+                                            self.config.get_theme_color_sel_background())        
 
         self.css_menu_bar  = """
 
@@ -116,11 +116,11 @@ class SCR_WDG_MenuCommon():
                             """
 
         self.css_menu_bar = self.css_menu_bar % (
-                                                    self.config.get_theme_background(),
-                                                    self.config.get_theme_foreground(),
-                                                    self.config.get_theme_sel_background(),
-                                                    self.config.get_theme_sel_foreground(),                                                    
-                                                    self.config.get_theme_sel_background(),)
+                                                    self.config.get_theme_color_background(),
+                                                    self.config.get_theme_color_foreground(),
+                                                    self.config.get_theme_color_sel_background(),
+                                                    self.config.get_theme_color_sel_foreground(),                                                    
+                                                    self.config.get_theme_color_sel_background(),)
 
     def add_menu(self,parent,name):
 
@@ -188,7 +188,7 @@ class SCR_WDG_ToolButton(QToolButton):
         _css  = """
         background-color: %s;
         color: %s; 
-        """ % (self.config.get_theme_background(),self.config.get_theme_foreground())
+        """ % (self.config.get_theme_color_background(),self.config.get_theme_color_foreground())
 
         self.setStyleSheet(_css)
 
@@ -206,7 +206,7 @@ class SCR_WDG_LineEdit(QLineEdit):
         _css  = """
         background-color: %s;
         color: %s; 
-        """ % (self.config.get_theme_background(),self.config.get_theme_foreground())
+        """ % (self.config.get_theme_color_background(),self.config.get_theme_color_foreground())
 
         self.setStyleSheet(_css)
 
@@ -236,7 +236,7 @@ class SCR_WDG_DockWidget(QDockWidget):
         _css  = """
         background-color: %s;
         color: %s; 
-        """ % (self.config.get_theme_background(),self.config.get_theme_foreground())
+        """ % (self.config.get_theme_color_background(),self.config.get_theme_color_foreground())
 
         self.setStyleSheet(_css)
 
@@ -256,7 +256,7 @@ class SCR_WDG_Button(QPushButton):
         _css  = """
             border: 0px solid gray;
             background-color: %s;
-        """  % (self.config.get_theme_background(),)
+        """  % (self.config.get_theme_color_background(),)
 
         self.setStyleSheet(_css)
 
@@ -342,8 +342,8 @@ class SCR_WDG_PopUp(QMessageBox):
     def draw_gui(self):
 
         _css = ""
-        _css += "background-color: {};".format(self.config.get_theme_background())
-        _css += "color: {};".format(self.config.get_theme_foreground(),)  
+        _css += "background-color: {};".format(self.config.get_theme_color_background())
+        _css += "color: {};".format(self.config.get_theme_color_foreground(),)  
 
         self.setWindowTitle(self.title)
         self.setWindowIcon(SCR_GetIcon('08e0c30ab7f9c6d43c70165c4ae42460d460c0aa'))
@@ -369,7 +369,7 @@ class SCR_WDG_Tree_Item(object):
         self.icon             = None
         self.tooltip          = None
         self.userdata         = None
-        self.background_color = config.get_theme_background()
+        self.background_color = config.get_theme_color_background()
 
     def add_child(self, item):
 
@@ -638,13 +638,13 @@ class SCR_WDG_Tree(QTreeView):
         self.config = config
 
         _css  = ""
-        _css += "background-color: {};".format(self.config.get_theme_background(),)
-        _css += "color: {};".format(self.config.get_theme_foreground(),)  
-        _css += "selection-color: {};".format(self.config.get_theme_sel_foreground(),) 
-        _css += "selection-background-color: {};".format(self.config.get_theme_sel_background(),) 
+        _css += "background-color: {};".format(self.config.get_theme_color_background(),)
+        _css += "color: {};".format(self.config.get_theme_color_foreground(),)  
+        _css += "selection-color: {};".format(self.config.get_theme_color_sel_foreground(),) 
+        _css += "selection-background-color: {};".format(self.config.get_theme_color_sel_background(),) 
         _css += "font-family: Arial;"
         _css += "font-size: 9pt;"
-        _css += "border: 1px solid {};".format(self.config.get_theme_border_color())
+        _css += "border: 1px solid {};".format(self.config.get_theme_color_border())
 
         self.setStyleSheet(_css)
 
@@ -743,14 +743,14 @@ class SCR_WDG_Table(QTableView):
         self.config = config
 
         _css  = ""
-        _css += "background-color: {};".format(self.config.get_theme_background(),)
-        _css += "color: {};".format(self.config.get_theme_foreground(),)  
-        _css += "selection-color: {};".format(self.config.get_theme_sel_foreground(),) 
-        _css += "selection-background-color: {};".format(self.config.get_theme_sel_background(),) 
+        _css += "background-color: {};".format(self.config.get_theme_color_background(),)
+        _css += "color: {};".format(self.config.get_theme_color_foreground(),)  
+        _css += "selection-color: {};".format(self.config.get_theme_color_sel_foreground(),) 
+        _css += "selection-background-color: {};".format(self.config.get_theme_color_sel_background(),) 
         _css += "font-family: Consolas;"
         _css += "font-size: 10pt;"
-        _css += "border: 1px solid {};".format(self.config.get_theme_border_color())
-        _css += "border-color: {}".format(self.config.get_theme_border_color())
+        _css += "border: 1px solid {};".format(self.config.get_theme_color_border())
+        _css += "gridline-color: {}".format(self.config.get_theme_color_grid())
 
         self.setStyleSheet(_css)
 
@@ -787,9 +787,9 @@ class SCR_WDG_Selection(QComboBox):
                      border-color: %s;
 
                      """ % (
-                                self.config.get_theme_background(), 
-                                self.config.get_theme_foreground(),
-                                self.config.get_theme_foreground(),)
+                                self.config.get_theme_color_background(), 
+                                self.config.get_theme_color_foreground(),
+                                self.config.get_theme_color_foreground(),)
 
         self.setStyleSheet(_css)
         self.editTextChanged.connect(self.textChangedHandler)
@@ -874,7 +874,7 @@ class SCR_WDG_Label(QLabel):
         border: 0px solid gray;
         font-family: Arial;
 
-        """ % (self.config.get_theme_background(),self.config.get_theme_foreground())
+        """ % (self.config.get_theme_color_background(),self.config.get_theme_color_foreground())
 
         self.setStyleSheet(_css)
 
@@ -919,7 +919,7 @@ class SCR_WDG_ActionBar(SCR_WDG_Widget):
 
         self.wdg_txt.setFont(_font)
         self.wdg_txt.setFixedWidth(self.text_wdg_width)
-        self.wdg_txt.setStyleSheet("border: 1px solid gray; border-radius: 4px; color: %s" % (self.config.get_theme_foreground(),))
+        self.wdg_txt.setStyleSheet("border: 1px solid gray; border-radius: 4px; color: %s" % (self.config.get_theme_color_foreground(),))
 
     def draw_progress(self):
 
@@ -1000,7 +1000,7 @@ class SCR_WDG_RadioButton(QRadioButton):
         _css  = """
         background-color: %s;
         color: %s; 
-        """ % (self.config.get_theme_background(),self.config.get_theme_foreground())
+        """ % (self.config.get_theme_color_background(),self.config.get_theme_color_foreground())
 
         self.setStyleSheet(_css)
 
@@ -1017,7 +1017,7 @@ class SCR_WDG_CheckBox(QCheckBox):
         font-family: Arial;
         background-color: %s;
         color: %s; 
-        """ % (self.config.get_theme_background(),self.config.get_theme_foreground())
+        """ % (self.config.get_theme_color_background(),self.config.get_theme_color_foreground())
 
         self.setStyleSheet(_css)
 
@@ -1063,14 +1063,14 @@ class SCR_WDG_Tab(QTabWidget):
         }
 
         """ % (
-                self.config.get_theme_border_color(),
-                self.config.get_theme_border_color(),
-                self.config.get_theme_border_color(),
-                self.config.get_theme_border_color(),
-                self.config.get_theme_foreground(),
-                self.config.get_theme_sel_background(),
-                self.config.get_theme_foreground(),
-                self.config.get_theme_foreground())
+                self.config.get_theme_color_border(),
+                self.config.get_theme_color_border(),
+                self.config.get_theme_color_border(),
+                self.config.get_theme_color_border(),
+                self.config.get_theme_color_foreground(),
+                self.config.get_theme_color_sel_background(),
+                self.config.get_theme_color_foreground(),
+                self.config.get_theme_color_foreground())
 
         self.setStyleSheet(_css)
 
