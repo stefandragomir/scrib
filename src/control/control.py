@@ -149,38 +149,132 @@ class _SCR_Control_WitTable(_SCR_Control_Base):
         return _count
 
     def is_valid(self):
+        """
+        Return True or Fals if the entire model (Test Case or Keyword) is valid or not
+        """
 
         return self.model.valid
 
+    def is_keyword_name(self,row,column):
+        """
+        Return True if the cell contains a keyword name
+        """
+
+        #get the rf statement on this row
+        _statement = self.model.get_statement_by_index(row)
+
+        return self.model.is_cell_keyword_call_name(_statement,column)
+
+    def is_keyword_assignment(self,row,column):
+        """
+        Returns True if the cell contains a keyword assignment (usually a variable of some type)
+        """
+
+        #get the rf statement on this row
+        _statement = self.model.get_statement_by_index(row)
+
+        return self.model.is_cell_keyword_call_assignment(_statement,column)
+
     def validate(self,row,column):
+        """
+        Check if a single statement cell is valid or invalid
+        Valid - no syntax error
+        Invalid - has a syntax error and an error text
+        """
+
+        _valid = False
+
+        #get the rf statement on this row
+        _statement = self.model.get_statement_by_index(row)
+
+        #ask the model if the statement on this row is a keyword call
+        if self.model.is_statement_keyword_call(_statement):
+
+            #check if the cell in the statement is valid
+            _valid = self.validate_keyword_call(_statement,row,column)
+
+        return _valid
+
+    def validate_keyword_call(self,statement,row,column):
+        """
+        Check if the keyword call statement cell is valid
+        """
+
+        _valid = False
+
+        if self.model.is_cell_keyword_call_name(statement,column):
+
+            _valid = self.validate_keyword_call_name(statement,row,column)
+        else:
+            if self.model.is_cell_keyword_call_assignment(statement,column):
+
+                _valid = self.validate_keyword_call_assignment(statement,row,column)
+            else:
+                _valid = self.validate_keyword_call_argument(statement,row,column)
+
+        return _valid
+
+    def validate_keyword_call_name(self,statement,row,column):
+        """
+        Check if the keyword call name in the statement is valid
+        """
+
+        _valid = False
 
         _keywords_db = []
 
-        _statement = self.model.get_statement_by_index(row)
+        #get the name of the keyword
+        _keyword_name = self.model.get_statement_keyword_name(statement)
 
-        if self.model.is_statement_keyword_call(_statement):
+        #get the names of all keywords in the parent (Resource or Test Suite)
+        _keywords_db += [_keyword.name for _keyword in self.parent.keywords]
 
-            _keyword_name = self.model.get_statement_keyword_name(_statement)
+        #get the names of all keywords in the parent imported resources
+        for _resource in self.parent.resources:
 
-            _keywords_db += [_keyword.name for _keyword in self.parent.keywords]
+            _keywords_db += [_keyword.name for _keyword in _resource.keywords]
 
-            for _resource in self.parent.resources:
+        if _keyword_name in _keywords_db:
 
-                _keywords_db += [_keyword.name for _keyword in _resource.keywords]
+            _valid = True
 
-            if _keyword_name in _keywords_db:
+        else:
+            self.model.add_error(
+                                    row,
+                                    column,
+                                    SCR_Model_Error.ERROR_UNKNOWN_KEYWORD,
+                                    _keyword_name)
 
-                self.model.valid = True
-            else:
-                self.model.add_error(
-                                        row,
-                                        column,
-                                        SCR_Model_Error.ERROR_UNKNOWN_KEYWORD,
-                                        _keyword_name)
+            #invalidate entire model
+            self.model.valid = False
 
-                self.model.valid = False
+            _valid = False
+
+        return _valid
+
+    def validate_keyword_call_assignment(self,statement,row,column):
+        """
+        Check if a keyword call assignment cell in the statement is valid
+        """
+
+        _valid = True
+
+        return _valid
+
+    def validate_keyword_call_argument(self,statement,row,column):
+        """
+        Check if a keyword call argument cell in the statement is valid
+        """
+
+        _valid = True
+
+        return _valid
 
     def get_error_text(self,row,column):
+        """
+        Return the error text of a cell in the statement
+        Used for tooltips
+        """
 
         _text = ""
 

@@ -8,6 +8,7 @@ tc1
     Should Be Equal    8    9
     Comment    debug test    debug test 2    debug test 3    debug test 4
     wrong_keyword    ${var1}
+    ${a}    Set Variable   2
     kw1
     kw3    ${var2}
 

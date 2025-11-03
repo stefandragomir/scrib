@@ -113,6 +113,11 @@ class SCR_WDG_EditorGrid_Item(object):
         #foreground color default value. will be changed by validator
         self.foreground_color = config.get_theme_color_foreground()
 
+        self.set_font(
+                        self.config.get_theme_font_editor(),
+                        False,
+                        self.config.get_theme_text_size_editor())
+
     def validate(self):
         """
         Method will check if the table item RF syntax is correct
@@ -120,16 +125,37 @@ class SCR_WDG_EditorGrid_Item(object):
         """
 
         if self.empty == False:
+            #if cell is not empty the text color must come after validation
 
-            self.item_data.validate(self.item_row,self.item_column)
+            #check if the statement cell is valid in this context
+            if self.item_data.validate(self.item_row,self.item_column):
 
-            if self.item_data.is_valid():
+                if self.item_data.is_keyword_name(self.item_row,self.item_column):
 
-                self.foreground_color = self.config.get_theme_color_keyword_valid()
+                    #the cell is valid and a keyword name
+                    self.background_color = self.config.get_theme_color_background()
+                    self.foreground_color = self.config.get_theme_color_keyword_valid()
+                    self.set_font(
+                                    self.config.get_theme_font_editor(),
+                                    True,
+                                    self.config.get_theme_text_size_editor() + 1)
+
+                else:
+                    if self.item_data.is_keyword_assignment(self.item_row,self.item_column):
+                        #the cell is an assignment and is valid
+                        self.background_color = self.config.get_theme_color_background()
+                        self.foreground_color = self.config.get_theme_color_variable_valid()
+                    else:
+                        #the cell is an assignment and is an argument
+                        self.background_color = self.config.get_theme_color_background()
+                        self.foreground_color = self.config.get_theme_color_foreground()
             else:
-                self.tooltip = self.item_data.get_error_text(self.item_row,self.item_column)
-                self.foreground_color = self.config.get_theme_color_keyword_invalid()
+                #the cell is not valid whatever it is
+                self.tooltip          = self.item_data.get_error_text(self.item_row,self.item_column)
+                self.background_color = self.config.get_theme_color_cell_invalid()
+                self.foreground_color = self.config.get_theme_color_foreground()
         else:
+            #the cell is empty
             self.foreground_color = self.config.get_theme_color_foreground()
 
     def clear(self):
@@ -156,6 +182,13 @@ class SCR_WDG_EditorGrid_Item(object):
             _text = self.item_data.get_cell_text(self.item_row, self.item_column)
 
         return _text
+
+    def set_font(self,type,bold,size):
+
+        self.font = QFont(type)
+        self.font.setBold(bold)
+        self.font.setPointSize(size)
+
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -307,6 +340,11 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
 
                 _item = index.internalPointer()
                 _data = QColor(_item.foreground_color)
+
+            elif role == Qt.ItemDataRole.FontRole:
+
+                _item = index.internalPointer()
+                _data = _item.font
 
             else:
                 _data = None

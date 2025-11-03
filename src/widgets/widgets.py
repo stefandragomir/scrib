@@ -638,11 +638,11 @@ class SCR_WDG_Tree(QTreeView):
         self.config = config
 
         _css  = ""
-        _css += "background-color: {};".format(self.config.get_theme_color_background(),)
+        _css += "background-color: {};".format(self.config.get_theme_color_background())
         _css += "color: {};".format(self.config.get_theme_color_foreground(),)  
-        _css += "selection-color: {};".format(self.config.get_theme_color_sel_foreground(),) 
-        _css += "selection-background-color: {};".format(self.config.get_theme_color_sel_background(),) 
-        _css += "font-family: Arial;"
+        _css += "selection-color: {};".format(self.config.get_theme_color_sel_foreground()) 
+        _css += "selection-background-color: {};".format(self.config.get_theme_color_sel_background()) 
+        _css += "font-family: {};".format(self.config.get_theme_font_test_tree())
         _css += "font-size: 9pt;"
         _css += "border: 1px solid {};".format(self.config.get_theme_color_border())
 
@@ -747,7 +747,7 @@ class SCR_WDG_Table(QTableView):
         _css += "color: {};".format(self.config.get_theme_color_foreground(),)  
         _css += "selection-color: {};".format(self.config.get_theme_color_sel_foreground(),) 
         _css += "selection-background-color: {};".format(self.config.get_theme_color_sel_background(),) 
-        _css += "font-family: Consolas;"
+        _css += "font-family: {};".format(self.config.get_theme_font_editor())
         _css += "font-size: 10pt;"
         _css += "border: 1px solid {};".format(self.config.get_theme_color_border())
         _css += "gridline-color: {}".format(self.config.get_theme_color_grid())
@@ -783,12 +783,13 @@ class SCR_WDG_Selection(QComboBox):
                      color: %s;  
                      border-radius: 3px;
                      font-size: 9pt;
-                     font-family: Arial;
+                     font-family: %s;
                      border-color: %s;
 
                      """ % (
                                 self.config.get_theme_color_background(), 
                                 self.config.get_theme_color_foreground(),
+                                self.config.get_theme_font_menu(),
                                 self.config.get_theme_color_foreground(),)
 
         self.setStyleSheet(_css)
@@ -872,9 +873,12 @@ class SCR_WDG_Label(QLabel):
         background-color: %s;
         color: %s; 
         border: 0px solid gray;
-        font-family: Arial;
+        font-family: %s;
 
-        """ % (self.config.get_theme_color_background(),self.config.get_theme_color_foreground())
+        """ % (
+                self.config.get_theme_color_background(),
+                self.config.get_theme_color_foreground(),
+                self.config.get_theme_font_menu(),)
 
         self.setStyleSheet(_css)
 
@@ -1014,10 +1018,13 @@ class SCR_WDG_CheckBox(QCheckBox):
         QCheckBox.__init__(self,label)
 
         _css = """
-        font-family: Arial;
+        font-family: %s;
         background-color: %s;
         color: %s; 
-        """ % (self.config.get_theme_color_background(),self.config.get_theme_color_foreground())
+        """ % (
+                self.config.get_theme_font_menu(),
+                self.config.get_theme_color_background(),
+                self.config.get_theme_color_foreground())
 
         self.setStyleSheet(_css)
 
@@ -1042,7 +1049,7 @@ class SCR_WDG_Tab(QTabWidget):
                     border: 1px solid %s;
                     border-bottom-color: %s;
                     width:70px;
-                    font-family: Arial;
+                    font-family: %s;
                     padding: 2px;
                     border-radius: 3px;
                     color: %s
@@ -1066,6 +1073,7 @@ class SCR_WDG_Tab(QTabWidget):
                 self.config.get_theme_color_border(),
                 self.config.get_theme_color_border(),
                 self.config.get_theme_color_border(),
+                self.config.get_theme_font_menu(),
                 self.config.get_theme_color_border(),
                 self.config.get_theme_color_foreground(),
                 self.config.get_theme_color_sel_background(),

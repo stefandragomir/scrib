@@ -198,11 +198,42 @@ class _SCR_Model_WithStatements():
                                 Comment       : self.get_statement_comment_size,
                         }
 
+    def is_cell_keyword_call_name(self,statement,column):
+        """
+        Return True if the statement cell if a keyword name
+        """
+
+        #check if cell column is equal to the number of keyword assignment cells
+        return column == len(statement.assign)
+
+    def is_cell_keyword_call_assignment(self,statement,column):
+        """
+        Return True if the statement cell if a keyword assignment
+        """
+
+        #check if cell column is smaller than number of keyword assignment cells
+        return column < len(statement.assign)
+
+    def is_cell_keyword_call_argument(self,statement,column):
+        """
+        Return True if the statement cell if a keyword argument
+        """
+
+        #check if cell column is larger than number of 
+        #keyword assignment cells plus on for the keyword name
+        return column > (len(statement.assign) + 1)
+
     def is_statement_keyword_call(self,statement):
+        """
+        Return True if the statement is a Keyword Call
+        """
 
         return type(statement) == KeywordCall
 
     def get_statement_keyword_name(self,statement):
+        """
+        Return the name of the keyword in a Keyword Call statement
+        """
 
         return statement.tokens[len(statement.assign) + 1].value
 
