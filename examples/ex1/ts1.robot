@@ -1,3 +1,6 @@
+*** Settings ***
+Documentation    This is the top-level suite documentation.
+
 *** Variables ***
 ${v1}             11
 @{v2}             22    33

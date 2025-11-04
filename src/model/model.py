@@ -16,6 +16,7 @@ from robot.parsing.model.statements   import KeywordCall
 from robot.parsing.model.statements   import EmptyLine
 from robot.parsing.model.statements   import Tags
 from robot.parsing.model.statements   import Comment
+from robot.libraries.BuiltIn          import BuiltIn
 
 from robot.parsing.lexer.tokens       import Token
 
@@ -139,6 +140,17 @@ class _SCR_Model_Base_Item():
         _error.text   = self._error_map[number].format(*args)
 
         self.errors.add(_error)
+
+    def get_doc_text(self):
+
+        _text = "Debug"
+
+        for _statement in self.rf_model.body:
+
+            print(_statement)
+
+
+        return _text
 
     @abstractmethod
     def load_rf_model(self,rf_model):

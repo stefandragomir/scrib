@@ -89,6 +89,14 @@ class _SCR_Control_Base():
 
         return _text
 
+    def get_doc(self):
+
+        _doc = ""
+
+        _doc = self.model.get_doc_text()
+
+        return _doc
+
     @abstractmethod
     def validate(self):
 
@@ -190,7 +198,7 @@ class _SCR_Control_WitTable(_SCR_Control_Base):
         #ask the model if the statement on this row is a keyword call
         if self.model.is_statement_keyword_call(_statement):
 
-            #check if the cell in the statement is valid
+            #check if the cell in the keyword call statement is valid
             _valid = self.validate_keyword_call(_statement,row,column)
 
         return _valid
@@ -234,6 +242,7 @@ class _SCR_Control_WitTable(_SCR_Control_Base):
 
             _keywords_db += [_keyword.name for _keyword in _resource.keywords]
 
+        #check if keyword is user defined
         if _keyword_name in _keywords_db:
 
             _valid = True

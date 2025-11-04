@@ -7,9 +7,14 @@ from PyQt6.QtGui            import *
 from PyQt6.QtWidgets        import * 
 from widgets.widgets        import SCR_WDG_Widget
 from widgets.widgets        import SCR_WDG_Table
+from widgets.widgets        import SCR_WDG_Tab
+from widgets.widgets        import SCR_WDG_TextEdit
 from widgets.plugin_manager import SCR_Plugin
 from control.control        import SCR_Control_TestCase
 from control.control        import SCR_Control_Keyword
+from control.control        import SCR_Control_TestSuite
+from control.control        import SCR_Control_Resource
+from control.control        import SCR_Control_Library
 from model.model            import SCR_Base_List
 
 """******************************************************************************************
@@ -27,6 +32,9 @@ class SCR_EditorPlugin(SCR_Plugin):
                                 config=config,
                                 logger=logger,
                                 preferences=preferences)
+
+        self.tab_settings_index = 0 
+        self.tab_steps_index    = 1
 
     def load(self):
         """
@@ -49,17 +57,70 @@ class SCR_EditorPlugin(SCR_Plugin):
         Create all widgets and objects needed to draw the plugin UI
         """
 
-        self.table = SCR_WDG_Table(
-                                    config=self.config, 
-                                    model_class=SCR_WDG_EditorGrid_Model)
+        self.wdg_tab = SCR_WDG_Tab(self.config)
 
-        self.table.setWordWrap(True)
+        self.draw_tab_settings()
+
+        self.draw_tab_steps()
 
         self.ly = QVBoxLayout()
 
-        self.ly.addWidget(self.table)    
+        self.ly.addWidget(self.wdg_tab)
 
-        self.setLayout(self.ly)
+        self.setLayout(self.ly) 
+
+        self.wdg_tab.setTabVisible(self.tab_settings_index,False)
+        self.wdg_tab.setTabVisible(self.tab_steps_index,False)
+
+    def draw_tab_settings(self):
+        """
+        Create settings tab widgets
+        """
+
+        self.wdg_tab_settings = self.wdg_tab.add_tab("Settings")
+        self.wdg_doc          = SCR_WDG_DocumentationEditor(self.config)
+        self.wdg_import       = SCR_WDG_ImporterEditor(self.config)
+        self.wdg_tags         = SCR_WDG_TagsEditor(self.config)
+
+        self.wdg_doc.setMinimumHeight(50)
+        self.wdg_import.setMinimumHeight(50)
+        self.wdg_tags.setMinimumHeight(50)
+
+        self.ly_tab_settings  = QVBoxLayout()
+
+        self.ly_tab_settings.addWidget(self.wdg_doc)    
+        self.ly_tab_settings.addWidget(self.wdg_tags)    
+        self.ly_tab_settings.addWidget(self.wdg_import)  
+
+        #set the stresch factor of widget with index 0 to 5/10
+        self.ly_tab_settings.setStretch(0, 4)  
+
+        #set the stresch factor of widget with index 1 to 2/10
+        self.ly_tab_settings.setStretch(1, 2) 
+
+        #set the stresch factor of widget with index 2 to 3/10
+        self.ly_tab_settings.setStretch(2, 4) 
+
+        self.wdg_tab_settings.setLayout(self.ly_tab_settings)      
+
+    def draw_tab_steps(self):
+        """
+        Create statements tab widgets
+        """
+
+        self.wdg_tab_steps = self.wdg_tab.add_tab("Steps")
+
+        self.wdg_table_steps = SCR_WDG_Table(
+                                    config=self.config, 
+                                    model_class=SCR_WDG_EditorGrid_Model)
+
+        self.wdg_table_steps.setWordWrap(True)
+
+        self.ly_tab_steps = QVBoxLayout()
+
+        self.ly_tab_steps.addWidget(self.wdg_table_steps)    
+
+        self.wdg_tab_steps.setLayout(self.ly_tab_steps)
 
     def subscribe(self):
         """
@@ -76,11 +137,36 @@ class SCR_EditorPlugin(SCR_Plugin):
         #only test case and keyword populate the editor table
         if type(data) in [SCR_Control_TestCase,SCR_Control_Keyword]:
 
-            #empty entire table
-            self.table.clear()
+            #empty entire steps table
+            self.wdg_table_steps.clear()
 
-            #populate table with new controller
-            self.table.populate(data)
+            #populate steps table with new controller
+            self.wdg_table_steps.populate(data)
+
+            #populate settings documentation with new controller
+            self.wdg_doc.populate(data)
+
+            #set visibility of editor tabs
+            self.wdg_tab.setTabVisible(self.tab_settings_index,True)
+            self.wdg_tab.setTabVisible(self.tab_steps_index,True)
+
+        elif type(data) in [SCR_Control_TestSuite,SCR_Control_Resource]:
+
+            #empty entire steps table
+            self.wdg_table_steps.clear()
+
+            #populate settings documentation with new controller
+            self.wdg_doc.populate(data)
+
+            #set visibility of editor tabs
+            self.wdg_tab.setTabVisible(self.tab_settings_index,True)
+            self.wdg_tab.setTabVisible(self.tab_steps_index,False)
+
+        else:
+
+            #set visibility of editor tabs
+            self.wdg_tab.setTabVisible(self.tab_settings_index,False)
+            self.wdg_tab.setTabVisible(self.tab_steps_index,False)
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -188,7 +274,6 @@ class SCR_WDG_EditorGrid_Item(object):
         self.font = QFont(type)
         self.font.setBold(bold)
         self.font.setPointSize(size)
-
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -394,3 +479,60 @@ class SCR_WDG_EditorGrid_Model(QAbstractItemModel):
                 _item.clear()
 
         self.endResetModel()
+
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_WDG_DocumentationEditor(SCR_WDG_TextEdit):
+
+    def __init__(self,config):
+
+        SCR_WDG_TextEdit.__init__(self,config)
+
+        self.data = None
+
+        _css = ""
+        _css += "background-color: {};".format(self.config.get_theme_color_background())
+        _css += "color: {};".format(self.config.get_theme_color_foreground(),)  
+        _css += "border: 1px solid {};".format(self.config.get_theme_color_border())
+
+        self.setStyleSheet(_css)
+
+    def populate(self,data):
+
+        self.data = data
+
+        self.setText(self.data.get_doc())
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_WDG_TagsEditor(SCR_WDG_Widget):
+
+    def __init__(self,config):
+
+        SCR_WDG_Widget.__init__(self,config)
+
+        _css = ""
+        _css += "background-color: {};".format(self.config.get_theme_color_background())
+        _css += "color: {};".format(self.config.get_theme_color_foreground(),)  
+        _css += "border: 1px solid {};".format(self.config.get_theme_color_border())
+
+        self.setStyleSheet(_css)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+class SCR_WDG_ImporterEditor(SCR_WDG_Widget):
+
+    def __init__(self,config):
+
+        SCR_WDG_Widget.__init__(self,config)
+
+        _css = ""
+        _css += "background-color: {};".format(self.config.get_theme_color_background())
+        _css += "color: {};".format(self.config.get_theme_color_foreground(),)  
+        _css += "border: 1px solid {};".format(self.config.get_theme_color_border())
+
+        self.setStyleSheet(_css)
